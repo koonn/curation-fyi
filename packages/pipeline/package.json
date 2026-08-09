@@ -1,0 +1,21 @@
+{
+  "name": "@curation-fyi/pipeline",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "collect": "tsx src/index.ts collect",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@curation-fyi/shared": "workspace:*",
+    "rss-parser": "^3.13.0",
+    "ulid": "^3.0.0",
+    "yaml": "^2.7.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.1",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0"
+  }
+}

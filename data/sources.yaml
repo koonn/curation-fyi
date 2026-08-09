@@ -1,0 +1,55 @@
+# 収集ソースのマスタ。1エントリ = 1収集元。
+# fetcher: rss | hn_api | arxiv_api | hatena_hotentry | custom:<name>
+- id: mercari-engineering
+  name: メルカリ Engineering Blog
+  type: company_blog
+  language: ja
+  site_url: https://engineering.mercari.com/
+  feed_url: https://engineering.mercari.com/blog/feed.xml
+  fetcher: rss
+  enabled: true
+
+- id: cookpad-techlife
+  name: クックパッド開発者ブログ
+  type: company_blog
+  language: ja
+  site_url: https://techlife.cookpad.com/
+  feed_url: https://techlife.cookpad.com/rss
+  fetcher: rss
+  enabled: true
+
+- id: cloudflare-blog
+  name: The Cloudflare Blog
+  type: company_blog
+  language: en
+  site_url: https://blog.cloudflare.com/
+  feed_url: https://blog.cloudflare.com/rss/
+  fetcher: rss
+  enabled: true
+
+- id: stripe-blog
+  name: Stripe Blog
+  type: company_blog
+  language: en
+  site_url: https://stripe.com/blog
+  feed_url: https://stripe.com/blog/feed.rss
+  fetcher: rss
+  enabled: true
+
+- id: martinfowler
+  name: martinfowler.com
+  type: personal_blog
+  language: en
+  site_url: https://martinfowler.com/
+  feed_url: https://martinfowler.com/feed.atom
+  fetcher: rss
+  enabled: true
+
+- id: jxck
+  name: blog.jxck.io
+  type: personal_blog
+  language: ja
+  site_url: https://blog.jxck.io/
+  feed_url: https://blog.jxck.io/feeds/atom.xml
+  fetcher: rss
+  enabled: true
