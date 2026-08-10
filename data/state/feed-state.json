@@ -1,0 +1,56 @@
+{
+  "mercari-engineering": {
+    "etag": null,
+    "last_modified": null,
+    "consecutive_failures": 0,
+    "last_success": "2026-08-10T23:08:11.037Z"
+  },
+  "cookpad-techlife": {
+    "etag": null,
+    "last_modified": null,
+    "consecutive_failures": 0,
+    "last_success": "2026-08-10T23:08:11.037Z"
+  },
+  "cloudflare-blog": {
+    "etag": null,
+    "last_modified": "Mon, 10 Aug 2026 18:45:10 GMT",
+    "consecutive_failures": 0,
+    "last_success": "2026-08-10T23:08:11.037Z"
+  },
+  "stripe-blog": {
+    "etag": null,
+    "last_modified": null,
+    "consecutive_failures": 0,
+    "last_success": "2026-08-10T23:08:11.037Z"
+  },
+  "martinfowler": {
+    "etag": "\"2ef6a-658545f9ebe40\"",
+    "last_modified": "Wed, 05 Aug 2026 22:34:25 GMT",
+    "consecutive_failures": 0,
+    "last_success": "2026-08-10T23:08:11.037Z"
+  },
+  "jxck": {
+    "etag": "\"6a70869e-a486\"",
+    "last_modified": "Mon, 03 Aug 2026 12:16:30 GMT",
+    "consecutive_failures": 0,
+    "last_success": "2026-08-10T23:08:11.037Z"
+  },
+  "hn-frontpage": {
+    "etag": null,
+    "last_modified": null,
+    "consecutive_failures": 0,
+    "last_success": "2026-08-10T23:08:11.037Z"
+  },
+  "hatena-hotentry-it": {
+    "etag": null,
+    "last_modified": null,
+    "consecutive_failures": 0,
+    "last_success": "2026-08-10T23:08:11.037Z"
+  },
+  "arxiv-cs": {
+    "etag": null,
+    "last_modified": null,
+    "consecutive_failures": 0,
+    "last_success": "2026-08-10T23:08:11.037Z"
+  }
+}

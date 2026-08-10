@@ -1,11 +1,14 @@
 import Parser from "rss-parser";
 import type { Source } from "@curation-fyi/shared";
 import { normalizeUrl } from "../normalize.ts";
+import type { SourceState } from "../state.ts";
 import type { FetchedItem } from "./types.ts";
+
+const USER_AGENT = "curation-fyi/0.1 (+https://github.com/koonn/curation-fyi)";
 
 const parser = new Parser({
   timeout: 20_000,
-  headers: { "User-Agent": "curation-fyi/0.1 (+https://github.com/koonn/curation-fyi)" },
+  headers: { "User-Agent": USER_AGENT },
 });
 
 const SUMMARY_MAX = 300;
@@ -17,11 +20,32 @@ export function toSummary(snippet: string | undefined): string | null {
   return text.length > SUMMARY_MAX ? text.slice(0, SUMMARY_MAX) + "…" : text;
 }
 
-export async function fetchRss(source: Source): Promise<FetchedItem[]> {
+export interface RssFetchResult {
+  items: FetchedItem[];
+  notModified: boolean;
+  /** 200応答時のみ設定。ヘッダが無ければnull */
+  etag?: string | null;
+  lastModified?: string | null;
+}
+
+export async function fetchRss(source: Source, state: SourceState): Promise<RssFetchResult> {
   if (!source.feed_url) {
     throw new Error(`feed_url がありません: ${source.id}`);
   }
-  const feed = await parser.parseURL(source.feed_url);
+  const headers: Record<string, string> = { "User-Agent": USER_AGENT };
+  if (state.etag) headers["If-None-Match"] = state.etag;
+  if (state.last_modified) headers["If-Modified-Since"] = state.last_modified;
+
+  const res = await fetch(source.feed_url, { headers });
+  if (res.status === 304) {
+    return { items: [], notModified: true };
+  }
+  if (!res.ok) {
+    throw new Error(`Status code ${res.status}`);
+  }
+
+  const body = await res.text();
+  const feed = await parser.parseString(body);
   const items: FetchedItem[] = [];
   for (const item of feed.items) {
     if (!item.link || !item.title) continue;
@@ -36,5 +60,10 @@ export async function fetchRss(source: Source): Promise<FetchedItem[]> {
       language: source.language === "mixed" ? "en" : source.language,
     });
   }
-  return items;
+  return {
+    items,
+    notModified: false,
+    etag: res.headers.get("etag"),
+    lastModified: res.headers.get("last-modified"),
+  };
 }

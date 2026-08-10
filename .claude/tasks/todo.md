@@ -57,6 +57,7 @@
 - 検証1: `pnpm collect` → `✓ hatena-hotentry-it: 新規 30 件`（期待15〜30の範囲内、上限ぴったり）
 - 検証2: `grep -h hatebu_count data/articles/*.jsonl | wc -l` → **30**（期待15以上）
 - 検証3（追加確認）: 重複URLチェック → 0
+- CI検証: `gh workflow run collect` (run 31416416137) 成功、mercari-engineeringのみ既知403
 
 ### A-4: arXiv fetcher（fetchers/arxiv.ts）— 完了（2026-08-11）
 
@@ -68,6 +69,16 @@
 - 検証1: `pnpm collect` → `✓ arxiv-cs: 新規 50 件`（期待40〜50の範囲内、上限）
 - 検証2: バージョン接尾辞残存チェック → **0**
 - 検証3（追加確認）: 重複URLチェック → 0
+- CI検証: `gh workflow run collect` (run 31440457053) 成功、mercari-engineeringのみ既知403
+
+### A-5: Conditional GET と失敗カウント — 完了（2026-08-11）
+
+- `data/state/feed-state.json` 新規（git管理）。`state.ts` に load/save/defaultSourceState を実装
+- `fetchers/rss.ts`: `parser.parseURL` → `fetch()` + `parser.parseString()` に変更。If-None-Match/If-Modified-Sinceを送信、304時は`{items:[], notModified:true}`を返す
+- `collect.ts`: ソースごとに成功時 `consecutive_failures=0`・`last_success`更新、失敗時 `+=1`。`consecutive_failures>=7` のソースがあれば `GITHUB_STEP_SUMMARY`（存在時のみ）に見出し+表を追記
+- typecheck: 通過
+- 検証1: `pnpm collect` を2回連続実行 → 2回目のログに `304 Not Modified` **3件**（cloudflare-blog / martinfowler / jxck。期待1件以上）
+- 検証2: `stripe-blog` の feed_url を存在しないURLに変えて7回実行 → `consecutive_failures` が **7** になり、`GITHUB_STEP_SUMMARY` に見出し+表（stripe-blog, 7, 最終成功日時）が出力されることを確認。検証後 feed_url を戻し正常実行1回で `consecutive_failures` が **0** に復旧したことを確認
 
 ## レビュー（v0 実装分）
 
