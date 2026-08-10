@@ -70,3 +70,11 @@
   feed_url: https://b.hatena.ne.jp/hotentry/it.rss
   fetcher: hatena_hotentry
   enabled: true
+
+- id: arxiv-cs
+  name: arXiv (cs.AI / cs.LG / cs.CL / cs.SE)
+  type: paper
+  language: en
+  site_url: https://arxiv.org/
+  fetcher: arxiv_api
+  enabled: true

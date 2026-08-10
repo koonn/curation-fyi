@@ -58,6 +58,17 @@
 - 検証2: `grep -h hatebu_count data/articles/*.jsonl | wc -l` → **30**（期待15以上）
 - 検証3（追加確認）: 重複URLチェック → 0
 
+### A-4: arXiv fetcher（fetchers/arxiv.ts）— 完了（2026-08-11）
+
+- `fetchers/arxiv.ts` 新規作成。rss-parserでAtomフィードをパース、entry.id からバージョン接尾辞(`v\d+`)を除去してarxiv_idとurlを生成
+- `noUncheckedIndexedAccess` により正規表現マッチの `m[1]` が `string | undefined` になる点を `m?.[1] ?? null` で対応（tsconfig.base.jsonの既存設定、実装時に typecheck で検出）
+- `collect.ts` のディスパッチに `arxiv_api` を追加
+- `data/sources.yaml` に `arxiv-cs` を追記
+- typecheck: 通過
+- 検証1: `pnpm collect` → `✓ arxiv-cs: 新規 50 件`（期待40〜50の範囲内、上限）
+- 検証2: バージョン接尾辞残存チェック → **0**
+- 検証3（追加確認）: 重複URLチェック → 0
+
 ## レビュー（v0 実装分）
 
 - 初回収集で463記事（6ソース、2016年〜のバックフィル含む）。CI初回コミットで464件
