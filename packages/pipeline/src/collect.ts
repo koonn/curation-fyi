@@ -3,6 +3,7 @@ import type { Article, Source } from "@curation-fyi/shared";
 import { loadSources } from "./sources.ts";
 import { fetchRss } from "./fetchers/rss.ts";
 import { fetchHackernews } from "./fetchers/hackernews.ts";
+import { fetchHatena } from "./fetchers/hatena.ts";
 import type { FetchedItem } from "./fetchers/types.ts";
 import { loadExisting, saveAll } from "./store.ts";
 
@@ -12,6 +13,8 @@ async function fetchItems(source: Source): Promise<FetchedItem[]> {
       return fetchRss(source);
     case "hn_api":
       return fetchHackernews(source);
+    case "hatena_hotentry":
+      return fetchHatena(source);
     default:
       throw new Error(`未対応のfetcher: ${source.fetcher} (${source.id})`);
   }

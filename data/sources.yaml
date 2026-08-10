@@ -61,3 +61,12 @@
   site_url: https://news.ycombinator.com/
   fetcher: hn_api
   enabled: true
+
+- id: hatena-hotentry-it
+  name: はてなブックマーク 人気エントリー（テクノロジー）
+  type: aggregator
+  language: ja
+  site_url: https://b.hatena.ne.jp/hotentry/it
+  feed_url: https://b.hatena.ne.jp/hotentry/it.rss
+  fetcher: hatena_hotentry
+  enabled: true

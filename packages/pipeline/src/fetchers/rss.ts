@@ -10,7 +10,7 @@ const parser = new Parser({
 
 const SUMMARY_MAX = 300;
 
-function toSummary(snippet: string | undefined): string | null {
+export function toSummary(snippet: string | undefined): string | null {
   if (!snippet) return null;
   const text = snippet.replace(/\s+/g, " ").trim();
   if (text === "") return null;

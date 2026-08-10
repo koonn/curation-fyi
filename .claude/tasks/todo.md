@@ -47,6 +47,17 @@
 - 検証4（A-1のmergeパス実運動）: 3回目の `pnpm collect` で `hn-frontpage: metrics更新 48 件` を確認。git diffで記事のid・件数が不変でmetrics値のみ更新されていることを目視確認
 - CI検証: `gh workflow run collect` (run 31416416137) → 成功。ログ `✓ hn-frontpage: 新規 1 件 / metrics更新 47 件`（mercari-engineeringのみ既知の403、A-6で対処予定）
 
+### A-3: はてなブックマーク fetcher（fetchers/hatena.ts）— 完了（2026-08-11）
+
+- `fetchers/hatena.ts` 新規作成。rss-parser の customFields で `hatena:bookmarkcount`/`dc:date` を取得
+- `toSummary` を `fetchers/rss.ts` から export し共通利用
+- `collect.ts` のディスパッチに `hatena_hotentry` を追加
+- `data/sources.yaml` に `hatena-hotentry-it` を追記
+- typecheck: 通過
+- 検証1: `pnpm collect` → `✓ hatena-hotentry-it: 新規 30 件`（期待15〜30の範囲内、上限ぴったり）
+- 検証2: `grep -h hatebu_count data/articles/*.jsonl | wc -l` → **30**（期待15以上）
+- 検証3（追加確認）: 重複URLチェック → 0
+
 ## レビュー（v0 実装分）
 
 - 初回収集で463記事（6ソース、2016年〜のバックフィル含む）。CI初回コミットで464件
