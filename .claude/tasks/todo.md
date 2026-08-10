@@ -45,7 +45,7 @@
 - 検証2: `grep -h hn_points data/articles/*.jsonl | wc -l` → **48**（期待20以上）
 - 検証3（追加確認）: 重複URLチェック → 0
 - 検証4（A-1のmergeパス実運動）: 3回目の `pnpm collect` で `hn-frontpage: metrics更新 48 件` を確認。git diffで記事のid・件数が不変でmetrics値のみ更新されていることを目視確認
-- CI検証はpush後に `gh workflow run collect` で別途実施（結果は下記に追記）
+- CI検証: `gh workflow run collect` (run 31416416137) → 成功。ログ `✓ hn-frontpage: 新規 1 件 / metrics更新 47 件`（mercari-engineeringのみ既知の403、A-6で対処予定）
 
 ## レビュー（v0 実装分）
 
