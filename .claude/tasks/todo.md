@@ -101,6 +101,7 @@
   - 原因: (a) design.mdは「jxck/cookpadのフィードは本文全文を含む」としていたが、実データではjxckのAtomフィードは要約のみで本文全文を含まない（`content`/`content:encoded`フィールドなし）。本文全文を持つのはcookpadのみ（実測: 直近30件中14件がコード片を含む）
   - (b) A-1の設計上、既存記事（`existing.has(url)`）はmetricsマージ以外のフィールドを書き換えない。cookpadの既存30件は全てv0時点で取得済み（has_code判定が実装される前）で、今回のcollectでもcookpadの新着は0件のため、has_code判定が走る対象がまだ存在しない
   - 対応: 実装は変更せず維持。cookpadに新着記事が出た次回以降のcollectで自然にhas_code:trueが現れる想定。mixedソース同様「実装とテストのみ行う」の扱いとして先へ進む
+- CI検証: `gh workflow run collect` (run 31443563975) 成功。hatena-hotentry-itがCIで3回連続タイムアウト中（`consecutive_failures: 3`）。A-5の失敗カウント機構どおり追跡されており、7回に達すればGITHUB_STEP_SUMMARYで可視化される。現時点では実害なし・監視継続
 
 ## レビュー（v0 実装分）
 
