@@ -79,6 +79,7 @@
 - typecheck: 通過
 - 検証1: `pnpm collect` を2回連続実行 → 2回目のログに `304 Not Modified` **3件**（cloudflare-blog / martinfowler / jxck。期待1件以上）
 - 検証2: `stripe-blog` の feed_url を存在しないURLに変えて7回実行 → `consecutive_failures` が **7** になり、`GITHUB_STEP_SUMMARY` に見出し+表（stripe-blog, 7, 最終成功日時）が出力されることを確認。検証後 feed_url を戻し正常実行1回で `consecutive_failures` が **0** に復旧したことを確認
+- CI検証: `gh workflow run collect` (run 31441640725) 成功。ログに `304 Not Modified` **3件**（cloudflare-blog/martinfowler/jxck）。mercari-engineeringは既知403。arxiv-csが一時的に20秒タイムアウトで失敗したが、これはA-5のconsecutive_failuresが正しく1として記録する想定どおりの動作（7回連続しない限り実害なし。次回CI実行で回復を確認する）
 
 ## レビュー（v0 実装分）
 
