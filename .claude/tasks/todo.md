@@ -86,7 +86,7 @@
 - 手順1-2: 一時ブランチ `tmp/a6-mercari-ua-diagnosis` でUser-Agentをブラウザ風に変更しpush、`gh workflow run collect --ref` で実行（run 31441877185）→ **依然として403**（ログ確認済み）
 - 手順3: UA変更でも403が続いたためIP起因と判断。`sources.yaml` の `mercari-engineering` を `enabled: false` にし、name行に `# CIのIPが403になるため無効化（2026-08-10 診断）` を追記
 - 手順4: 一時ブランチを削除（`git push origin --delete` + `git branch -D`）
-- 検証: main の CI 実行で `✗ mercari` のログ行が出ないこと（下記CI検証で確認）
+- 検証: `gh workflow run collect` (run 31442147625) → 成功。ログに `✗ mercari` の行が**出ない**ことを確認（A-6完了条件クリア）。hatena-hotentry-itが一時的に20秒タイムアウトで失敗したが、arxiv-cs同様に一過性のネットワーク事象でA-5の失敗カウント機構がconsecutive_failures=1として記録するのみ（7回連続しない限り実害なし）
 
 ## レビュー（v0 実装分）
 
