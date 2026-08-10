@@ -1,13 +1,13 @@
 # 収集ソースのマスタ。1エントリ = 1収集元。
 # fetcher: rss | hn_api | arxiv_api | hatena_hotentry | custom:<name>
 - id: mercari-engineering
-  name: メルカリ Engineering Blog
+  name: メルカリ Engineering Blog # CIのIPが403になるため無効化（2026-08-10 診断）
   type: company_blog
   language: ja
   site_url: https://engineering.mercari.com/
   feed_url: https://engineering.mercari.com/blog/feed.xml
   fetcher: rss
-  enabled: true
+  enabled: false
 
 - id: cookpad-techlife
   name: クックパッド開発者ブログ

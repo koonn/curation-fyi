@@ -81,6 +81,13 @@
 - 検証2: `stripe-blog` の feed_url を存在しないURLに変えて7回実行 → `consecutive_failures` が **7** になり、`GITHUB_STEP_SUMMARY` に見出し+表（stripe-blog, 7, 最終成功日時）が出力されることを確認。検証後 feed_url を戻し正常実行1回で `consecutive_failures` が **0** に復旧したことを確認
 - CI検証: `gh workflow run collect` (run 31441640725) 成功。ログに `304 Not Modified` **3件**（cloudflare-blog/martinfowler/jxck）。mercari-engineeringは既知403。arxiv-csが一時的に20秒タイムアウトで失敗したが、これはA-5のconsecutive_failuresが正しく1として記録する想定どおりの動作（7回連続しない限り実害なし。次回CI実行で回復を確認する）
 
+### A-6: mercari 403の対処 — 完了（2026-08-11）
+
+- 手順1-2: 一時ブランチ `tmp/a6-mercari-ua-diagnosis` でUser-Agentをブラウザ風に変更しpush、`gh workflow run collect --ref` で実行（run 31441877185）→ **依然として403**（ログ確認済み）
+- 手順3: UA変更でも403が続いたためIP起因と判断。`sources.yaml` の `mercari-engineering` を `enabled: false` にし、name行に `# CIのIPが403になるため無効化（2026-08-10 診断）` を追記
+- 手順4: 一時ブランチを削除（`git push origin --delete` + `git branch -D`）
+- 検証: main の CI 実行で `✗ mercari` のログ行が出ないこと（下記CI検証で確認）
+
 ## レビュー（v0 実装分）
 
 - 初回収集で463記事（6ソース、2016年〜のバックフィル含む）。CI初回コミットで464件
