@@ -1,21 +1,36 @@
-# curation-fyi v0 実装 TODO
+# curation-fyi タスク台帳
 
-計画: `~/.claude/plans/jaunty-plotting-dragonfly.md`（承認済み）
+- 全体計画: `~/.claude/plans/jaunty-plotting-dragonfly.md`（承認済み）
+- **v0.5 / v1 の実装指示書: `.claude/tasks/design.md`**（実装セッションはまずこれを読む）
 
-## v0（最小動作）
+## v0（最小動作）— 完了
 
-- [ ] git init + pnpm workspace 初期化
-- [ ] packages/shared: Article/Source 型定義
-- [ ] data/sources.yaml: RSSソース5本（フィードURLは実フェッチで検証してから登録）
-- [ ] packages/pipeline: rss fetcher + URL正規化 + 重複排除 + JSONL追記 + collect CLI
-- [ ] packages/site: Astro トップページ（新着100件一覧）
-- [ ] .github/workflows/collect.yml（cron 6時間ごと）
-- [ ] 検証: `pnpm collect` 2回実行で重複0件（`jq .url | sort | uniq -d` 空）
-- [ ] 検証: 1ソースの feed_url を故意に壊して他ソースが成功すること
-- [ ] 検証: `pnpm build` でサイトが生成され記事一覧が表示されること
-- [ ] GitHub public repo 作成 + push（ユーザー確認後）
-- [ ] Cloudflare Pages 接続（ユーザー操作が必要）
+- [x] git init + pnpm workspace 初期化
+- [x] packages/shared: Article/Source 型定義
+- [x] data/sources.yaml: RSSソース6本（全URLを実フェッチで200確認してから登録）
+- [x] packages/pipeline: rss fetcher + URL正規化 + 重複排除 + JSONL追記 + collect CLI
+- [x] packages/site: Astro トップページ（新着100件一覧）
+- [x] .github/workflows/collect.yml（cron 6時間ごと）
+- [x] 検証: `pnpm collect` 2回実行で2回目は新規0件・重複URL 0件（463件中）
+- [x] 検証: stripe の feed_url を故意に壊して他5ソースが成功（失敗分離OK）
+- [x] 検証: `pnpm build` 成功、dist/index.html に記事カード100件・日英混在（ja42/en58）
+- [x] typecheck 全パッケージ通過
+- [x] GitHub public repo 作成 + push（koonn/curation-fyi、ユーザー承認済み）
+- [x] CI 検証: workflow_dispatch 実行が成功（24秒）し、data/ の自動コミットが main に載った（52bfb6f）
+- [ ] Cloudflare Pages 接続（**ユーザー操作待ち**: CF ダッシュボード → Workers & Pages → Pages → Connect to Git → koonn/curation-fyi、Build command `pnpm build`、Build output `packages/site/dist`）
+- [ ] 検証: cron が48時間で8回成功し無操作で本番に新記事反映（デプロイ後に確認）
 
-## レビュー
+## v0.5 / v1 — 未着手（実装は design.md の A-1〜B-5 の順）
 
-（完了時に記載）
+実装セッションへ: 各タスクの「検証」の実測値をこのファイルに記録してから次へ進むこと。
+
+## レビュー（v0 実装分）
+
+- 初回収集で463記事（6ソース、2016年〜のバックフィル含む）。CI初回コミットで464件
+- 発見して修正したバグ2件:
+  1. 同一フィード内の同一URL重複（martinfowler の atom は記事更新ごとに同一リンクの
+     エントリを持つ）→ フィード内 seen セットで排除
+  2. CI で collect がハング（フェッチ失敗時に残るソケットがイベントループを維持。
+     ローカルでは全ソース成功のため再現しなかった）→ 明示的 process.exit + timeout-minutes: 15
+- 既知の問題: mercari-engineering が CI の IP からのみ 403（対処手順は design.md タスク A-6）
+- コミット: 8b2ecd9（v0）、5347ada（CIハング修正）、52bfb6f（CI初回データ）
