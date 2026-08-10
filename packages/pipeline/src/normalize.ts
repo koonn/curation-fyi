@@ -1,3 +1,6 @@
+import { detect } from "tinyld";
+import type { Language } from "@curation-fyi/shared";
+
 const TRACKING_PARAMS = /^(utm_|fbclid$|gclid$|ref$|source$)/;
 
 /**
@@ -17,4 +20,15 @@ export function normalizeUrl(input: string): string {
     u.pathname = u.pathname.replace(/\/+$/, "");
   }
   return u.toString();
+}
+
+/**
+ * source.language === "mixed" の記事単位言語判定に使う。
+ * 本サイトの言語軸は2値（ja/en）。zh/ko等もen側に倒す（決定済みの仕様）。
+ */
+export function detectLanguage(text: string, fallback: Language): Language {
+  const detected = detect(text);
+  if (detected === "ja") return "ja";
+  if (detected === "") return fallback;
+  return "en";
 }

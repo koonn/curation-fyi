@@ -9,4 +9,5 @@ export interface FetchedItem {
   language: Language;
   external_ids?: ExternalIds;
   metrics?: Metrics;
+  has_code?: boolean | null;
 }

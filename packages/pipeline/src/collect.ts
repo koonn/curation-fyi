@@ -73,7 +73,7 @@ function mergeItems(
         language: item.language,
         source_id: source.id,
         tags: source.default_tags ?? [],
-        has_code: null,
+        has_code: item.has_code ?? null,
         external_ids: item.external_ids ?? {},
         metrics: item.metrics ?? {},
       };

@@ -10,6 +10,7 @@
   "dependencies": {
     "@curation-fyi/shared": "workspace:*",
     "rss-parser": "^3.13.0",
+    "tinyld": "^1.3.4",
     "ulid": "^3.0.0",
     "yaml": "^2.7.0"
   },

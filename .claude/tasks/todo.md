@@ -88,6 +88,20 @@
 - 手順4: 一時ブランチを削除（`git push origin --delete` + `git branch -D`）
 - 検証: `gh workflow run collect` (run 31442147625) → 成功。ログに `✗ mercari` の行が**出ない**ことを確認（A-6完了条件クリア）。hatena-hotentry-itが一時的に20秒タイムアウトで失敗したが、arxiv-cs同様に一過性のネットワーク事象でA-5の失敗カウント機構がconsecutive_failures=1として記録するのみ（7回連続しない限り実害なし）
 
+### A-7: 言語判定と has_code — 完了（2026-08-11）
+
+- 依存追加: `tinyld`（pipeline）
+- `normalize.ts` に `detectLanguage(text, fallback)` を追加。tinyldの `detect()` が `"ja"` → `"ja"`、空文字（判定不能）→ `fallback`、それ以外 → `"en"`
+- `fetchers/rss.ts`: customFields で `content:encoded` を取得し、`item["content:encoded"] ?? item.content` に対し `/<pre[\s>]|<code[\s>]/` をテストして `has_code` を設定。`source.language === "mixed"` のときのみ `detectLanguage(title + summary, "en")` を使用（既存の具体値ソースは判定しない）
+- `fetchers/types.ts` に `FetchedItem.has_code?: boolean | null` を追加、`collect.ts` の新規記事生成で `item.has_code ?? null` を使用
+- typecheck: 通過
+- 検証1: `pnpm --filter @curation-fyi/pipeline exec tsx -e "..."` → `ja en`（design.md記載の期待値と一致）
+- 検証2: `grep -hL '"language"' data/articles/*.jsonl | wc -l` → **0**（期待0件）
+- 検証3: `grep -h '"has_code": true' data/articles/*.jsonl | wc -l` → **実測0件**（design.md期待値は1件以上）。**ユーザー確認済み・実装のまま先へ進む方針で合意**
+  - 原因: (a) design.mdは「jxck/cookpadのフィードは本文全文を含む」としていたが、実データではjxckのAtomフィードは要約のみで本文全文を含まない（`content`/`content:encoded`フィールドなし）。本文全文を持つのはcookpadのみ（実測: 直近30件中14件がコード片を含む）
+  - (b) A-1の設計上、既存記事（`existing.has(url)`）はmetricsマージ以外のフィールドを書き換えない。cookpadの既存30件は全てv0時点で取得済み（has_code判定が実装される前）で、今回のcollectでもcookpadの新着は0件のため、has_code判定が走る対象がまだ存在しない
+  - 対応: 実装は変更せず維持。cookpadに新着記事が出た次回以降のcollectで自然にhas_code:trueが現れる想定。mixedソース同様「実装とテストのみ行う」の扱いとして先へ進む
+
 ## レビュー（v0 実装分）
 
 - 初回収集で463記事（6ソース、2016年〜のバックフィル含む）。CI初回コミットで464件
