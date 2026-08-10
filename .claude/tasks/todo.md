@@ -20,9 +20,19 @@
 - [ ] Cloudflare Pages 接続（**ユーザー操作待ち**: CF ダッシュボード → Workers & Pages → Pages → Connect to Git → koonn/curation-fyi、Build command `pnpm build`、Build output `packages/site/dist`）
 - [ ] 検証: cron が48時間で8回成功し無操作で本番に新記事反映（デプロイ後に確認）
 
-## v0.5 / v1 — 未着手（実装は design.md の A-1〜B-5 の順）
+## v0.5 / v1 — 実装中（design.md の A-1〜B-5 の順）
 
 実装セッションへ: 各タスクの「検証」の実測値をこのファイルに記録してから次へ進むこと。
+
+### A-1: Fetcher インターフェースの整理と aggregator マージ — 完了（2026-08-11）
+
+- `FetchedItem` を `packages/pipeline/src/fetchers/types.ts` に切り出し、`external_ids`/`metrics` を追加（rss fetcher はこの型を import）
+- `store.ts`: `appendArticles` を削除し `saveAll(articles: Iterable<Article>)` を追加（渡された記事を月でグループ化し月ファイルを全量書き直す。sort: published_at 昇順→id 昇順）
+- `collect.ts`: 新規/マージ/スキップの3分岐に変更。`changedMonths` を追跡し、その月に属する既存 Map 全記事を集めて `saveAll` に渡す方式に変更
+- typecheck: 全パッケージ通過（`pnpm typecheck`）
+- 検証1: `pnpm collect` を2回連続実行 → 2回目後 `git diff --stat data/` は**空**（現行6ソースは全てrss単独でaggregatorが未実装のため、metrics変動自体が発生しない。想定どおり）
+- 検証2: 重複URLチェック → **0**
+- 現行6ソースは全てRSS単独のためmerge分岐（新規/aggregator系）は本タスクでは未運用。A-2/A-3でHN・はてブfetcherを追加した時点で実際にmergeパスが動くことを確認する
 
 ## レビュー（v0 実装分）
 

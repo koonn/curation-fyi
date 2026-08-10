@@ -24,10 +24,11 @@ export function loadExisting(): Map<string, Article> {
   return map;
 }
 
-/** published_at の月ごとのシャードに追記する */
-export function appendArticles(articles: Article[]): void {
-  if (articles.length === 0) return;
-  fs.mkdirSync(ARTICLES_DIR, { recursive: true });
+/**
+ * 渡された記事を published_at の月（YYYY-MM）でグループ化し、該当月のファイルを全量書き直す（追記ではない）。
+ * 呼び出し側は変更のあった月に属する記事全件を渡すこと（一部だけ渡すとその月のファイルから記事が失われる）。
+ */
+export function saveAll(articles: Iterable<Article>): void {
   const byMonth = new Map<string, Article[]>();
   for (const a of articles) {
     const month = a.published_at.slice(0, 7); // YYYY-MM
@@ -35,9 +36,17 @@ export function appendArticles(articles: Article[]): void {
     list.push(a);
     byMonth.set(month, list);
   }
+  if (byMonth.size === 0) return;
+  fs.mkdirSync(ARTICLES_DIR, { recursive: true });
   for (const [month, list] of byMonth) {
+    list.sort((a, b) => {
+      if (a.published_at !== b.published_at) {
+        return a.published_at < b.published_at ? -1 : 1;
+      }
+      return a.id < b.id ? -1 : a.id > b.id ? 1 : 0;
+    });
     const file = path.join(ARTICLES_DIR, `${month}.jsonl`);
     const body = list.map((a) => JSON.stringify(a)).join("\n") + "\n";
-    fs.appendFileSync(file, body);
+    fs.writeFileSync(file, body);
   }
 }

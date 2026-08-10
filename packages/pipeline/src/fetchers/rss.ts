@@ -1,14 +1,7 @@
 import Parser from "rss-parser";
-import type { Language, Source } from "@curation-fyi/shared";
+import type { Source } from "@curation-fyi/shared";
 import { normalizeUrl } from "../normalize.ts";
-
-export interface FetchedItem {
-  url: string;
-  title: string;
-  summary: string | null;
-  published_at: string;
-  language: Language;
-}
+import type { FetchedItem } from "./types.ts";
 
 const parser = new Parser({
   timeout: 20_000,
