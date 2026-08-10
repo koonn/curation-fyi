@@ -33,6 +33,19 @@
 - 検証1: `pnpm collect` を2回連続実行 → 2回目後 `git diff --stat data/` は**空**（現行6ソースは全てrss単独でaggregatorが未実装のため、metrics変動自体が発生しない。想定どおり）
 - 検証2: 重複URLチェック → **0**
 - 現行6ソースは全てRSS単独のためmerge分岐（新規/aggregator系）は本タスクでは未運用。A-2/A-3でHN・はてブfetcherを追加した時点で実際にmergeパスが動くことを確認する
+- **追記**: A-2実装後にmergeパスを実運動で確認済み（下記A-2参照）。3回目のcollectでhn-frontpage 48件が「metrics更新」に分岐し、git diffは月ファイルの並び替え＋metrics値の更新のみ（記事内容・件数は不変）、重複URL 0件
+
+### A-2: HN fetcher（fetchers/hackernews.ts）— 完了（2026-08-11）
+
+- `fetchers/hackernews.ts` 新規作成。`fetch()` でHN Algolia APIを叩き、`url === null` の hit（Ask HN等）をスキップ
+- `collect.ts` に `fetchItems()` ディスパッチを追加（`rss` | `hn_api` で分岐、他は未対応throw）
+- `data/sources.yaml` に `hn-frontpage` を追記（`fetcher: hn_api`、`feed_url` なし）
+- typecheck: 通過
+- 検証1: `pnpm collect` → `✓ hn-frontpage: 新規 48 件`（期待20〜50の範囲内）
+- 検証2: `grep -h hn_points data/articles/*.jsonl | wc -l` → **48**（期待20以上）
+- 検証3（追加確認）: 重複URLチェック → 0
+- 検証4（A-1のmergeパス実運動）: 3回目の `pnpm collect` で `hn-frontpage: metrics更新 48 件` を確認。git diffで記事のid・件数が不変でmetrics値のみ更新されていることを目視確認
+- CI検証はpush後に `gh workflow run collect` で別途実施（結果は下記に追記）
 
 ## レビュー（v0 実装分）
 

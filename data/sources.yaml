@@ -53,3 +53,11 @@
   feed_url: https://blog.jxck.io/feeds/atom.xml
   fetcher: rss
   enabled: true
+
+- id: hn-frontpage
+  name: Hacker News Front Page
+  type: aggregator
+  language: en
+  site_url: https://news.ycombinator.com/
+  fetcher: hn_api
+  enabled: true

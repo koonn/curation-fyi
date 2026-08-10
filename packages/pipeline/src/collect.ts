@@ -2,7 +2,20 @@ import { ulid } from "ulid";
 import type { Article, Source } from "@curation-fyi/shared";
 import { loadSources } from "./sources.ts";
 import { fetchRss } from "./fetchers/rss.ts";
+import { fetchHackernews } from "./fetchers/hackernews.ts";
+import type { FetchedItem } from "./fetchers/types.ts";
 import { loadExisting, saveAll } from "./store.ts";
+
+async function fetchItems(source: Source): Promise<FetchedItem[]> {
+  switch (source.fetcher) {
+    case "rss":
+      return fetchRss(source);
+    case "hn_api":
+      return fetchHackernews(source);
+    default:
+      throw new Error(`未対応のfetcher: ${source.fetcher} (${source.id})`);
+  }
+}
 
 interface SourceResult {
   source: Source;
@@ -18,10 +31,7 @@ async function collectSource(
   fetchedAt: string,
   changedMonths: Set<string>,
 ): Promise<{ added: number; merged: number; skipped: number }> {
-  if (source.fetcher !== "rss") {
-    throw new Error(`未対応のfetcher: ${source.fetcher} (${source.id})`);
-  }
-  const items = await fetchRss(source);
+  const items = await fetchItems(source);
   const seenInFeed = new Set<string>(); // 同一フィード内の同一URL（更新entry等）を弾く
   let added = 0;
   let merged = 0;
