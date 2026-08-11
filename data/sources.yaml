@@ -78,3 +78,201 @@
   site_url: https://arxiv.org/
   fetcher: arxiv_api
   enabled: true
+
+- id: github-engineering
+  name: The GitHub Blog (Engineering)
+  type: company_blog
+  language: en
+  site_url: https://github.blog/engineering/
+  feed_url: https://github.blog/engineering/feed/
+  fetcher: rss
+  enabled: true
+
+- id: netflix-techblog
+  name: Netflix TechBlog
+  type: company_blog
+  language: en
+  site_url: https://netflixtechblog.com/
+  feed_url: https://netflixtechblog.com/feed
+  fetcher: rss
+  enabled: true
+
+- id: airbnb-engineering
+  name: Airbnb Engineering
+  type: company_blog
+  language: en
+  site_url: https://medium.com/airbnb-engineering
+  feed_url: https://medium.com/feed/airbnb-engineering
+  fetcher: rss
+  enabled: true
+
+- id: slack-engineering
+  name: Slack Engineering
+  type: company_blog
+  language: en
+  site_url: https://slack.engineering/
+  feed_url: https://slack.engineering/feed/
+  fetcher: rss
+  enabled: true
+
+- id: spotify-engineering
+  name: Spotify Engineering
+  type: company_blog
+  language: en
+  site_url: https://engineering.atspotify.com/
+  feed_url: https://engineering.atspotify.com/feed
+  fetcher: rss
+  enabled: true
+
+- id: dropbox-tech
+  name: Dropbox Tech
+  type: company_blog
+  language: en
+  site_url: https://dropbox.tech/
+  feed_url: https://dropbox.tech/feed
+  fetcher: rss
+  enabled: true
+
+- id: shopify-engineering
+  name: Shopify Engineering # フィード廃止によりHTMLへリダイレクトされXMLパース不能のため無効化（2026-08-10診断）
+  type: company_blog
+  language: en
+  site_url: https://shopify.engineering/
+  feed_url: https://shopify.engineering/blog.atom
+  fetcher: rss
+  enabled: false
+
+- id: meta-engineering
+  name: Engineering at Meta
+  type: company_blog
+  language: en
+  site_url: https://engineering.fb.com/
+  feed_url: https://engineering.fb.com/feed/
+  fetcher: rss
+  enabled: true
+
+- id: discord-engineering
+  name: Discord Engineering
+  type: company_blog
+  language: en
+  site_url: https://discord.com/blog
+  feed_url: https://discord.com/blog/rss.xml
+  fetcher: rss
+  enabled: true
+
+- id: vercel-blog
+  name: Vercel Blog
+  type: company_blog
+  language: en
+  site_url: https://vercel.com/blog
+  feed_url: https://vercel.com/atom
+  fetcher: rss
+  enabled: true
+
+- id: line-yahoo-tech
+  name: LINEヤフー Tech Blog
+  type: company_blog
+  language: ja
+  site_url: https://techblog.lycorp.co.jp/ja/
+  feed_url: https://techblog.lycorp.co.jp/ja/feed/index.xml
+  fetcher: rss
+  enabled: true
+
+- id: cyberagent-developers
+  name: CyberAgent Developers Blog
+  type: company_blog
+  language: ja
+  site_url: https://developers.cyberagent.co.jp/blog/
+  feed_url: https://developers.cyberagent.co.jp/blog/feed/
+  fetcher: rss
+  enabled: true
+
+- id: hatena-developer
+  name: Hatena Developer Blog
+  type: company_blog
+  language: ja
+  site_url: https://developer.hatenastaff.com/
+  feed_url: https://developer.hatenastaff.com/rss
+  fetcher: rss
+  enabled: true
+
+- id: zozo-techblog
+  name: ZOZO TECH BLOG
+  type: company_blog
+  language: ja
+  site_url: https://techblog.zozo.com/
+  feed_url: https://techblog.zozo.com/rss
+  fetcher: rss
+  enabled: true
+
+- id: moneyforward-dev
+  name: Money Forward Developers Blog
+  type: company_blog
+  language: ja
+  site_url: https://moneyforward-dev.jp/
+  feed_url: https://moneyforward-dev.jp/rss
+  fetcher: rss
+  enabled: true
+
+- id: smarthr-tech
+  name: SmartHR Tech Blog
+  type: company_blog
+  language: ja
+  site_url: https://tech.smarthr.jp/
+  feed_url: https://tech.smarthr.jp/feed
+  fetcher: rss
+  enabled: true
+
+- id: dena-engineering
+  name: DeNA Engineering
+  type: company_blog
+  language: ja
+  site_url: https://engineering.dena.com/
+  feed_url: https://engineering.dena.com/index.xml
+  fetcher: rss
+  enabled: true
+
+- id: freee-developers
+  name: freee Developers Hub
+  type: company_blog
+  language: ja
+  site_url: https://developers.freee.co.jp/
+  feed_url: https://developers.freee.co.jp/rss
+  fetcher: rss
+  enabled: true
+
+- id: simonwillison
+  name: Simon Willison's Weblog
+  type: personal_blog
+  language: en
+  site_url: https://simonwillison.net/
+  feed_url: https://simonwillison.net/atom/everything/
+  fetcher: rss
+  enabled: true
+
+- id: overreacted
+  name: overreacted (Dan Abramov)
+  type: personal_blog
+  language: en
+  site_url: https://overreacted.io/
+  feed_url: https://overreacted.io/rss.xml
+  fetcher: rss
+  enabled: true
+
+- id: naoya
+  name: naoyaのはてなダイアリー # 2016年以降更新停止（2026-08-10確認）。手順1どおりフィードは200のため登録
+  type: personal_blog
+  language: ja
+  site_url: https://naoya-2.hatenadiary.org/
+  feed_url: https://naoya-2.hatenadiary.org/rss
+  fetcher: rss
+  enabled: true
+
+- id: azukiazusa
+  name: azukiazusaのテックブログ
+  type: personal_blog
+  language: ja
+  site_url: https://azukiazusa.dev/
+  feed_url: https://azukiazusa.dev/rss.xml
+  fetcher: rss
+  enabled: true
