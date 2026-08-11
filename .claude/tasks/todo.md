@@ -113,8 +113,8 @@
   - `shopify-engineering`: curlでは200だったが実際は `blog.atom` がHTMLトップページへの301リダイレクトになっておりXMLパース不能（`pnpm collect`で✗）。リダイレクト先HTMLにもRSS/Atomリンクなし → 手順3どおりエラーメッセージを記録し `enabled: false`
 - typecheck: 通過
 - 検証1: 有効ソース数 → `loadSources().length` で**29件**（pyyaml未インストールのためdesign.md記載のpython3+yamlコマンドの代わりに、本番と同じsources.tsのloaderで計測。期待25以上をクリア）
-- 検証2: `pnpm collect` の失敗ソース → 複数回実行中に `hatena-hotentry-it`（20秒タイムアウト、再実行で成功）・`arxiv-cs`（429レート制限、本セッションでの短時間の連続実行が原因と推測）が一過性で失敗したが、いずれも登録済みソースの一時的なネットワーク事象でA-5の失敗カウントが正しく追跡している。新規追加した24候補由来の恒常的な失敗はshopify-engineeringのみで、これは無効化済み
-- 検証3: 総記事数 → **3056件**（期待900件以上を大幅にクリア。内訳: vercel-blogが全履歴1450件・azukiazusaが458件と大きく寄与）
+- 検証2: `pnpm collect` の失敗ソース → 途中複数回 `hatena-hotentry-it`（タイムアウト）・`arxiv-cs`（429/タイムアウト、本セッションでの短時間の連続実行が原因と推測）が一過性で失敗したが、時間を置いての最終実行では **失敗ソース0/29** を達成。新規追加した24候補由来の恒常的な失敗はshopify-engineeringのみで、これは無効化済み
+- 検証3: 総記事数 → **3105件**（期待900件以上を大幅にクリア。内訳: vercel-blogが全履歴1450件・azukiazusaが458件と大きく寄与）。重複URLチェック0件
 
 ## レビュー（v0 実装分）
 
