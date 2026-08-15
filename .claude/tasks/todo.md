@@ -20,7 +20,7 @@
 - [ ] Cloudflare Pages 接続（**ユーザー操作待ち**: CF ダッシュボード → Workers & Pages → Pages → Connect to Git → koonn/curation-fyi、Build command `pnpm build`、Build output `packages/site/dist`）
 - [ ] 検証: cron が48時間で8回成功し無操作で本番に新記事反映（デプロイ後に確認）
 
-## v0.5 / v1 — 実装中（design.md の A-1〜B-5 の順）
+## v0.5（A-1〜A-8）— 完了 / v1（B-1〜B-5）— 未着手
 
 実装セッションへ: 各タスクの「検証」の実測値をこのファイルに記録してから次へ進むこと。
 
@@ -115,6 +115,22 @@
 - 検証1: 有効ソース数 → `loadSources().length` で**29件**（pyyaml未インストールのためdesign.md記載のpython3+yamlコマンドの代わりに、本番と同じsources.tsのloaderで計測。期待25以上をクリア）
 - 検証2: `pnpm collect` の失敗ソース → 途中複数回 `hatena-hotentry-it`（タイムアウト）・`arxiv-cs`（429/タイムアウト、本セッションでの短時間の連続実行が原因と推測）が一過性で失敗したが、時間を置いての最終実行では **失敗ソース0/29** を達成。新規追加した24候補由来の恒常的な失敗はshopify-engineeringのみで、これは無効化済み
 - 検証3: 総記事数 → **3105件**（期待900件以上を大幅にクリア。内訳: vercel-blogが全履歴1450件・azukiazusaが458件と大きく寄与）。重複URLチェック0件
+
+## レビュー（v0.5 実装分、A-1〜A-8）
+
+- design.mdの実装順序どおりA-1→A-8を完走。各タスクの検証は実測値付きで上記に記録済み
+- 主な成果:
+  - fetcherをrss/HN/はてブ/arXivの4種に拡張、aggregator系はexisting記事へのmetricsマージ方式に対応（A-1〜A-4）
+  - Conditional GET（ETag/If-Modified-Since）と7回連続失敗の可視化を実装（A-5）
+  - mercari-engineeringのCI 403問題をIP起因と診断し無効化（A-6）
+  - mixedソース向けdetectLanguageとhas_code判定を実装（A-7。has_codeは実データの都合で実測0件のままユーザー合意の上で先送り——cookpadに新着が出れば自然に解消する見込み）
+  - ソースを8→29件（有効）に拡充、記事数464→3105件（A-8）
+- 判断のためユーザー確認を挟んだ箇所: A-7のhas_code実測0件（実装維持の方針で合意）
+- 既知の残課題（v0.5の範囲外・監視継続）:
+  - `hatena-hotentry-it`・`arxiv-cs`がCI/ローカルで断続的にタイムアウトすることがある（A-5の失敗カウント機構が正しく追跡、7回連続には未達）
+  - `shopify-engineering`はフィード仕様変更（HTMLへリダイレクト）によりA-8で無効化済み
+- typecheck: 全パッケージ通過（各タスクで確認）。`pnpm build`もサイト側の大規模データ（3105記事）で899msで成功することを確認
+- コミット: 2ced885〜464c242（A-1〜A-8、コード/データを分離してタスクごとに複数コミット）
 
 ## レビュー（v0 実装分）
 
