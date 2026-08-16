@@ -1,5 +1,6 @@
 ---
 import Base from "../layouts/Base.astro";
+import { href } from "../lib/url";
 ---
 
 <Base title="検索 — curation.fyi">
@@ -7,23 +8,26 @@ import Base from "../layouts/Base.astro";
   <p class="mb-4 text-sm text-slate-500">
     収集した全記事のタイトルと要約から検索します（インデックスはアーカイブから生成）。
   </p>
-  <div id="search"></div>
+  <div id="search" data-bundle-path={href("/pagefind/")}></div>
   <noscript>
     <p class="text-slate-500">
-      検索には JavaScript が必要です。<a href="/archive/1/" class="underline">アーカイブ</a> を辿ってください。
+      検索には JavaScript が必要です。<a href={href("/archive/1/")} class="underline">アーカイブ</a> を辿ってください。
     </p>
   </noscript>
 </Base>
 
 <!-- Pagefind の資産は astro build の後に pagefind CLI が dist/pagefind/ へ出力する。
      このため dev サーバーでは動かず、ビルド後の preview で確認する -->
-<link rel="stylesheet" href="/pagefind/pagefind-ui.css" />
-<script is:inline src="/pagefind/pagefind-ui.js"></script>
+<link rel="stylesheet" href={href("/pagefind/pagefind-ui.css")} />
+<script is:inline src={href("/pagefind/pagefind-ui.js")}></script>
 <script is:inline>
   window.addEventListener("DOMContentLoaded", () => {
     if (typeof PagefindUI === "undefined") return;
+    // base 付きで配信されるので Pagefind の資産の場所を明示する
+    const bundlePath = document.getElementById("search").dataset.bundlePath;
     new PagefindUI({
       element: "#search",
+      bundlePath,
       showSubResults: true,
       showImages: false,
       translations: {

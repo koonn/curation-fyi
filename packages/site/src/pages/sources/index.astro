@@ -1,5 +1,6 @@
 ---
 import Base from "../../layouts/Base.astro";
+import { href } from "../../lib/url";
 import { loadArticles, loadEnabledSources } from "../../lib/load-articles";
 
 const articles = loadArticles();
@@ -35,7 +36,7 @@ const sources = loadEnabledSources()
         {sources.map((s) => (
           <tr class="border-b border-slate-100 last:border-0">
             <td class="px-4 py-2">
-              <a href={`/sources/${s.id}/1/`} class="font-medium hover:underline">{s.name}</a>
+              <a href={href(`/sources/${s.id}/1/`)} class="font-medium hover:underline">{s.name}</a>
             </td>
             <td class="px-4 py-2 text-slate-500">{TYPE_LABEL[s.type] ?? s.type}</td>
             <td class="px-4 py-2 text-right tabular-nums text-slate-600">{s.count}</td>

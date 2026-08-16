@@ -1,6 +1,7 @@
 ---
 import type { GetStaticPaths } from "astro";
 import type { Article } from "@curation-fyi/shared";
+import { href } from "../../lib/url";
 import { displayTags, loadArticles, loadSourceMap, loadTagMap } from "../../lib/load-articles";
 
 /**
@@ -44,7 +45,7 @@ const date = article.published_at.slice(0, 10);
       {article.summary && <p>{article.summary}</p>}
       <p>{sourceName} · {date} · {article.language}{tagNames.length > 0 && ` · ${tagNames.join(" ")}`}</p>
       <p><a href={article.url} data-pagefind-meta="url[href]">原文を読む</a></p>
-      <p><a href="/">curation.fyi</a></p>
+      <p><a href={href("/")}>curation.fyi</a></p>
     </main>
   </body>
 </html>

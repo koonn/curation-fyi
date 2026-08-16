@@ -3,6 +3,7 @@ import type { GetStaticPaths } from "astro";
 import Base from "../../../layouts/Base.astro";
 import ArticleCard from "../../../components/ArticleCard.astro";
 import Pagination from "../../../components/Pagination.astro";
+import { href } from "../../../lib/url";
 import type { Article } from "@curation-fyi/shared";
 import { displayTags, loadArticles, loadSourceMap, loadTagMap, pageEntries } from "../../../lib/load-articles";
 
@@ -35,5 +36,5 @@ const current = Number(Astro.params.page);
       <ArticleCard article={article} source={sourceMap.get(article.source_id)} tagMap={tagMap} />
     ))}
   </div>
-  <Pagination base={`/tags/${slug}/`} current={current} total={total} />
+  <Pagination base={href(`/tags/${slug}/`)} current={current} total={total} />
 </Base>

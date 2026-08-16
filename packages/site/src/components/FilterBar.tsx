@@ -1,4 +1,5 @@
 import { useEffect, useState } from "preact/hooks";
+import { href } from "../lib/url";
 
 /** recent.json の1件。フィールド名は転送量を抑えるため1文字 */
 interface RecentItem {
@@ -56,7 +57,7 @@ export default function FilterBar({ tags, sources, types, serverListId }: Props)
   useEffect(() => {
     if (!active || items !== null || loading) return;
     setLoading(true);
-    fetch("/recent.json")
+    fetch(href("/recent.json"))
       .then((r) => r.json())
       .then((data: RecentItem[]) => setItems(data))
       .catch(() => setItems([]))
@@ -156,7 +157,7 @@ export default function FilterBar({ tags, sources, types, serverListId }: Props)
             {results.map((it) => (
               <article class="rounded-lg border border-slate-200 bg-white p-4">
                 <div class="mb-1 flex flex-wrap items-center gap-2 text-xs text-slate-500">
-                  <a href={`/sources/${it.s}/1/`} class="font-medium text-slate-600 hover:underline">
+                  <a href={href(`/sources/${it.s}/1/`)} class="font-medium text-slate-600 hover:underline">
                     {sources[it.s]?.name ?? it.s}
                   </a>
                   <span>·</span>
@@ -184,8 +185,8 @@ export default function FilterBar({ tags, sources, types, serverListId }: Props)
           {!loading && (
             <p class="mt-6 text-sm text-slate-500">
               ここに出るのは直近90日分です。それより古い記事は{" "}
-              <a href="/archive/1/" class="underline">アーカイブ</a> か{" "}
-              <a href="/search/" class="underline">検索</a> から。
+              <a href={href("/archive/1/")} class="underline">アーカイブ</a> か{" "}
+              <a href={href("/search/")} class="underline">検索</a> から。
             </p>
           )}
         </div>

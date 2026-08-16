@@ -17,8 +17,12 @@
 - [x] typecheck 全パッケージ通過
 - [x] GitHub public repo 作成 + push（koonn/curation-fyi、ユーザー承認済み）
 - [x] CI 検証: workflow_dispatch 実行が成功（24秒）し、data/ の自動コミットが main に載った（52bfb6f）
-- [ ] Cloudflare Pages 接続（**ユーザー操作待ち**: CF ダッシュボード → Workers & Pages → Pages → Connect to Git → koonn/curation-fyi、Build command `pnpm build`、Build output `packages/site/dist`）
-- [ ] 検証: cron が48時間で8回成功し無操作で本番に新記事反映（デプロイ後に確認）
+- [x] 検証: cron が48時間で8回成功（2026-08-16 確認: 直近15回のスケジュール実行が全て success。48時間では9回すべて成功）
+- [x] ホスティング: **GitHub Pages に変更**（2026-08-16）
+  - 前回セッションの申し送りにあった「Cloudflare Pages の接続をやった」は**事実と違っていた**。ユーザーに確認したところ未着手で、`curation-fyi.pages.dev` は名前解決もできない状態だった（DNS・通信が生きていることは example.com / github.com / developers.cloudflare.com が200であることで確認済み）。GitHub の Deployments も0件
+  - ダッシュボード操作が要らず repo 内で完結するため、ユーザー判断で GitHub Pages に切り替え
+  - URL: **https://koonn.github.io/curation-fyi/**（プロジェクトページなので `/curation-fyi/` 配下）
+- [ ] 検証: 無操作で本番に新記事が反映される（cron → collect の自動コミット → deploy が連鎖することの確認）
 
 ## v0.5（A-1〜A-8）— 完了 / v1（B-1〜B-5）— 着手中
 

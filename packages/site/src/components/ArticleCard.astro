@@ -1,6 +1,7 @@
 ---
 import type { Article, Source, Tag } from "@curation-fyi/shared";
 import { displayTags } from "../lib/load-articles";
+import { href } from "../lib/url";
 
 interface Props {
   article: Article;
@@ -26,7 +27,7 @@ const hatebu = article.metrics.hatebu_count ?? 0;
   {...indexAttrs}
 >
   <div class="mb-1 flex flex-wrap items-center gap-2 text-xs text-slate-500">
-    <a href={`/sources/${article.source_id}/1/`} class="font-medium text-slate-600 hover:underline">
+    <a href={href(`/sources/${article.source_id}/1/`)} class="font-medium text-slate-600 hover:underline">
       {source?.name ?? article.source_id}
     </a>
     <span>·</span>
@@ -56,7 +57,7 @@ const hatebu = article.metrics.hatebu_count ?? 0;
     <div class="mt-2 flex flex-wrap gap-1.5">
       {tags.map((slug) => (
         <a
-          href={`/tags/${slug}/1/`}
+          href={href(`/tags/${slug}/1/`)}
           class="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-600 hover:bg-slate-200"
         >
           {tagMap?.get(slug)?.name ?? slug}

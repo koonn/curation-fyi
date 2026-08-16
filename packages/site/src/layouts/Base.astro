@@ -1,5 +1,6 @@
 ---
 import "../styles/global.css";
+import { href } from "../lib/url";
 
 interface Props {
   title: string;
@@ -7,13 +8,13 @@ interface Props {
 const { title } = Astro.props;
 
 const nav = [
-  { href: "/", label: "新着" },
-  { href: "/social/", label: "Social" },
-  { href: "/papers/", label: "論文" },
-  { href: "/hot/", label: "Hot" },
-  { href: "/sources/", label: "ソース" },
-  { href: "/archive/1/", label: "アーカイブ" },
-  { href: "/search/", label: "検索" },
+  { href: href("/"), label: "新着" },
+  { href: href("/social/"), label: "Social" },
+  { href: href("/papers/"), label: "論文" },
+  { href: href("/hot/"), label: "Hot" },
+  { href: href("/sources/"), label: "ソース" },
+  { href: href("/archive/1/"), label: "アーカイブ" },
+  { href: href("/search/"), label: "検索" },
 ];
 const current = Astro.url.pathname;
 ---
@@ -25,12 +26,12 @@ const current = Astro.url.pathname;
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content="Tech企業ブログ・個人ブログ・話題の記事を日英横断でまとめるキュレーションサイト" />
-    <link rel="alternate" type="application/rss+xml" title="curation.fyi" href="/feed.xml" />
+    <link rel="alternate" type="application/rss+xml" title="curation.fyi" href={href("/feed.xml")} />
   </head>
   <body class="bg-slate-50 text-slate-900">
     <header class="border-b border-slate-200 bg-white">
       <div class="mx-auto flex max-w-4xl flex-wrap items-baseline gap-x-3 gap-y-1 px-4 py-4">
-        <a href="/" class="text-xl font-bold tracking-tight">curation.fyi</a>
+        <a href={href("/")} class="text-xl font-bold tracking-tight">curation.fyi</a>
         <span class="text-sm text-slate-500">Tech記事キュレーション</span>
         <nav class="ml-auto flex gap-3 text-sm">
           {nav.map((item) => (
@@ -45,7 +46,7 @@ const current = Astro.url.pathname;
               {item.label}
             </a>
           ))}
-          <a href="/feed.xml" class="text-slate-500 hover:text-slate-900">RSS</a>
+          <a href={href("/feed.xml")} class="text-slate-500 hover:text-slate-900">RSS</a>
         </nav>
       </div>
     </header>

@@ -18,7 +18,10 @@ const dropPreactServerFromPrebundle = {
 };
 
 export default defineConfig({
-  site: "https://curation-fyi.pages.dev",
+  // GitHub Pages のプロジェクトページ。/curation-fyi/ 配下に出るので base が要る。
+  // サイト内リンクは src/lib/url.ts の href() を通すこと
+  site: "https://koonn.github.io",
+  base: "/curation-fyi",
   integrations: [preact()],
   vite: {
     plugins: [tailwindcss(), dropPreactServerFromPrebundle],

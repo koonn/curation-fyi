@@ -1,5 +1,6 @@
 ---
 import ArticleCard from "./ArticleCard.astro";
+import { href } from "../lib/url";
 import FilterBar from "./FilterBar.tsx";
 import {
   CATEGORIES,
@@ -42,7 +43,7 @@ const types = [...CATEGORIES[category].types];
     ))}
   </div>
   <p class="mt-6 text-sm text-slate-500">
-    さらに古い記事は <a href="/archive/1/" class="underline">アーカイブ</a> か{" "}
-    <a href="/search/" class="underline">検索</a> から。
+    さらに古い記事は <a href={href("/archive/1/")} class="underline">アーカイブ</a> か{" "}
+    <a href={href("/search/")} class="underline">検索</a> から。
   </p>
 </div>
