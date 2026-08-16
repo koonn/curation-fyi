@@ -18,6 +18,7 @@ export function loadExisting(): Map<string, Article> {
       .filter((l) => l.trim() !== "");
     for (const line of lines) {
       const article = JSON.parse(line) as Article;
+      article.llm_tags ??= []; // B-2以前のデータ互換。次回 saveAll で永続化される
       map.set(article.url, article);
     }
   }

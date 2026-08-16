@@ -60,7 +60,10 @@ export interface Article {
   fetched_at: string;
   language: Language;
   source_id: string;
+  /** taxonomy/tags.yaml のキーワードマッチで付いたタグ */
   tags: string[];
+  /** LLM が付けたタグ（tags が空の記事にのみ付く）。表示は union(tags, llm_tags) */
+  llm_tags: string[];
   has_code: boolean | null;
   external_ids: ExternalIds;
   metrics: Metrics;
