@@ -10,10 +10,12 @@
     "typecheck": "astro check"
   },
   "dependencies": {
+    "@astrojs/preact": "^5.1.5",
     "@astrojs/rss": "^4.0.19",
     "@curation-fyi/shared": "workspace:*",
     "@tailwindcss/vite": "^4.1.0",
     "astro": "^5.13.0",
+    "preact": "^10.29.8",
     "tailwindcss": "^4.1.0",
     "yaml": "^2.7.0"
   },

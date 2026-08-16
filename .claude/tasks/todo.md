@@ -201,6 +201,20 @@ design.md はAPIキー前提だが、キーを渡さない運用を正規手順�
 - 検証6（ページング）: archive 1ページ目20件 / 最終153ページ目13件 / トップ100件 / hot 50件。記事数3053件に対し `ceil(3053/20)=153`ページ・最終ページ13件と一致
   - ※ 検証中に最終ページ件数が計算と合わないと誤認したが、原因は参照した記事数がprune直後の3041（その後のcollectが12件追加）という古い値だったこと。サイト側は正しい
 
+### B-4: フィルタバー island — 実装完了 / 目視確認のみ未実施（2026-08-16）
+
+- `@astrojs/preact` + `preact` を site に追加。`components/FilterBar.tsx`（Preact island、`client:load`）
+- `src/pages/recent.json.ts`（Astroエンドポイント）で直近90日のメタデータを生成。フィールドは design.md 指定の7つ（`u/t/d/l/s/g/c`）だけ
+- 状態: 言語（all/ja/en）・タグ（単一選択）・ソース種別（all/company_blog/personal_blog/aggregator/paper）・has_codeトグル。言語は `localStorage["curation-fyi:lang"]` に保存し初回マウントで復元
+- フィルタが立った時だけ `/recent.json` を取得（遅延ロード）。サーバー生成の一覧は `#recent-articles` を `hidden` にして隠し、解除で戻す
+- **ビルドが通らずハマった点**: `@astrojs/preact` が `optimizeDeps.include` に `@astrojs/preact/server.js` を入れるが、その入口は仮想モジュール `astro:preact:opts` を import しており、Viteのクライアント側依存プリバンドル（esbuild）が解決できずビルドが落ちる。`optimizeDeps.exclude` を足しても **include 側が勝つ**ため効かない。バージョン変更（6.0.2→5.1.5→5.0.2→4.1.3）でも直らず、`DEBUG=vite:deps` と `configResolved` で解決済み設定を実際に覗いて原因を確定させた。対処は astro.config.mjs の自前viteプラグインで include から当該エントリを外す
+- 検証1: `pnpm build` 成功、**467ページ 2.48秒**
+- 検証2: `dist/recent.json` の **gzip 94,829 bytes**（期待500KB以下を大幅にクリア）。1419件、フィールドは指定の7つのみ、期間 2026-05-18〜2026-08-16
+- 検証3: island の props をビルド済みHTMLで確認 → tags 14件・sources 29件・`serverListId: recent-articles`・`client="load"`・`component-url=/_astro/FilterBar.*.js`
+- 検証4: FilterBarのフィルタ述語を実データ（dist/recent.json）で実行 → all 1419 / ja 567 / en 852 / ja+llm 165 / codeOnly 89。ja+en=全体が成立
+- **未実施**: design.md の「`pnpm dev` でブラウザ目視（ja選択で一覧がjaのみ・リロードで保持）＋スクリーンショット添付」。Chrome拡張がツール呼び出しごとにタブグループを失い（`Couldn't determine which page this action targets`）3回失敗したため中断。手順をユーザーに引き継ぐ
+- design.mdからの意図的な差分: フィルタ結果末尾の誘導リンクは `/archive/` のみにした。`/search/` はB-5で作るページなので、先に張ると壊れたリンクになる。B-5で追加する
+
 ## レビュー（v0.5 実装分、A-1〜A-8）
 
 - design.mdの実装順序どおりA-1→A-8を完走。各タスクの検証は実測値付きで上記に記録済み
