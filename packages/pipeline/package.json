@@ -6,7 +6,9 @@
   "scripts": {
     "collect": "tsx src/index.ts collect",
     "retag": "tsx src/index.ts retag",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "tag-export": "tsx src/index.ts tag-export",
+    "tag-import": "tsx src/index.ts tag-import"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.117.1",

@@ -7,7 +7,9 @@
     "retag": "pnpm --filter @curation-fyi/pipeline retag",
     "dev": "pnpm --filter @curation-fyi/site dev",
     "build": "pnpm --filter @curation-fyi/site build",
-    "typecheck": "pnpm -r typecheck"
+    "typecheck": "pnpm -r typecheck",
+    "tag-export": "pnpm --filter @curation-fyi/pipeline tag-export",
+    "tag-import": "pnpm --filter @curation-fyi/pipeline tag-import"
   },
   "packageManager": "pnpm@11.21.0",
   "engines": {

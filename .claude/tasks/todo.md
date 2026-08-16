@@ -132,6 +132,35 @@
   - design.mdは60%を「ルールのみでの実測目安」とし本目標95%はB-2のLLM併用後としているため、実装は変更せず記録して先へ進む
 - 検証2: 決定性 → `retag` を2回連続実行し、1回目の `data/articles/` 全体をコピーして2回目と `diff -rq` → **差分なし**（全111ファイル一致）
 
+### B-2: LLM タグ付け・要約 — 実装完了 / 検証は手動経路で実施（2026-08-16）
+
+- スキーマ: `Article.llm_tags: string[]` を追加。`store.loadExisting()` で `??= []` 補完（既存データは saveAll 時に永続化）
+- `tagger/llm.ts` 新規: `@anthropic-ai/sdk`、`claude-haiku-4-5-20251001`、`max_tokens: 300`、`MAX_LLM_PER_RUN = 100`。design.md記載のプロンプトをそのまま使用。JSON.parse失敗はスキップ＋ログ、taxonomyにないslugは捨てる。`usage` を合算して概算コストをログ出力
+- `collect.ts` にタグ付け段階 `tagArticles()` を追加。呼び出し順はルールベース → 残りがLLM対象。LLM候補は**新しい順**（design.mdに規定がないため、サイトのトップに出る記事から埋まるよう判断。todo記録）
+- 検証1（APIキー未設定時のスキップ）: `pnpm collect` → `LLMタグ付け: APIキー未設定のためスキップ` / `ルールベースタグ付け: 0 件更新 / LLM候補 1677 件`。2回連続実行でルールベース更新0件（冪等）
+- typecheck: 全パッケージ通過
+
+#### B-2追加: APIキーなしの手動タグ付け経路（ユーザー要望により正規手順化）
+
+design.md はAPIキー前提だが、キーを渡さない運用を正規手順にしたいとの指示により、
+同じ `llm_tags` に書く手動経路を追加した。②LLM と ③手動 はどちらか一方があればよい関係。
+
+- `tagger/manual.ts` 新規 + CLI サブコマンド `tag-export` / `tag-import`（root/pipeline に pnpm script 追加）
+- `tag-export --limit N` → `data/tagging/pending.jsonl`（gitignore追加）に1行1記事のJSONLを出力。対象条件・並び順はLLM経路と同一。要約は300字で切る
+- `tag-import` → taxonomyにないslugが1つでもあれば**何も書き込まずエラー**（typoを握り潰さない）。tagsが空の行は「未判定」として何も書かない
+- 手順は `docs/tagging.md` に記載（正典）
+- 検証2（手動経路の通し実行、2026-08-16）: 100件をエクスポート → Claude Codeセッションで判定 → インポート
+  - `tag-import: 39 件に llm_tags を付与（未判定 61 件、記事なし 0 件、書き直した月 1 個）`
+  - **付与率: 2308/3946 = 58.5%**（design.md B-2期待値95%以上に対し**未達**）
+  - タグ別内訳: llm 670 / frontend 571 / infrastructure 315 / performance 304 / paper 289 / backend 273 / team-process 241 / security 186 / architecture 129 / programming-language 128 / machine-learning 114 / database 97 / mobile 78 / data-engineering 48
+  - コスト実測: **$0（APIを呼んでいない）**。design.mdのコスト条件（100記事で$0.15未満）はAPI経路を回したときに測る
+- **重要な実測（design.mdの前提と食い違う）**: 100件中**61件が「どのタグにも合わない」空判定**
+  - 空判定61件のソース内訳: hn-frontpage 42 / hatena-hotentry-it 18 / simonwillison 1
+  - 中身は心臓病・エルニーニョ・スポーツ・防災アプリ・政治など、技術記事でない一般ニュース。この2ソースは技術限定ではない集約サイトなので構造的に混ざる
+  - design.mdのLLM対象条件は「tagsも0個かつllm_tagsも0個」なので、**空判定の記事は毎回対象に戻る**。61%という率だと未タグキューが永久に減らない
+  - 付与率95%は、受け皿タグの追加か対象条件の変更なしには到達不能（対処案3つを `docs/tagging.md` に記載）
+  - ユーザー合意により「実測してから判断する」方針。この実測をもって判断待ち
+
 ## レビュー（v0.5 実装分、A-1〜A-8）
 
 - design.mdの実装順序どおりA-1→A-8を完走。各タスクの検証は実測値付きで上記に記録済み
