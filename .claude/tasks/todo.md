@@ -269,6 +269,21 @@ design.md 範囲外。ユーザー判断「Social Trend と Tech Company の Tre
 - ビルド: 3523ページ / 3.25秒
 - 手順とカテゴリ定義は `docs/pages.md`（新規）
 
+### 追加: タグ付けの対象から social を外す（2026-08-16）
+
+ユーザー合意により実施。カテゴリ分割を受けて、再処理問題への対処を軽く済ませる方針。
+
+- **着手前の実測（カテゴリ別のタグ付与率）**: papers 100%（289/289。`paper` タグが無条件で付くため対象外）/ tech 60.2%（未タグ813）/ social 39.0%（未タグ441）
+- **tech 未タグ813件から20件を判定**: 12件にタグ付与・8件が空判定（40%）。ただし**この標本は代表的でない**——新着順に取ったため simonwillison が標本の60%を占めた（母集団では3.3%）。空判定8件のうち6件が simonwillison のリンクブログ（「Northern Gannet」「Quoting OpenClaw」等の短文）。simonwillison を除くと 8件中2件（25%）
+- **結論**: tech の未タグは「タグの付けようがない」のではなく「キーワードルールの取りこぼし」が主体。未タグの55%を占める vercel-blog(240)+jxck(204) は先の層化抽出で jxck 12/12・vercel `/blog/` 4/4 がタグ付け可能だった
+- 実装: 分類定義 `CATEGORIES` / `categoryOf()` を `@curation-fyi/shared` に移し（site と pipeline で二重管理しないため）、`collect` の LLM 候補と `tag-export` の既定対象から social を除外。`--source` で明示したときは従来どおり出せる
+- typecheck: 全パッケージ 0 errors
+- 検証1（手動経路）: `pnpm tag-export` → `social を除く未タグ 801 件 / 未タグ全体 1242 件`。出た記事は simonwillison 4・discord 1 で aggregator なし
+- 検証2（明示指定の上書き）: `--source hn-frontpage` → 290件が従来どおり出る
+- 検証3（収集経路）: `pnpm collect` → `LLM候補 801 件（未タグ 1251 件のうち social 450 件は対象外）`
+- 検証4: `pnpm build` 成功（3538ページ）
+- **残課題**: 処理済みフラグ（空判定の再処理）は未対応。social を外した今、影響は tech の1〜2割程度。判断待ち
+
 ## レビュー（v0.5 実装分、A-1〜A-8）
 
 - design.mdの実装順序どおりA-1→A-8を完走。各タスクの検証は実測値付きで上記に記録済み

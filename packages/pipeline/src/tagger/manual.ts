@@ -1,7 +1,8 @@
 import fs from "node:fs";
 import path from "node:path";
-import type { Article } from "@curation-fyi/shared";
+import { categoryOf, type Article } from "@curation-fyi/shared";
 import { REPO_ROOT, TAGGING_FILE } from "../paths.ts";
+import { loadAllSources } from "../sources.ts";
 import { loadExisting, saveAll } from "../store.ts";
 import { loadTaxonomy } from "./rules.ts";
 
@@ -41,7 +42,14 @@ export function exportUntagged(limit = DEFAULT_LIMIT, file = TAGGING_FILE, sourc
   const out = resolveFile(file);
   const existing = loadExisting();
   const all = untagged(existing);
-  const candidates = sources?.length ? all.filter((a) => sources.includes(a.source_id)) : all;
+  // ソースを明示したときはそのまま従う。既定では social（HN・はてブ）を対象から外す
+  // （技術タグが付かなくて当然のものが多く、/social/ はタグを必要としないため）
+  const candidates = sources?.length
+    ? all.filter((a) => sources.includes(a.source_id))
+    : (() => {
+        const typeById = new Map(loadAllSources().map((s) => [s.id, s.type]));
+        return all.filter((a) => categoryOf(typeById.get(a.source_id)) !== "social");
+      })();
   const rows: PendingRow[] = candidates.slice(0, limit).map((a) => ({
     url: a.url,
     title: a.title,
@@ -55,7 +63,9 @@ export function exportUntagged(limit = DEFAULT_LIMIT, file = TAGGING_FILE, sourc
   fs.writeFileSync(out, rows.map((r) => JSON.stringify(r)).join("\n") + "\n");
 
   const taxonomy = loadTaxonomy();
-  const scope = sources?.length ? `${sources.join(",")} の未タグ ${candidates.length} 件` : `未タグ全体 ${all.length} 件`;
+  const scope = sources?.length
+    ? `${sources.join(",")} の未タグ ${candidates.length} 件`
+    : `social を除く未タグ ${candidates.length} 件 / 未タグ全体 ${all.length} 件`;
   console.log(`tag-export: ${rows.length} 件を ${out} に書き出し（${scope}）`);
   console.log(`利用可能な slug: ${taxonomy.map((t) => t.slug).join(", ")}`);
 }

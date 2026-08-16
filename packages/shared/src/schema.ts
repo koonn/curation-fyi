@@ -7,6 +7,26 @@ export type SourceType =
 
 export type Language = "en" | "ja";
 
+/**
+ * 記事の分類。ソースの type で切る。site のページ分割と pipeline のタグ付け対象の
+ * 両方がこれを使うので、片方だけずれないよう shared に置く。
+ */
+export const CATEGORIES = {
+  tech: { label: "Tech", types: ["company_blog", "personal_blog", "tweet"] },
+  social: { label: "Social", types: ["aggregator"] },
+  papers: { label: "論文", types: ["paper"] },
+} as const;
+
+export type Category = keyof typeof CATEGORIES;
+
+export function categoryOf(type: string | undefined): Category | undefined {
+  if (!type) return undefined;
+  for (const [key, def] of Object.entries(CATEGORIES)) {
+    if ((def.types as readonly string[]).includes(type)) return key as Category;
+  }
+  return undefined;
+}
+
 export type FetcherKind =
   | "rss"
   | "hn_api"
