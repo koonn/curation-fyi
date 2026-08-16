@@ -38,15 +38,38 @@ export function saveAll(articles: Iterable<Article>): void {
     byMonth.set(month, list);
   }
   if (byMonth.size === 0) return;
+  writeMonths(byMonth);
+}
+
+/**
+ * 指定した月のファイルを、残った記事だけで書き直す（削除に使う）。
+ * その月の記事が0件になったらファイルごと消す。
+ */
+export function rewriteMonths(remaining: Iterable<Article>, months: Set<string>): void {
+  if (months.size === 0) return;
+  const byMonth = new Map<string, Article[]>();
+  for (const month of months) byMonth.set(month, []);
+  for (const a of remaining) {
+    const list = byMonth.get(a.published_at.slice(0, 7));
+    if (list) list.push(a);
+  }
+  writeMonths(byMonth);
+}
+
+function writeMonths(byMonth: Map<string, Article[]>): void {
   fs.mkdirSync(ARTICLES_DIR, { recursive: true });
   for (const [month, list] of byMonth) {
+    const file = path.join(ARTICLES_DIR, `${month}.jsonl`);
+    if (list.length === 0) {
+      fs.rmSync(file, { force: true });
+      continue;
+    }
     list.sort((a, b) => {
       if (a.published_at !== b.published_at) {
         return a.published_at < b.published_at ? -1 : 1;
       }
       return a.id < b.id ? -1 : a.id > b.id ? 1 : 0;
     });
-    const file = path.join(ARTICLES_DIR, `${month}.jsonl`);
     const body = list.map((a) => JSON.stringify(a)).join("\n") + "\n";
     fs.writeFileSync(file, body);
   }

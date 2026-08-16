@@ -158,6 +158,9 @@
   site_url: https://discord.com/blog
   feed_url: https://discord.com/blog/rss.xml
   fetcher: rss
+  # Changelog / Patch Notes はアプリの更新告知でキュレーション対象外
+  exclude:
+    title_matches: ["Changelog", "Patch Notes"]
   enabled: true
 
 - id: vercel-blog
@@ -167,6 +170,10 @@
   site_url: https://vercel.com/blog
   feed_url: https://vercel.com/atom
   fetcher: rss
+  # /changelog/ は製品告知（新機能・料金・提携）でキュレーション対象外。
+  # 技術記事は /blog/ 側にある（2026-08-16 に未タグ12件を判定して確認）
+  exclude:
+    url_contains: ["/changelog/"]
   enabled: true
 
 - id: line-yahoo-tech

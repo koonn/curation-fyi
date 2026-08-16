@@ -167,7 +167,24 @@ design.md はAPIキー前提だが、キーを渡さない運用を正規手順�
   - 空判定は2種類に分かれる: **(a) そもそも技術記事でない**（hn-frontpage・hatena-hotentry-it）と **(b) 技術ドメインだが製品告知**（vercel-blog `/changelog/`、discord-engineering の Changelog/Patch Notes）
   - **(b)はタグ付けの問題ではない**: vercel-blog `/changelog/` 881件（全記事の22%）のうち**529件は既にルールベースでタグが付いており**、タグ付け段階を直しても表示からは消えない。収集または表示の段階で切る必要がある
   - 現在の付与率: **2317/3945 = 58.7%**（llm_tags あり57件、未タグ残1628件）
-  - 対処案3つと見分けの手掛かりを `docs/tagging.md` に記載。**判断待ち**
+  - 対処案3つと見分けの手掛かりを `docs/tagging.md` に記載
+
+### B-2追加: 製品告知の除外（(b)の対処、2026-08-16）
+
+ユーザー判断「URL/タイトルパターンで収集時に弾き、既存も消す」により実施。design.md 範囲外の設計追加。
+
+- `Source.exclude`（`url_contains` / `title_matches`）を schema に追加。判定は `exclude.ts` の `isExcluded()` に集約し、収集と prune で同じ規則を使う
+- `collect` は除外対象を取り込まず、`✓ <id>: ... / 除外 N 件` としてログに出す
+- `prune` サブコマンド新規（pnpm script は組み込み `pnpm prune` と衝突するため **`prune-excluded`**）。`--dry-run` あり
+- `store.rewriteMonths()` を追加。月の記事が0件になったら月ファイルごと削除する
+- 設定: vercel-blog に `url_contains: ["/changelog/"]`、discord-engineering に `title_matches: ["Changelog","Patch Notes"]`
+- 検証1（削除前の突合、L75）: 消える側904件・残る側の件数とタイトル抜粋を目視。`/changelog/` は全て告知、残る `/blog/` は技術記事であることを確認
+- 検証2（件数の再現、L113）: 独立した2経路（python集計と `prune --dry-run`）がどちらも **904件**（vercel-blog 881 / discord-engineering 23）で一致
+- 検証3（削除実行）: 3945 → **3041件**（-22.9%）。`/changelog/` 残0件・Changelog/Patch Notes 残0件。月ファイル数は137で不変（空になった月なし）
+- 検証4（収集経路）: `pnpm collect` → `vercel-blog: ... / 除外 881 件`、`discord-engineering: ... / 除外 22 件`、両ソースとも新規0件。失敗ソース0/29
+- 付与率は 58.7% → **58.8%** とほぼ不変（削除した904件のタグ付与率がコーパス全体とほぼ同じだったため）。未タグ残は1628 → 1254件
+- 手順は `docs/sources.md`（新規）に記載
+- **残課題**: (a)「そもそも技術記事でない」（hn-frontpage・hatena-hotentry-it）と、空判定記事が毎回対象に戻る問題は未解決。**判断待ち**
 
 ## レビュー（v0.5 実装分、A-1〜A-8）
 

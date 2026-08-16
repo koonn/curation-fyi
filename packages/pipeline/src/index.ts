@@ -1,6 +1,7 @@
 import { collect } from "./collect.ts";
 import { retag } from "./retag.ts";
 import { exportUntagged, importTags } from "./tagger/manual.ts";
+import { prune } from "./prune.ts";
 
 const [, , command = "collect", ...rest] = process.argv;
 
@@ -30,7 +31,11 @@ switch (command) {
     importTags(flag("file"));
     process.exit(process.exitCode ?? 0);
     break;
+  case "prune":
+    prune(rest.includes("--dry-run"));
+    process.exit(process.exitCode ?? 0);
+    break;
   default:
-    console.error(`不明なコマンド: ${command}（利用可能: collect, retag, tag-export, tag-import）`);
+    console.error(`不明なコマンド: ${command}（利用可能: collect, retag, tag-export, tag-import, prune）`);
     process.exitCode = 1;
 }

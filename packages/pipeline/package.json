@@ -8,7 +8,8 @@
     "retag": "tsx src/index.ts retag",
     "typecheck": "tsc --noEmit",
     "tag-export": "tsx src/index.ts tag-export",
-    "tag-import": "tsx src/index.ts tag-import"
+    "tag-import": "tsx src/index.ts tag-import",
+    "prune-excluded": "tsx src/index.ts prune"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.117.1",

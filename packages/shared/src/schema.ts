@@ -24,7 +24,16 @@ export interface Source {
   feed_url?: string;
   fetcher: FetcherKind;
   default_tags?: string[];
+  /** 収集対象から外す条件。製品告知など、キュレーションの対象外を弾く */
+  exclude?: SourceExclude;
   enabled: boolean;
+}
+
+export interface SourceExclude {
+  /** URL にこの文字列を含むものを除外する */
+  url_contains?: string[];
+  /** タイトルがこの正規表現にマッチするものを除外する（大文字小文字は無視） */
+  title_matches?: string[];
 }
 
 /** taxonomy/tags.yaml の 1 エントリ */

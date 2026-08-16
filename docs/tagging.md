@@ -110,13 +110,23 @@ pnpm tag-import --file data/tagging/vercel-blog.jsonl
 - discord-engineering はタイトルの `Changelog` / `Patch Notes` で23件（全102件の23%）が機械的に分かれる。
   そもそもこのソースは engineering ブログではなく Discord の一般ブログで、技術記事は稀
 
-対処案:
+### (b) は解決済み（2026-08-16）
+
+製品告知はキュレーション対象外とする方針が決まり、収集段階で除外するようにした。
+`data/sources.yaml` の `exclude` と `pnpm prune-excluded` で、904件を削除済み。
+詳細は `docs/sources.md`。
+
+### (a) は未解決
+
+残る対処案:
 
 1. 処理済みフラグ（`llm_tagged_at` 等）を `Article` に足し、対象条件を「未処理かつ `tags` 0個」に変える
    — 「毎回同じ記事を判定し直す」問題そのものの解決
-2. 製品告知を収集または表示の段階で除外する（URL・タイトルパターン、あるいはソース自体の見直し）
-   — (b) の解決。対象は vercel-blog `/changelog/` 881件（全記事の22%）と discord-engineering の23件
-3. `taxonomy/tags.yaml` に受け皿のタグ（ハードウェア・科学・ビジネス等）を足す
+2. `taxonomy/tags.yaml` に受け皿のタグ（ハードウェア・科学・ビジネス等）を足す
    — (a) を拾いにいく場合。ただしキュレーションの対象を広げる判断になる
+3. hn-frontpage / hatena-hotentry-it 自体の扱いを見直す
+   — この2つは技術限定ではない集約サイトで、空判定の主因
 
-design.md の B-2 完了条件「付与率95%以上」は、上記のいずれかを入れないと到達できない。
+design.md の B-2 完了条件「付与率95%以上」は、上記のいずれかを入れないと到達できない
+（製品告知の除外後も付与率は58.8%でほぼ変わらなかった。削除した904件のタグ付与率が
+コーパス全体とほぼ同じだったため）。
