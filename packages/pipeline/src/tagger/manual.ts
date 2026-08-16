@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import type { Article } from "@curation-fyi/shared";
-import { TAGGING_FILE } from "../paths.ts";
+import { REPO_ROOT, TAGGING_FILE } from "../paths.ts";
 import { loadExisting, saveAll } from "../store.ts";
 import { loadTaxonomy } from "./rules.ts";
 
@@ -21,6 +21,14 @@ interface PendingRow {
   tags: string[];
 }
 
+/**
+ * --file の相対パスはリポジトリルート基準にする。
+ * pnpm script 経由だと cwd が packages/pipeline になるため、そのままでは直感と食い違う。
+ */
+function resolveFile(file: string): string {
+  return path.isAbsolute(file) ? file : path.join(REPO_ROOT, file);
+}
+
 /** tags も llm_tags も空の記事を新しい順に返す（LLM経路の候補選定と同じ規則） */
 function untagged(existing: Map<string, Article>): Article[] {
   return [...existing.values()]
@@ -28,10 +36,12 @@ function untagged(existing: Map<string, Article>): Article[] {
     .sort((a, b) => (a.published_at === b.published_at ? 0 : a.published_at < b.published_at ? 1 : -1));
 }
 
-/** 未タグ記事を作業ファイルへ書き出す */
-export function exportUntagged(limit = DEFAULT_LIMIT, file = TAGGING_FILE): void {
+/** 未タグ記事を作業ファイルへ書き出す。sources を渡すとそのソースだけに絞る */
+export function exportUntagged(limit = DEFAULT_LIMIT, file = TAGGING_FILE, sources?: string[]): void {
+  const out = resolveFile(file);
   const existing = loadExisting();
-  const candidates = untagged(existing);
+  const all = untagged(existing);
+  const candidates = sources?.length ? all.filter((a) => sources.includes(a.source_id)) : all;
   const rows: PendingRow[] = candidates.slice(0, limit).map((a) => ({
     url: a.url,
     title: a.title,
@@ -41,23 +51,25 @@ export function exportUntagged(limit = DEFAULT_LIMIT, file = TAGGING_FILE): void
     tags: [],
   }));
 
-  fs.mkdirSync(path.dirname(file), { recursive: true });
-  fs.writeFileSync(file, rows.map((r) => JSON.stringify(r)).join("\n") + "\n");
+  fs.mkdirSync(path.dirname(out), { recursive: true });
+  fs.writeFileSync(out, rows.map((r) => JSON.stringify(r)).join("\n") + "\n");
 
   const taxonomy = loadTaxonomy();
-  console.log(`tag-export: ${rows.length} 件を ${file} に書き出し（未タグ全体 ${candidates.length} 件）`);
+  const scope = sources?.length ? `${sources.join(",")} の未タグ ${candidates.length} 件` : `未タグ全体 ${all.length} 件`;
+  console.log(`tag-export: ${rows.length} 件を ${out} に書き出し（${scope}）`);
   console.log(`利用可能な slug: ${taxonomy.map((t) => t.slug).join(", ")}`);
 }
 
 /** 作業ファイルの tags を llm_tags に取り込む */
 export function importTags(file = TAGGING_FILE): void {
-  if (!fs.existsSync(file)) {
-    throw new Error(`作業ファイルがない: ${file}（先に tag-export を実行する）`);
+  const src = resolveFile(file);
+  if (!fs.existsSync(src)) {
+    throw new Error(`作業ファイルがない: ${src}（先に tag-export を実行する）`);
   }
   const taxonomy = loadTaxonomy();
   const known = new Set(taxonomy.map((t) => t.slug));
   const lines = fs
-    .readFileSync(file, "utf8")
+    .readFileSync(src, "utf8")
     .split("\n")
     .filter((l) => l.trim() !== "");
 

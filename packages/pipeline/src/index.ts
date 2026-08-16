@@ -21,7 +21,8 @@ switch (command) {
     break;
   case "tag-export": {
     const limit = flag("limit");
-    exportUntagged(limit === undefined ? undefined : Number(limit), flag("file"));
+    const sources = flag("source")?.split(",").filter(Boolean);
+    exportUntagged(limit === undefined ? undefined : Number(limit), flag("file"), sources);
     process.exit(process.exitCode ?? 0);
     break;
   }
