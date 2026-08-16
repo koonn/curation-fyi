@@ -1,32 +1,12 @@
 ---
 import Base from "../layouts/Base.astro";
-import ArticleCard from "../components/ArticleCard.astro";
-import FilterBar from "../components/FilterBar.tsx";
-import { loadArticles, loadEnabledSources, loadSourceMap, loadTagMap } from "../lib/load-articles";
-
-const articles = loadArticles().slice(0, 100);
-const sourceMap = loadSourceMap();
-const tagMap = loadTagMap();
-
-// island へ渡す静的テーブル。recent.json は source_id しか持たないため名前と種別はここで渡す
-const tags: [string, string][] = [...tagMap.values()].map((t) => [t.slug, t.name]);
-const sources = Object.fromEntries(
-  loadEnabledSources().map((s) => [s.id, { name: s.name, type: s.type }]),
-);
+import CategoryFeed from "../components/CategoryFeed.astro";
 ---
 
 <Base title="curation.fyi — Tech記事キュレーション">
-  <h1 class="mb-4 text-lg font-bold">新着記事</h1>
-  <FilterBar client:load tags={tags} sources={sources} serverListId="recent-articles" />
-  {articles.length === 0 && <p class="text-slate-500">記事がまだありません。収集をお待ちください。</p>}
-  <div id="recent-articles">
-    <div class="flex flex-col gap-3">
-      {articles.map((article) => (
-        <ArticleCard article={article} source={sourceMap.get(article.source_id)} tagMap={tagMap} />
-      ))}
-    </div>
-    <p class="mt-6 text-sm text-slate-500">
-      さらに古い記事は <a href="/archive/1/" class="underline">アーカイブ</a> から。
-    </p>
-  </div>
+  <CategoryFeed
+    category="tech"
+    heading="新着"
+    description="企業ブログ・個人ブログの新着記事"
+  />
 </Base>

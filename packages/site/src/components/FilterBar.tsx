@@ -16,21 +16,23 @@ interface Props {
   tags: [string, string][];
   /** source_id → { name, type } */
   sources: Record<string, { name: string; type: string }>;
+  /** このページが扱うソース種別。recent.json をこの範囲に絞る */
+  types: string[];
   /** サーバー生成の一覧を隠すための要素 id */
   serverListId: string;
 }
 
 const LANG_KEY = "curation-fyi:lang";
 
-const SOURCE_TYPES: [string, string][] = [
-  ["all", "すべて"],
-  ["company_blog", "企業ブログ"],
-  ["personal_blog", "個人ブログ"],
-  ["aggregator", "アグリゲータ"],
-  ["paper", "論文"],
-];
+const TYPE_LABELS: Record<string, string> = {
+  company_blog: "企業ブログ",
+  personal_blog: "個人ブログ",
+  aggregator: "アグリゲータ",
+  paper: "論文",
+  tweet: "ツイート",
+};
 
-export default function FilterBar({ tags, sources, serverListId }: Props) {
+export default function FilterBar({ tags, sources, types, serverListId }: Props) {
   const [lang, setLang] = useState("all");
   const [tag, setTag] = useState("all");
   const [sourceType, setSourceType] = useState("all");
@@ -69,6 +71,7 @@ export default function FilterBar({ tags, sources, serverListId }: Props) {
 
   const results = (items ?? []).filter(
     (it) =>
+      types.includes(sources[it.s]?.type ?? "") &&
       (lang === "all" || it.l === lang) &&
       (tag === "all" || it.g.includes(tag)) &&
       (sourceType === "all" || sources[it.s]?.type === sourceType) &&
@@ -112,18 +115,21 @@ export default function FilterBar({ tags, sources, serverListId }: Props) {
           </select>
         </label>
 
-        <label class="flex items-center gap-1">
-          <span class="text-slate-500">種別</span>
-          <select
-            class="rounded border border-slate-200 px-1.5 py-1"
-            value={sourceType}
-            onChange={(e) => setSourceType((e.target as HTMLSelectElement).value)}
-          >
-            {SOURCE_TYPES.map(([value, label]) => (
-              <option value={value}>{label}</option>
-            ))}
-          </select>
-        </label>
+        {types.length > 1 && (
+          <label class="flex items-center gap-1">
+            <span class="text-slate-500">種別</span>
+            <select
+              class="rounded border border-slate-200 px-1.5 py-1"
+              value={sourceType}
+              onChange={(e) => setSourceType((e.target as HTMLSelectElement).value)}
+            >
+              <option value="all">すべて</option>
+              {types.map((t) => (
+                <option value={t}>{TYPE_LABELS[t] ?? t}</option>
+              ))}
+            </select>
+          </label>
+        )}
 
         <label class="flex items-center gap-1">
           <input

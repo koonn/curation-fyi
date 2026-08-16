@@ -249,6 +249,26 @@ design.md はAPIキー前提だが、キーを渡さない運用を正規手順�
 - 検証4（コスト実測）: astro 3521ページを約4秒（変更前は468ページ2.3秒）、Pagefind 1.6〜5秒。`dist` 合計 **18.3MB**（薄いページ2.4MB + Pagefind 3.0MB）
 - 既知の非対称: 英語のソース名は検索に引っかかるが日本語のソース名は引っかからない（Cloudflare の43件にはソース名だけの一致6件が含まれるが、「メルカリ Engineering Blog」の約100件は `メルカリ` で出ない）。Pagefind の日本語分かち書きの挙動と見られる。詳細は `docs/search.md`
 
+### 追加: Social / Tech / 論文 のページ分割（2026-08-16）
+
+design.md 範囲外。ユーザー判断「Social Trend と Tech Company の Trend は別物扱い」により実施。
+
+- **着手前の実測（分ける根拠）**: 直近90日1419件のうち aggregator 708件（50%）。新着順のトップ100件は **aggregator 96 / personal_blog 4**、トップ20件は全部 aggregator で、企業ブログがトップページから消えていた。並んでいたのはクレジットカード債務・嗅覚研究・血糖記録アプリ等
+- 分類は `load-articles.ts` の `CATEGORIES` に定義（ソースの `type` で切る）: tech = company_blog/personal_blog/tweet（2041件） / social = aggregator（723件） / papers = paper（289件）
+- `components/CategoryFeed.astro` 新規（3ページ共通の本体）。`pages/index.astro` を tech に絞り、`pages/social.astro` / `pages/papers.astro` を新設
+- `FilterBar` に `types` prop を追加。recent.json をそのページの種別に絞り、**種別セレクトは2種類以上あるときだけ出す**（social/papers では消える）
+- ナビを 新着 / Social / 論文 / Hot / ソース / アーカイブ / 検索 に変更
+- `/feed.xml` をトップと同じ tech の新着50件に変更（Social と論文は混ぜない）
+- `/hot/` は分類と直交するスコア軸なので横断のまま
+- typecheck: 全パッケージ 0 errors
+- 検証1（ページ構成、静的）: `/` → personal_blog 40 + company_blog 60 = 100件 / `/social/` → aggregator 100件 / `/papers/` → paper 100件。混入なし
+- 検証2（ナビ）: 全ページに7リンク存在
+- 検証3（feed）: `<item>` 50件、内訳は personal_blog 20 + company_blog 30 の tech のみ
+  - ※ 照合スクリプトが一時「?17件」を出したが、これは feed が `'` を `&apos;` にXMLエスケープしているのを私の正規表現が拾えなかっただけ（Simon Willison's Weblog）。feed 自体は正しい
+- 検証4（ブラウザ目視）: `/` は Simon Willison / azukiazusa / The Cloudflare Blog、`/social/` は Hacker News / はてなブックマーク（HN・B! バッジ付き）。種別セレクトが social で消えることも確認
+- ビルド: 3523ページ / 3.25秒
+- 手順とカテゴリ定義は `docs/pages.md`（新規）
+
 ## レビュー（v0.5 実装分、A-1〜A-8）
 
 - design.mdの実装順序どおりA-1→A-8を完走。各タスクの検証は実測値付きで上記に記録済み

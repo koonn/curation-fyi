@@ -13,6 +13,36 @@ const TAXONOMY_FILE = path.join(REPO_ROOT, "taxonomy", "tags.yaml");
 /** 1ページの件数 */
 export const PAGE_SIZE = 20;
 
+/**
+ * 記事の分類。ソースの type で切る。
+ * 作り手が書いたもの（tech）と、みんなが読んでいるもの（social）と、論文（papers）は
+ * 性質が違うので別ページにする。直近90日ではアグリゲータが半数を占め、
+ * 混ぜるとトップが実質HN・はてブだけになる（2026-08-16 実測: トップ100件中96件）
+ */
+export const CATEGORIES = {
+  tech: { label: "Tech", types: ["company_blog", "personal_blog", "tweet"] },
+  social: { label: "Social", types: ["aggregator"] },
+  papers: { label: "論文", types: ["paper"] },
+} as const;
+
+export type Category = keyof typeof CATEGORIES;
+
+/** そのカテゴリに属するソースの type か */
+export function inCategory(
+  article: Article,
+  sourceMap: Map<string, Source>,
+  category: Category,
+): boolean {
+  const type = sourceMap.get(article.source_id)?.type;
+  return type !== undefined && (CATEGORIES[category].types as readonly string[]).includes(type);
+}
+
+/** カテゴリで絞った記事（published_at 降順のまま） */
+export function articlesIn(category: Category): Article[] {
+  const sourceMap = loadSourceMap();
+  return loadArticles().filter((a) => inCategory(a, sourceMap, category));
+}
+
 /** 全記事を published_at 降順で返す */
 export function loadArticles(): Article[] {
   if (!fs.existsSync(ARTICLES_DIR)) return [];

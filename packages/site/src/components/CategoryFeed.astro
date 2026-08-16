@@ -1,0 +1,48 @@
+---
+import ArticleCard from "./ArticleCard.astro";
+import FilterBar from "./FilterBar.tsx";
+import {
+  CATEGORIES,
+  articlesIn,
+  loadEnabledSources,
+  loadSourceMap,
+  loadTagMap,
+  type Category,
+} from "../lib/load-articles";
+
+interface Props {
+  category: Category;
+  heading: string;
+  description: string;
+  /** 新着として出す件数 */
+  limit?: number;
+}
+const { category, heading, description, limit = 100 } = Astro.props;
+
+const articles = articlesIn(category).slice(0, limit);
+const sourceMap = loadSourceMap();
+const tagMap = loadTagMap();
+
+// island へ渡す静的テーブル。recent.json は source_id しか持たないため名前と種別はここで渡す
+const tags: [string, string][] = [...tagMap.values()].map((t) => [t.slug, t.name]);
+const sources = Object.fromEntries(
+  loadEnabledSources().map((s) => [s.id, { name: s.name, type: s.type }]),
+);
+const types = [...CATEGORIES[category].types];
+---
+
+<h1 class="mb-1 text-lg font-bold">{heading}</h1>
+<p class="mb-4 text-sm text-slate-500">{description}</p>
+<FilterBar client:load tags={tags} sources={sources} types={types} serverListId="recent-articles" />
+{articles.length === 0 && <p class="text-slate-500">記事がまだありません。収集をお待ちください。</p>}
+<div id="recent-articles">
+  <div class="flex flex-col gap-3">
+    {articles.map((article) => (
+      <ArticleCard article={article} source={sourceMap.get(article.source_id)} tagMap={tagMap} />
+    ))}
+  </div>
+  <p class="mt-6 text-sm text-slate-500">
+    さらに古い記事は <a href="/archive/1/" class="underline">アーカイブ</a> か{" "}
+    <a href="/search/" class="underline">検索</a> から。
+  </p>
+</div>
