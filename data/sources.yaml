@@ -283,3 +283,16 @@
   feed_url: https://azukiazusa.dev/rss.xml
   fetcher: rss
   enabled: true
+
+# CACM（cacm.acm.org）は追加できない。Cloudflare が全経路を403で拒否しており、
+# ローカル・GitHub Actions のどちらからも通らない（Issue #1 で7経路×2ネットワークを実測）。
+# サイト自身が宣言する正規フィード /feed/ も sitemap も403で、robots.txt だけが200で返る。
+# 同じ ACM でも queue.acm.org のフィードのパスは許可されているため、そちらを収集する
+- id: acm-queue
+  name: ACM Queue
+  type: magazine
+  language: en
+  site_url: https://queue.acm.org/
+  feed_url: https://queue.acm.org/rss/feeds/queuecontent.xml
+  fetcher: rss
+  enabled: true

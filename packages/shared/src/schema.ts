@@ -2,6 +2,8 @@ export type SourceType =
   | "company_blog"
   | "personal_blog"
   | "aggregator"
+  /** 編集を経た技術誌（ACM Queue 等）。査読プレプリントの paper とは別に扱う */
+  | "magazine"
   | "paper"
   | "tweet";
 
@@ -12,7 +14,7 @@ export type Language = "en" | "ja";
  * 両方がこれを使うので、片方だけずれないよう shared に置く。
  */
 export const CATEGORIES = {
-  tech: { label: "Tech", types: ["company_blog", "personal_blog", "tweet"] },
+  tech: { label: "Tech", types: ["company_blog", "personal_blog", "magazine", "tweet"] },
   social: { label: "Social", types: ["aggregator"] },
   papers: { label: "論文", types: ["paper"] },
 } as const;

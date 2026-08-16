@@ -351,6 +351,33 @@ CACM 本体は見送りとして、残る選択肢は次の3つ。Issue #3 の�
 - 調査用ブランチ `spike/cacm-access` と `.github/workflows/spike-cacm.yml` は削除済み（main には一度も入れていない。main への push は deploy を起こすため）
 - 既存データに `acm.org` を含む記事は **0件**（HN 経由でも入ってきていない）
 
+## Issue #3: ACM Queue をソースとして収集に載せる — 完了（2026-08-16）
+
+CACM が取得できないため、ユーザー判断で ACM Queue に差し替えて実装した（経緯は Issue #1 の節）。
+
+### 実装
+
+- `SourceType` に `magazine` を新設し、`CATEGORIES` の `tech` に割り当て。**読み手側のラベル対応表2箇所**（`pages/sources/index.astro`・`components/FilterBar.tsx`）にも「技術誌」を追加した
+  - `paper` を使わなかった理由: `tagger/rules.ts` が `type === "paper"` の記事に自動で `paper` タグを付け、`/papers/` は「arXiv の新着（cs 系）」と銘打ったページのため。査読プレプリントではない編集記事を混ぜると両方の意味が濁る
+  - `company_blog` を使わなかった理由: ACM は企業ではなく、UI に「企業ブログ」と表示されてしまう
+- `data/sources.yaml` に `acm-queue` を追加（`fetcher: rss` で足りる）。CACM が使えない理由を同ファイルにコメントで残した（次に追加を試みる人が同じ調査を繰り返さないため）
+
+### 検証（実測値）
+
+- typecheck: 全3パッケージ **0 errors**
+- `pnpm collect`: `✓ acm-queue: 新規 19 件`、**失敗ソース 0/30**
+- 保存された記事: 19件、**URL に `ref=rss` を含むもの 0件**、URL のユニーク数 19（`normalizeUrl` が `ref` を落とし `id` を残す）
+- 重複排除: 2回目の実行は `304 Not Modified` になり**検証にならなかった**ため、`feed-state.json` の `acm-queue` の etag / last_modified を null にして取り直させた上で再実行 → `新規 0 件 / 既存スキップ 19 件`、記事数は19のまま
+- `pnpm build`: 成功（3,620ページ、1.6秒）
+- ビルド出力の確認: `/sources/acm-queue/1/` に**記事カード19件**、`/sources/` の表に `ACM Queue | 技術誌 | 19`、トップページに3件（新着100件の窓に入る分）、フィルタバーに「技術誌」が出る
+- `exclude` は**不要と判断**。19件すべて実務者向けの記事で、ポッドキャスト回・目次のみのエントリ・製品告知の混入はなかった（全19件のタイトルを目視確認）
+
+### 後続チケットに効く制約
+
+- **フィードに `<description>` が無い**（item は title / link / pubDate / guid のみ）。19件すべて `summary: null` で、これは取得漏れではなくフィードの忠実な反映
+- **記事本文も取れない**。`https://queue.acm.org/detail.cfm?id=...` は 403（フィードのパスだけが WAF で許可されている）
+- したがって Issue #2 / #4 の和訳・3行サマリは、この19件については**タイトルのみを入力に生成**することになる。要約の質がタイトル依存になる点を #2 の設計時に考慮すること
+
 ## レビュー（v0.5 実装分、A-1〜A-8）
 
 - design.mdの実装順序どおりA-1→A-8を完走。各タスクの検証は実測値付きで上記に記録済み

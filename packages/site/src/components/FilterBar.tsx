@@ -29,6 +29,7 @@ const TYPE_LABELS: Record<string, string> = {
   company_blog: "企業ブログ",
   personal_blog: "個人ブログ",
   aggregator: "アグリゲータ",
+  magazine: "技術誌",
   paper: "論文",
   tweet: "ツイート",
 };
