@@ -1,0 +1,28 @@
+---
+import Base from "../../layouts/Base.astro";
+import ArticleCard from "../../components/ArticleCard.astro";
+import { loadArticles, loadSourceMap, loadTagMap, score } from "../../lib/load-articles";
+
+const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
+const since = new Date(Date.now() - SEVEN_DAYS_MS).toISOString();
+
+const articles = loadArticles()
+  .filter((a) => a.published_at >= since && score(a) > 0)
+  .sort((a, b) => score(b) - score(a))
+  .slice(0, 50);
+const sourceMap = loadSourceMap();
+const tagMap = loadTagMap();
+---
+
+<Base title="Hot — curation.fyi">
+  <h1 class="mb-1 text-lg font-bold">Hot</h1>
+  <p class="mb-4 text-sm text-slate-500">
+    直近7日で Hacker News・はてなブックマークの反応が多かった記事（最大50件）
+  </p>
+  {articles.length === 0 && <p class="text-slate-500">直近7日で反応のあった記事がありません。</p>}
+  <div class="flex flex-col gap-3">
+    {articles.map((article) => (
+      <ArticleCard article={article} source={sourceMap.get(article.source_id)} tagMap={tagMap} />
+    ))}
+  </div>
+</Base>

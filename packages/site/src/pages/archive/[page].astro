@@ -1,0 +1,29 @@
+---
+import type { GetStaticPaths } from "astro";
+import Base from "../../layouts/Base.astro";
+import ArticleCard from "../../components/ArticleCard.astro";
+import Pagination from "../../components/Pagination.astro";
+import { loadArticles, loadSourceMap, loadTagMap, pageEntries } from "../../lib/load-articles";
+
+export const getStaticPaths: GetStaticPaths = () =>
+  pageEntries(loadArticles()).map((entry) => ({
+    params: { page: entry.page },
+    props: { items: entry.items, total: entry.total },
+  }));
+
+const { items, total } = Astro.props;
+const sourceMap = loadSourceMap();
+const tagMap = loadTagMap();
+const current = Number(Astro.params.page);
+---
+
+<Base title={`アーカイブ ${current}/${total} — curation.fyi`}>
+  <h1 class="mb-1 text-lg font-bold">アーカイブ</h1>
+  <p class="mb-4 text-sm text-slate-500">{total} ページ中 {current} ページ目</p>
+  <div class="flex flex-col gap-3">
+    {items.map((article) => (
+      <ArticleCard article={article} source={sourceMap.get(article.source_id)} tagMap={tagMap} />
+    ))}
+  </div>
+  <Pagination base="/archive/" current={current} total={total} />
+</Base>

@@ -1,21 +1,35 @@
 ---
-import type { Article, Source } from "@curation-fyi/shared";
+import type { Article, Source, Tag } from "@curation-fyi/shared";
+import { displayTags } from "../lib/load-articles";
 
 interface Props {
   article: Article;
   source: Source | undefined;
+  tagMap?: Map<string, Tag>;
 }
-const { article, source } = Astro.props;
+const { article, source, tagMap } = Astro.props;
 
 const date = article.published_at.slice(0, 10);
+const tags = displayTags(article);
+const hn = article.metrics.hn_points ?? 0;
+const hatebu = article.metrics.hatebu_count ?? 0;
 ---
 
 <article class="rounded-lg border border-slate-200 bg-white p-4 transition-shadow hover:shadow-md">
   <div class="mb-1 flex flex-wrap items-center gap-2 text-xs text-slate-500">
-    <span class="font-medium text-slate-600">{source?.name ?? article.source_id}</span>
+    <a href={`/sources/${article.source_id}/1/`} class="font-medium text-slate-600 hover:underline">
+      {source?.name ?? article.source_id}
+    </a>
     <span>·</span>
     <time datetime={article.published_at}>{date}</time>
     <span class="rounded bg-slate-100 px-1.5 py-0.5 uppercase">{article.language}</span>
+    {article.has_code && <span class="rounded bg-slate-100 px-1.5 py-0.5">code</span>}
+    {hn > 0 && (
+      <span class="rounded bg-orange-100 px-1.5 py-0.5 font-medium text-orange-700">HN {hn}</span>
+    )}
+    {hatebu > 0 && (
+      <span class="rounded bg-blue-100 px-1.5 py-0.5 font-medium text-blue-700">B! {hatebu}</span>
+    )}
   </div>
   <h2 class="text-base font-semibold leading-snug">
     <a href={article.url} target="_blank" rel="noopener" class="hover:underline">
@@ -23,4 +37,16 @@ const date = article.published_at.slice(0, 10);
     </a>
   </h2>
   {article.summary && <p class="mt-1 line-clamp-2 text-sm text-slate-600">{article.summary}</p>}
+  {tags.length > 0 && (
+    <div class="mt-2 flex flex-wrap gap-1.5">
+      {tags.map((slug) => (
+        <a
+          href={`/tags/${slug}/1/`}
+          class="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-600 hover:bg-slate-200"
+        >
+          {tagMap?.get(slug)?.name ?? slug}
+        </a>
+      ))}
+    </div>
+  )}
 </article>

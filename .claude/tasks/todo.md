@@ -186,6 +186,21 @@ design.md はAPIキー前提だが、キーを渡さない運用を正規手順�
 - 手順は `docs/sources.md`（新規）に記載
 - **残課題**: (a)「そもそも技術記事でない」（hn-frontpage・hatena-hotentry-it）と、空判定記事が毎回対象に戻る問題は未解決。**判断待ち**
 
+### B-3: サイトのページ拡充 — 完了（2026-08-16）
+
+- `load-articles.ts` に `loadTagMap()` / `displayTags()` / `loadEnabledSources()` / `score()` / `paginate()` / `pageEntries()` を追加。`PAGE_SIZE = 20`
+- `ArticleCard.astro`: 表示用タグのチップ（`/tags/<slug>/1/` へリンク）、HN/はてブのスコアバッジ、`has_code` バッジ、ソース名リンクを追加
+- `Pagination.astro` 新規: 現在ページの前後2ページ＋先頭・末尾のみ表示（アーカイブが153ページあるため全列挙しない）
+- `Base.astro`: ナビ（新着 / Hot / ソース / アーカイブ / RSS）と `<link rel="alternate">` を追加
+- 新規ページ: `/hot/`、`/sources/`、`/sources/[id]/[page]`、`/tags/[slug]/[page]`、`/archive/[page]`、`/feed.xml`（`@astrojs/rss` 追加）
+- 検証1: `pnpm build` 成功。**467ページを2.29秒**（design.md期待値60秒以内を大幅にクリア）
+- 検証2: `dist` のHTMLファイル数 → **467**（期待100以上）。内訳 archive 153 / sources 167 / tags 145 / hot 1 / top 1
+- 検証3: `/hot/index.html` の **HNバッジ46件・はてブバッジ11件**（期待1件以上）
+- 検証4: トップのナビリンク `/hot/` `/sources/` `/archive/1/` `/feed.xml` すべて存在
+- 検証5: `dist/feed.xml` のルート要素が `rss`、`<item>` が **50個**（期待50）
+- 検証6（ページング）: archive 1ページ目20件 / 最終153ページ目13件 / トップ100件 / hot 50件。記事数3053件に対し `ceil(3053/20)=153`ページ・最終ページ13件と一致
+  - ※ 検証中に最終ページ件数が計算と合わないと誤認したが、原因は参照した記事数がprune直後の3041（その後のcollectが12件追加）という古い値だったこと。サイト側は正しい
+
 ## レビュー（v0.5 実装分、A-1〜A-8）
 
 - design.mdの実装順序どおりA-1→A-8を完走。各タスクの検証は実測値付きで上記に記録済み

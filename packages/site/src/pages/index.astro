@@ -1,10 +1,11 @@
 ---
 import Base from "../layouts/Base.astro";
 import ArticleCard from "../components/ArticleCard.astro";
-import { loadArticles, loadSourceMap } from "../lib/load-articles";
+import { loadArticles, loadSourceMap, loadTagMap } from "../lib/load-articles";
 
 const articles = loadArticles().slice(0, 100);
 const sourceMap = loadSourceMap();
+const tagMap = loadTagMap();
 ---
 
 <Base title="curation.fyi — Tech記事キュレーション">
@@ -12,7 +13,10 @@ const sourceMap = loadSourceMap();
   {articles.length === 0 && <p class="text-slate-500">記事がまだありません。収集をお待ちください。</p>}
   <div class="flex flex-col gap-3">
     {articles.map((article) => (
-      <ArticleCard article={article} source={sourceMap.get(article.source_id)} />
+      <ArticleCard article={article} source={sourceMap.get(article.source_id)} tagMap={tagMap} />
     ))}
   </div>
+  <p class="mt-6 text-sm text-slate-500">
+    さらに古い記事は <a href="/archive/1/" class="underline">アーカイブ</a> から。
+  </p>
 </Base>

@@ -1,0 +1,43 @@
+---
+import type { GetStaticPaths } from "astro";
+import Base from "../../../layouts/Base.astro";
+import ArticleCard from "../../../components/ArticleCard.astro";
+import Pagination from "../../../components/Pagination.astro";
+import { loadArticles, loadSourceMap, loadTagMap, pageEntries } from "../../../lib/load-articles";
+
+export const getStaticPaths: GetStaticPaths = () => {
+  const articles = loadArticles();
+  const sourceMap = loadSourceMap();
+  const bySource = new Map<string, typeof articles>();
+  for (const a of articles) {
+    const list = bySource.get(a.source_id) ?? [];
+    list.push(a);
+    bySource.set(a.source_id, list);
+  }
+  return [...bySource].flatMap(([id, list]) =>
+    pageEntries(list).map((entry) => ({
+      params: { id, page: entry.page },
+      props: { items: entry.items, total: entry.total, name: sourceMap.get(id)?.name ?? id },
+    })),
+  );
+};
+
+const { id } = Astro.params;
+const { items, total, name } = Astro.props;
+const sourceMap = loadSourceMap();
+const tagMap = loadTagMap();
+const current = Number(Astro.params.page);
+---
+
+<Base title={`${name} — curation.fyi`}>
+  <h1 class="mb-1 text-lg font-bold">{name}</h1>
+  <p class="mb-4 text-sm text-slate-500">
+    <a href="/sources/" class="underline">ソース一覧</a> · {total} ページ中 {current} ページ目
+  </p>
+  <div class="flex flex-col gap-3">
+    {items.map((article) => (
+      <ArticleCard article={article} source={sourceMap.get(article.source_id)} tagMap={tagMap} />
+    ))}
+  </div>
+  <Pagination base={`/sources/${id}/`} current={current} total={total} />
+</Base>
