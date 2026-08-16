@@ -22,7 +22,14 @@
   - 前回セッションの申し送りにあった「Cloudflare Pages の接続をやった」は**事実と違っていた**。ユーザーに確認したところ未着手で、`curation-fyi.pages.dev` は名前解決もできない状態だった（DNS・通信が生きていることは example.com / github.com / developers.cloudflare.com が200であることで確認済み）。GitHub の Deployments も0件
   - ダッシュボード操作が要らず repo 内で完結するため、ユーザー判断で GitHub Pages に切り替え
   - URL: **https://koonn.github.io/curation-fyi/**（プロジェクトページなので `/curation-fyi/` 配下）
-- [ ] 検証: 無操作で本番に新記事が反映される（cron → collect の自動コミット → deploy が連鎖することの確認）
+- [x] 検証: 本番が公開され全ページが応答する（2026-08-16）
+  - 主要9パス（/ /social/ /papers/ /hot/ /sources/ /archive/1/ /search/ /feed.xml /recent.json）すべて HTTP 200
+  - Pagefind の資産3つ、トップが参照する JS/CSS 3つ（CSS・FilterBar island・Preact ランタイム）すべて実体を取得できることを確認
+  - サイト内絶対リンク **32,030個すべてに base が付いている**（ビルド出力を走査して0件の漏れを確認）
+  - ブラウザ実測（本番）: `/search/` で `Cloudflare` → 43件、リンク先は原文URL、`bundlePath` は `/curation-fyi/pagefind/`
+  - ブラウザ実測（本番）: トップで言語=日本語 → サーバー生成分が hidden になり196件に絞り込み、EN バッジ0件、`localStorage` に `ja` が保存される
+- [ ] 検証: 無操作で本番に新記事が反映される（cron → collect → deploy の連鎖）
+  - **落とし穴**: `collect` が `GITHUB_TOKEN` で push したコミットは push イベントを起こさない（ワークフロー再帰を防ぐGitHubの仕様）ため、`deploy` の `push` トリガーだけでは連鎖しない。`workflow_run`（collect の完了を契機にする）を追加して対処した
 
 ## v0.5（A-1〜A-8）— 完了 / v1（B-1〜B-5）— 着手中
 

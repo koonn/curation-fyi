@@ -3,6 +3,11 @@ name: deploy
 on:
   push:
     branches: [main]
+  # collect が GITHUB_TOKEN で push したコミットは push イベントを起こさない
+  # （ワークフローの再帰を防ぐGitHubの仕様）。収集の完了自体を契機にする
+  workflow_run:
+    workflows: [collect]
+    types: [completed]
   workflow_dispatch:
 
 permissions:
