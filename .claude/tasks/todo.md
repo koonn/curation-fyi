@@ -20,7 +20,7 @@
 - [ ] Cloudflare Pages 接続（**ユーザー操作待ち**: CF ダッシュボード → Workers & Pages → Pages → Connect to Git → koonn/curation-fyi、Build command `pnpm build`、Build output `packages/site/dist`）
 - [ ] 検証: cron が48時間で8回成功し無操作で本番に新記事反映（デプロイ後に確認）
 
-## v0.5（A-1〜A-8）— 完了 / v1（B-1〜B-5）— 未着手
+## v0.5（A-1〜A-8）— 完了 / v1（B-1〜B-5）— 着手中
 
 実装セッションへ: 各タスクの「検証」の実測値をこのファイルに記録してから次へ進むこと。
 
@@ -115,6 +115,22 @@
 - 検証1: 有効ソース数 → `loadSources().length` で**29件**（pyyaml未インストールのためdesign.md記載のpython3+yamlコマンドの代わりに、本番と同じsources.tsのloaderで計測。期待25以上をクリア）
 - 検証2: `pnpm collect` の失敗ソース → 途中複数回 `hatena-hotentry-it`（タイムアウト）・`arxiv-cs`（429/タイムアウト、本セッションでの短時間の連続実行が原因と推測）が一過性で失敗したが、時間を置いての最終実行では **失敗ソース0/29** を達成。新規追加した24候補由来の恒常的な失敗はshopify-engineeringのみで、これは無効化済み
 - 検証3: 総記事数 → **3105件**（期待900件以上を大幅にクリア。内訳: vercel-blogが全履歴1450件・azukiazusaが458件と大きく寄与）。重複URLチェック0件
+
+### B-1: ルールベースタグ付け — 完了（2026-08-16）
+
+- `taxonomy/tags.yaml` 新規作成（design.md記載の14タグをそのまま使用）。`paths.ts` に `TAXONOMY_FILE` を追加
+- `shared/src/schema.ts` に `Tag` 型を追加（共通ルール「型はすべてshared」に従う。B-3のsite側 `loadTagMap()` でも使う）
+- `tagger/rules.ts` 新規作成: `loadTaxonomy()` / `ruleTags(article, source, taxonomy)`。enは `\b`+escapeRegExp+`\b`（i）、jaは `includes`、対象テキストは `title + " " + (summary ?? "")`、返り値は taxonomy 記載順
+- `sources.ts`: `loadAllSources()`（無効化済みを含む全件）を切り出し、`loadSources()` はその `enabled` フィルタに変更。retagは無効化済みソース（mercari/shopify）の既存記事も正しく引けるようにするため前者を使う
+- `retag.ts` 新規作成 + `index.ts` に `retag` サブコマンド追加。pipeline/rootの package.json に `retag` スクリプトを追加
+- typecheck: 全パッケージ通過
+- 検証1: タグ付与率 → **2260/3915 = 57.7%**（design.md期待値60%以上に対し**未達**。判断を仰いだ結果「このまま先へ進む」でユーザー合意）
+  - 原因はデータ構成の変化。design.mdは「~1000記事」前提で60%を置いていたが、A-8でソース29件・3915記事に増え、内訳が変わった
+  - 内訳実測: summaryあり3170件 → 66.1% / **summaryなし745件 → 22.1%** / vercel-blog+hn-frontpageを除く2098件 → **63.3%**（この母集団なら目安を満たす）/ en 55.2% / ja 61.9%
+  - 押し下げているのは vercel-blog 1471件（全体の38%・製品リリース告知中心・41%未タグ）と hn-frontpage 346件（summary無しでタイトルのみ・84%未タグ）
+  - 実装の妥当性確認: 未タグ記事20件をランダム抽出して目視 → いずれも taxonomy のキーワードを実際に含まない記事（家電のお買い得情報・Changelog・製品告知等）。一般語による誤検出も測定（`agent` 182件・`API` 178件・`Go` 40件）し、技術記事コーパスとして妥当な範囲と判断
+  - design.mdは60%を「ルールのみでの実測目安」とし本目標95%はB-2のLLM併用後としているため、実装は変更せず記録して先へ進む
+- 検証2: 決定性 → `retag` を2回連続実行し、1回目の `data/articles/` 全体をコピーして2回目と `diff -rq` → **差分なし**（全111ファイル一致）
 
 ## レビュー（v0.5 実装分、A-1〜A-8）
 

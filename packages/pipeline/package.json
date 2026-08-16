@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "collect": "tsx src/index.ts collect",
+    "retag": "tsx src/index.ts retag",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

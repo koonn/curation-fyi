@@ -27,6 +27,16 @@ export interface Source {
   enabled: boolean;
 }
 
+/** taxonomy/tags.yaml の 1 エントリ */
+export interface Tag {
+  slug: string;
+  name: string;
+  /** 単語境界マッチ（大文字小文字無視） */
+  keywords_en: string[];
+  /** 部分文字列マッチ */
+  keywords_ja: string[];
+}
+
 export interface ExternalIds {
   hn_id?: number;
   arxiv_id?: string;

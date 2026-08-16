@@ -3,7 +3,8 @@ import { parse } from "yaml";
 import type { Source } from "@curation-fyi/shared";
 import { SOURCES_FILE } from "./paths.ts";
 
-export function loadSources(): Source[] {
+/** 無効化済みを含む全ソース。既存記事の source を引くときに使う */
+export function loadAllSources(): Source[] {
   const raw = parse(fs.readFileSync(SOURCES_FILE, "utf8")) as Source[];
   const seen = new Set<string>();
   for (const s of raw) {
@@ -15,5 +16,10 @@ export function loadSources(): Source[] {
     }
     seen.add(s.id);
   }
-  return raw.filter((s) => s.enabled);
+  return raw;
+}
+
+/** 収集対象（enabled のみ） */
+export function loadSources(): Source[] {
+  return loadAllSources().filter((s) => s.enabled);
 }

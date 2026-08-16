@@ -1,0 +1,58 @@
+# tag slug → 表示名と検出キーワード。
+# en キーワードは単語境界マッチ（大文字小文字無視）、ja キーワードは部分文字列マッチ。
+- slug: llm
+  name: LLM / 生成AI
+  keywords_en: [LLM, GPT, Claude, Gemini, "generative AI", prompt, RAG, agent, agentic, transformer, "fine-tuning", embedding]
+  keywords_ja: [生成AI, プロンプト, エージェント, 大規模言語モデル, ファインチューニング]
+- slug: machine-learning
+  name: 機械学習
+  keywords_en: ["machine learning", "deep learning", "neural network", pytorch, tensorflow, inference, training]
+  keywords_ja: [機械学習, 深層学習, ニューラルネット, 推論, 学習]
+- slug: frontend
+  name: フロントエンド
+  keywords_en: [React, Vue, Svelte, CSS, TypeScript, JavaScript, browser, DOM, frontend, "web components", Next.js, Astro]
+  keywords_ja: [フロントエンド, ブラウザ]
+- slug: backend
+  name: バックエンド
+  keywords_en: [API, microservice, gRPC, GraphQL, backend, "server-side", REST]
+  keywords_ja: [バックエンド, マイクロサービス]
+- slug: infrastructure
+  name: インフラ / SRE
+  keywords_en: [Kubernetes, Docker, container, terraform, SRE, reliability, observability, monitoring, incident, deploy, CI/CD]
+  keywords_ja: [インフラ, 監視, 信頼性, 障害, デプロイ, コンテナ]
+- slug: database
+  name: データベース
+  keywords_en: [PostgreSQL, MySQL, SQLite, Redis, database, "query optimization", index, transaction]
+  keywords_ja: [データベース, クエリ, インデックス, トランザクション]
+- slug: security
+  name: セキュリティ
+  keywords_en: [security, vulnerability, CVE, authentication, authorization, encryption, XSS, CSRF]
+  keywords_ja: [セキュリティ, 脆弱性, 認証, 認可, 暗号]
+- slug: performance
+  name: パフォーマンス
+  keywords_en: [performance, latency, throughput, optimization, benchmark, profiling, cache, caching]
+  keywords_ja: [パフォーマンス, 高速化, レイテンシ, キャッシュ, 最適化]
+- slug: mobile
+  name: モバイル
+  keywords_en: [iOS, Android, Swift, Kotlin, "React Native", Flutter, mobile]
+  keywords_ja: [モバイル, アプリ開発]
+- slug: data-engineering
+  name: データエンジニアリング
+  keywords_en: ["data pipeline", Spark, Kafka, BigQuery, Snowflake, ETL, "data warehouse", analytics]
+  keywords_ja: [データ基盤, データパイプライン, 分析基盤]
+- slug: programming-language
+  name: プログラミング言語
+  keywords_en: [Rust, Go, Golang, Python, Ruby, Java, compiler, "type system"]
+  keywords_ja: [コンパイラ, 型システム]
+- slug: architecture
+  name: 設計 / アーキテクチャ
+  keywords_en: [architecture, "design pattern", refactoring, "domain-driven", modular, monolith]
+  keywords_ja: [設計, アーキテクチャ, リファクタリング, ドメイン駆動]
+- slug: team-process
+  name: チーム / プロセス
+  keywords_en: [hiring, onboarding, "code review", "engineering culture", productivity, agile, management]
+  keywords_ja: [組織, 採用, チーム, 開発生産性, マネジメント, スクラム]
+- slug: paper
+  name: 論文
+  keywords_en: []
+  keywords_ja: []

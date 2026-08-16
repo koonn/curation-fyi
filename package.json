@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "collect": "pnpm --filter @curation-fyi/pipeline collect",
+    "retag": "pnpm --filter @curation-fyi/pipeline retag",
     "dev": "pnpm --filter @curation-fyi/site dev",
     "build": "pnpm --filter @curation-fyi/site build",
     "typecheck": "pnpm -r typecheck"
