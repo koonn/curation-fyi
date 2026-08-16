@@ -1,0 +1,50 @@
+---
+import type { GetStaticPaths } from "astro";
+import type { Article } from "@curation-fyi/shared";
+import { displayTags, loadArticles, loadSourceMap, loadTagMap } from "../../lib/load-articles";
+
+/**
+ * Pagefind に「1ページ1記事」でインデックスさせるためだけの薄いページ。
+ * 検索結果のリンク先は data-pagefind-meta の url（＝記事の原文URL）に差し替わるので、
+ * 利用者がここへ来ることは通常ない。サイト内からもリンクしない。
+ * noindex を出して検索エンジンには載せない。
+ */
+export const getStaticPaths: GetStaticPaths = () => {
+  const sourceMap = loadSourceMap();
+  const tagMap = loadTagMap();
+  return loadArticles().map((article) => ({
+    params: { id: article.id },
+    props: {
+      article,
+      sourceName: sourceMap.get(article.source_id)?.name ?? article.source_id,
+      tagNames: displayTags(article).map((slug) => tagMap.get(slug)?.name ?? slug),
+    },
+  }));
+};
+
+type Props = { article: Article; sourceName: string; tagNames: string[] };
+const { article, sourceName, tagNames } = Astro.props;
+const date = article.published_at.slice(0, 10);
+
+// lang はサイトと同じ ja に固定する。記事ごとの言語にすると Pagefind が ja/en の
+// 2インデックスを作り、lang="ja" の /search/ からは ja しか引けない
+// （実測: Cloudflare が 43件中13件しか出なかった）。単一インデックスで日英まとめて引く
+---
+
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="robots" content="noindex,nofollow" />
+    <title>{article.title}</title>
+  </head>
+  <body>
+    <main data-pagefind-body>
+      <h1>{article.title}</h1>
+      {article.summary && <p>{article.summary}</p>}
+      <p>{sourceName} · {date} · {article.language}{tagNames.length > 0 && ` · ${tagNames.join(" ")}`}</p>
+      <p><a href={article.url} data-pagefind-meta="url[href]">原文を読む</a></p>
+      <p><a href="/">curation.fyi</a></p>
+    </main>
+  </body>
+</html>
