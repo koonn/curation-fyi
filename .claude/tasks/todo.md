@@ -212,8 +212,27 @@ design.md はAPIキー前提だが、キーを渡さない運用を正規手順�
 - 検証2: `dist/recent.json` の **gzip 94,829 bytes**（期待500KB以下を大幅にクリア）。1419件、フィールドは指定の7つのみ、期間 2026-05-18〜2026-08-16
 - 検証3: island の props をビルド済みHTMLで確認 → tags 14件・sources 29件・`serverListId: recent-articles`・`client="load"`・`component-url=/_astro/FilterBar.*.js`
 - 検証4: FilterBarのフィルタ述語を実データ（dist/recent.json）で実行 → all 1419 / ja 567 / en 852 / ja+llm 165 / codeOnly 89。ja+en=全体が成立
-- **未実施**: design.md の「`pnpm dev` でブラウザ目視（ja選択で一覧がjaのみ・リロードで保持）＋スクリーンショット添付」。Chrome拡張がツール呼び出しごとにタブグループを失い（`Couldn't determine which page this action targets`）3回失敗したため中断。手順をユーザーに引き継ぐ
+- 検証5（目視）: Chrome拡張がツール呼び出しごとにタブグループを失い（`Couldn't determine which page this action targets`）3回失敗したため、実装者による目視はできず**ユーザーに手順を引き継いで確認してもらい、OKの回答を得た**（2026-08-16）。スクリーンショットは取得できていない
 - design.mdからの意図的な差分: フィルタ結果末尾の誘導リンクは `/archive/` のみにした。`/search/` はB-5で作るページなので、先に張ると壊れたリンクになる。B-5で追加する
+
+### B-5: Pagefind 検索 — 実装完了 / 結果の粒度に既知の問題（2026-08-16）
+
+- `pagefind` + `@pagefind/default-ui` を site の devDependency に追加。build を `astro build && pagefind --site dist` に変更
+- `ArticleCard` に `indexable` prop を追加し、アーカイブのカードだけ `data-pagefind-body` を付与。タイトルリンクに `data-pagefind-meta="url[href]"`
+- `/search/` ページ新規（Pagefind Default UI、日本語のプレースホルダ・0件メッセージ、`processResult` で結果URLを記事原文に差し替える実装）
+- ナビと FilterBar 結果末尾に `/search/` へのリンクを追加（B-4で保留していたもの）
+- **B-3/B-4のtypecheck漏れを修正**: B-3のページ3枚が `Astro.props` 未型付けでエラー、B-4のFilterBarが `JSX.IntrinsicElements` 不在でエラーだった。B-3では typecheck を回しておらず、B-4ではビルドエラーに紛れて見落としていた。`tsconfig.json` に `jsx: react-jsx` / `jsxImportSource: preact` を追加し、3ページに `type Props` を明示 → **全パッケージ 0 errors / 0 warnings**
+- ルートに `preview` スクリプトを追加（無かった）
+- 検証1: `pnpm build` 成功。468ページ + Pagefind が **153ページ・17,284語**をインデックス（153＝アーカイブのページ数と一致し、意図どおりアーカイブ限定になっている）
+- 検証2: `dist/pagefind/` 存在（183ファイル、`pagefind-ui.js` / `pagefind-ui.css` あり）。`/search/` 生成あり
+- 検証3（ブラウザ目視・実施済み）: preview で `/search/` を開き `Cloudflare` を検索 → **「Cloudflareの26件の検索結果」**、ハイライト付きで表示。Pagefind UI・CSS の読み込みも確認
+- **既知の問題（design.md の前提が成立しない）**:
+  - Pagefind のインデックス単位は**ページ**であり、1ページに `data-pagefind-body` が複数あっても1レコードに統合される。実測でも Cloudflare の結果が **26件 = 「Cloudflare」を含むアーカイブページ数26**（出現は43件）と一致し、記事単位になっていない
+  - このため結果タイトルが全て「アーカイブ」（ページのtitle）になる
+  - `data-pagefind-meta` も**ページ単位**なので、1ページ20記事のうち1つのURLが全結果に使われる。実測で Cloudflare の検索結果の最初のリンク先が無関係な freee の記事URLだった
+  - design.md の「各記事要素に `data-pagefind-meta="url[href]"` でリンク先を外部URLにする」は、1ページに複数記事がある構成では成立しない
+  - 対処案: (a) 見出しに `id` を振って Pagefind の sub-results で記事単位に見せる（リンク先はアーカイブページ内アンカー） (b) 記事ごとの薄いページを3053枚生成して1ページ1記事にする (c) Pagefind の JS API で自前の検索UIを書き、アンカーID→原文URLの対応表を別途配って差し替える
+  - **判断待ち**。現状でも全文検索としては機能する（語の発見はできる）が、結果から原文へ正しく飛べない
 
 ## レビュー（v0.5 実装分、A-1〜A-8）
 

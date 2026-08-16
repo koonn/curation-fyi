@@ -3,6 +3,7 @@ import type { GetStaticPaths } from "astro";
 import Base from "../../../layouts/Base.astro";
 import ArticleCard from "../../../components/ArticleCard.astro";
 import Pagination from "../../../components/Pagination.astro";
+import type { Article } from "@curation-fyi/shared";
 import { loadArticles, loadSourceMap, loadTagMap, pageEntries } from "../../../lib/load-articles";
 
 export const getStaticPaths: GetStaticPaths = () => {
@@ -23,6 +24,7 @@ export const getStaticPaths: GetStaticPaths = () => {
 };
 
 const { id } = Astro.params;
+type Props = { items: Article[]; total: number; name: string };
 const { items, total, name } = Astro.props;
 const sourceMap = loadSourceMap();
 const tagMap = loadTagMap();

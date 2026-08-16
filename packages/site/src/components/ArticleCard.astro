@@ -6,8 +6,14 @@ interface Props {
   article: Article;
   source: Source | undefined;
   tagMap?: Map<string, Tag>;
+  /** Pagefind のインデックス対象にするか。アーカイブだけ true にする */
+  indexable?: boolean;
 }
-const { article, source, tagMap } = Astro.props;
+const { article, source, tagMap, indexable = false } = Astro.props;
+
+// data-pagefind-body を持つ要素がサイト内に1つでもあると、Pagefind は
+// その属性を持つページだけをインデックスする。よって付けるのはアーカイブだけでよい
+const indexAttrs = indexable ? { "data-pagefind-body": true } : {};
 
 const date = article.published_at.slice(0, 10);
 const tags = displayTags(article);
@@ -15,7 +21,10 @@ const hn = article.metrics.hn_points ?? 0;
 const hatebu = article.metrics.hatebu_count ?? 0;
 ---
 
-<article class="rounded-lg border border-slate-200 bg-white p-4 transition-shadow hover:shadow-md">
+<article
+  class="rounded-lg border border-slate-200 bg-white p-4 transition-shadow hover:shadow-md"
+  {...indexAttrs}
+>
   <div class="mb-1 flex flex-wrap items-center gap-2 text-xs text-slate-500">
     <a href={`/sources/${article.source_id}/1/`} class="font-medium text-slate-600 hover:underline">
       {source?.name ?? article.source_id}
@@ -32,7 +41,13 @@ const hatebu = article.metrics.hatebu_count ?? 0;
     )}
   </div>
   <h2 class="text-base font-semibold leading-snug">
-    <a href={article.url} target="_blank" rel="noopener" class="hover:underline">
+    <a
+      href={article.url}
+      target="_blank"
+      rel="noopener"
+      class="hover:underline"
+      data-pagefind-meta="url[href]"
+    >
       {article.title}
     </a>
   </h2>

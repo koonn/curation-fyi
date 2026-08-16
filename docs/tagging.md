@@ -1,3 +1,5 @@
+<!-- 検索の運用は docs/search.md、ソースの除外は docs/sources.md -->
+
 # タグ付けの運用
 
 記事のタグは3段階で決まる。表示用タグは `union(tags, llm_tags)`。

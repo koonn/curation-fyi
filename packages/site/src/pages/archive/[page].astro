@@ -3,6 +3,7 @@ import type { GetStaticPaths } from "astro";
 import Base from "../../layouts/Base.astro";
 import ArticleCard from "../../components/ArticleCard.astro";
 import Pagination from "../../components/Pagination.astro";
+import type { Article } from "@curation-fyi/shared";
 import { loadArticles, loadSourceMap, loadTagMap, pageEntries } from "../../lib/load-articles";
 
 export const getStaticPaths: GetStaticPaths = () =>
@@ -11,6 +12,7 @@ export const getStaticPaths: GetStaticPaths = () =>
     props: { items: entry.items, total: entry.total },
   }));
 
+type Props = { items: Article[]; total: number };
 const { items, total } = Astro.props;
 const sourceMap = loadSourceMap();
 const tagMap = loadTagMap();
@@ -22,7 +24,12 @@ const current = Number(Astro.params.page);
   <p class="mb-4 text-sm text-slate-500">{total} ページ中 {current} ページ目</p>
   <div class="flex flex-col gap-3">
     {items.map((article) => (
-      <ArticleCard article={article} source={sourceMap.get(article.source_id)} tagMap={tagMap} />
+      <ArticleCard
+        article={article}
+        source={sourceMap.get(article.source_id)}
+        tagMap={tagMap}
+        indexable
+      />
     ))}
   </div>
   <Pagination base="/archive/" current={current} total={total} />

@@ -178,7 +178,8 @@ export default function FilterBar({ tags, sources, serverListId }: Props) {
           {!loading && (
             <p class="mt-6 text-sm text-slate-500">
               ここに出るのは直近90日分です。それより古い記事は{" "}
-              <a href="/archive/1/" class="underline">アーカイブ</a> を見てください。
+              <a href="/archive/1/" class="underline">アーカイブ</a> か{" "}
+              <a href="/search/" class="underline">検索</a> から。
             </p>
           )}
         </div>

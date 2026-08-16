@@ -1,0 +1,45 @@
+---
+import Base from "../layouts/Base.astro";
+---
+
+<Base title="検索 — curation.fyi">
+  <h1 class="mb-1 text-lg font-bold">検索</h1>
+  <p class="mb-4 text-sm text-slate-500">
+    収集した全記事のタイトルと要約から検索します（インデックスはアーカイブから生成）。
+  </p>
+  <div id="search"></div>
+  <noscript>
+    <p class="text-slate-500">
+      検索には JavaScript が必要です。<a href="/archive/1/" class="underline">アーカイブ</a> を辿ってください。
+    </p>
+  </noscript>
+</Base>
+
+<!-- Pagefind の資産は astro build の後に pagefind CLI が dist/pagefind/ へ出力する。
+     このため dev サーバーでは動かず、ビルド後の preview で確認する -->
+<link rel="stylesheet" href="/pagefind/pagefind-ui.css" />
+<script is:inline src="/pagefind/pagefind-ui.js"></script>
+<script is:inline>
+  window.addEventListener("DOMContentLoaded", () => {
+    if (typeof PagefindUI === "undefined") return;
+    new PagefindUI({
+      element: "#search",
+      showSubResults: true,
+      showImages: false,
+      translations: {
+        placeholder: "記事を検索",
+        zero_results: "「[SEARCH_TERM]」に一致する記事はありません",
+      },
+      // 結果のリンク先を記事の原文URLにする（既定はサイト内のページ）
+      processResult: (result) => {
+        if (result.meta && result.meta.url) {
+          result.url = result.meta.url;
+          for (const sub of result.sub_results ?? []) {
+            sub.url = result.meta.url;
+          }
+        }
+        return result;
+      },
+    });
+  });
+</script>

@@ -10,7 +10,8 @@
     "typecheck": "pnpm -r typecheck",
     "tag-export": "pnpm --filter @curation-fyi/pipeline tag-export",
     "tag-import": "pnpm --filter @curation-fyi/pipeline tag-import",
-    "prune-excluded": "pnpm --filter @curation-fyi/pipeline prune-excluded"
+    "prune-excluded": "pnpm --filter @curation-fyi/pipeline prune-excluded",
+    "preview": "pnpm --filter @curation-fyi/site preview"
   },
   "packageManager": "pnpm@11.21.0",
   "engines": {
