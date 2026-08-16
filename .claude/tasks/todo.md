@@ -295,6 +295,62 @@ design.md 範囲外。ユーザー判断「Social Trend と Tech Company の Tre
 - 検証4: `pnpm build` 成功（3538ページ）
 - **残課題**: 処理済みフラグ（空判定の再処理）は未対応。social を外した今、影響は tech の1〜2割程度。判断待ち
 
+## Issue #1: CACM の取得経路スパイク — 完了（2026-08-16）
+
+**結論: cacm.acm.org からの機械的な収集は「見送り」。代わりに ACM Queue が正当に取得できる。**
+
+### 実測1: 全経路が Cloudflare で 403（ローカル・CI の両方）
+
+本番と同じ Node の fetch（undici）で7経路を測定。curl でも同結果。
+
+| 経路 | ローカル | CI（GitHub Actions） |
+|---|---|---|
+| `/feed/`（pipeline UA） | 403 | 403 |
+| `/feed/`（ブラウザ相当ヘッダ一式） | 403 | 403 |
+| `/`（HTML トップ） | 403 | 403 |
+| `/latest/`（HTML 一覧） | 403 | 403 |
+| `/wp-json/wp/v2/posts`（WP REST API） | 403 | 403 |
+| `/sitemap.xml` | 403 | 403 |
+| `/sitemap_index.xml` | 403 | 403 |
+
+- 応答は全経路で**同一の 5,480B**（Cloudflare の "Attention Required!"）、`server: cloudflare`
+- 初回以降は **13〜31ms で即返る**。JS チャレンジではなくエッジでの即時拒否
+- **ネットワークを変えても結果が変わらない**（自宅ISP・GitHub Actions の米国IP）。mercari の 403（A-6）と違い、IP 起因ではなくクライアント種別で弾かれている
+- UA の差し替え・`Accept` / `Accept-Language` / `Referer` の付与では通らない
+
+### 実測2: robots.txt だけが 200 で返り、宣言と防御が食い違っている
+
+- `robots.txt` は同じUAで **200**（374B）。`User-agent: *` に対する `Disallow` は `/wp-admin/` のみで、**記事パスの巡回自体は許可**されている
+- AI クローラ（GPTBot・ChatGPT-User・CCBot・Google-Extended）は明示的に `Disallow`
+- `Sitemap: https://cacm.acm.org/sitemap.xml` を案内しているが、**その URL は 403**
+- サイト自身が `<link rel="alternate">` で正規フィードを `https://cacm.acm.org/feed/` と宣言しているが、これも 403
+
+### 実測3: `/rss/feeds/*.xml` は WAF を通過するが、CACM 側に実体が無い
+
+- `https://cacm.acm.org/rss/feeds/cacmcontent.xml` → **404 だが本文は 163KB のサイト自身の 404 ページ**（5,480B の Cloudflare ブロックページではない）。つまりこのパス接頭辞はオリジンに到達している
+- ただし CACM 側に該当するフィードの実体は無い（`cacmcontent.xml` / `news.xml` / `blogcacm.xml` いずれも 404）
+- **この穴は採用しない**。相手が意図的に閉じている経路を迂回することになり、かつ WAF 設定の変更でいつでも塞がる
+
+### 実測4: ACM Queue のフィードは正当に取得できる
+
+- `https://queue.acm.org/rss/feeds/queuecontent.xml` → **200**（`text/xml`、5,432B）。**パイプライン自身の UA のまま**通る
+- 実記事 **19件**、最新 2026-08-13。title / link / pubDate すべて取得できる
+- 同ホストの HTML トップ（`https://queue.acm.org/`）は 403 なので、WAF の許可はパス単位
+- 記事 URL は `https://queue.acm.org/detail.cfm?ref=rss&id=3831358` の形式。**`ref=rss` の扱いを `normalizeUrl` で確認する必要がある**（採用する場合）
+
+### 判断が要る点
+
+CACM 本体は見送りとして、残る選択肢は次の3つ。Issue #3 の扱いはこの判断に従う。
+
+1. ACM Queue を代わりに追加する（実装は通常の rss fetcher で済む）
+2. ACM に対してクローラの許可（allowlist）を依頼する。robots.txt の方針上は筋が通る話だが、依頼は人間の作業
+3. ACM 系は諦める
+
+### 後片付け
+
+- 調査用ブランチ `spike/cacm-access` と `.github/workflows/spike-cacm.yml` は削除済み（main には一度も入れていない。main への push は deploy を起こすため）
+- 既存データに `acm.org` を含む記事は **0件**（HN 経由でも入ってきていない）
+
 ## レビュー（v0.5 実装分、A-1〜A-8）
 
 - design.mdの実装順序どおりA-1→A-8を完走。各タスクの検証は実測値付きで上記に記録済み
