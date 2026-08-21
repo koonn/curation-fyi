@@ -296,3 +296,12 @@
   feed_url: https://queue.acm.org/rss/feeds/queuecontent.xml
   fetcher: rss
   enabled: true
+
+- id: analyzecore
+  name: AnalyzeCore by Serhiy Bryl
+  type: personal_blog
+  language: en
+  site_url: https://www.analyzecore.com/
+  feed_url: https://www.analyzecore.com/feed/
+  fetcher: rss
+  enabled: true
