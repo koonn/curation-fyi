@@ -1,5 +1,9 @@
 packages:
   - packages/*
 allowBuilds:
+  # Gemini SDK とその依存。インストール時スクリプトは実行しない
+  # （実行しなくても import・クライアント生成ができることを確認済み）
+  '@google/genai': false
+  protobufjs: false
   esbuild: true
   sharp: true

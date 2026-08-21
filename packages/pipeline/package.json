@@ -12,8 +12,8 @@
     "prune-excluded": "tsx src/index.ts prune"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.117.1",
     "@curation-fyi/shared": "workspace:*",
+    "@google/genai": "^2.17.1",
     "rss-parser": "^3.13.0",
     "tinyld": "^1.3.4",
     "ulid": "^3.0.0",

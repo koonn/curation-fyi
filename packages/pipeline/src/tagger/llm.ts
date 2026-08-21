@@ -1,39 +1,44 @@
-import Anthropic from "@anthropic-ai/sdk";
+import { Type } from "@google/genai";
 import type { Article, Tag } from "@curation-fyi/shared";
+import { BATCH_SIZE, chunk, type LlmRunner, QuotaExceededError } from "../llm/gemini.ts";
 
-/** 1回の実行で LLM に投げる記事数の上限。超過分は次回実行に回る */
-const MAX_LLM_PER_RUN = 100;
-const MODEL = "claude-haiku-4-5-20251001";
-const MAX_TOKENS = 300;
+/** レスポンスの形。記事は index で対応づける（順序ズレ・件数不足で他の記事を巻き込まないため） */
+const RESPONSE_SCHEMA = {
+  type: Type.ARRAY,
+  items: {
+    type: Type.OBJECT,
+    properties: {
+      i: { type: Type.INTEGER, description: "記事番号" },
+      tags: { type: Type.ARRAY, items: { type: Type.STRING } },
+    },
+    required: ["i", "tags"],
+  },
+};
 
-// Haiku 4.5 の料金（$/MTok）。ログのコスト概算に使う
-const PRICE_INPUT_PER_MTOK = 1;
-const PRICE_OUTPUT_PER_MTOK = 5;
+interface TagAnswer {
+  i: number;
+  tags: string[];
+}
 
-function buildPrompt(article: Article, taxonomy: Tag[]): string {
+function buildPrompt(articles: Article[], taxonomy: Tag[]): string {
   const tagList = taxonomy.map((t) => `- ${t.slug}: ${t.name}`).join("\n");
-  return `以下の技術記事に合うタグを、タグ一覧から0〜3個選んでください。
-どれにも合わなければ空配列にしてください。JSONのみを出力してください。
+  const articleList = articles
+    .map((a, i) => `${i}. タイトル: ${a.title}\n   要約: ${a.summary ?? "（なし）"}`)
+    .join("\n");
+  return `以下の技術記事それぞれに合うタグを、タグ一覧から0〜3個選んでください。
+どれにも合わなければ空配列にしてください。記事番号 i は入力のものをそのまま返してください。
+全 ${articles.length} 件について、漏れなく1件ずつ返してください。
 
 タグ一覧:
 ${tagList}
 
-記事タイトル: ${article.title}
-記事要約: ${article.summary ?? ""}
-
-出力形式: {"tags": ["slug1", "slug2"]}`;
+記事:
+${articleList}`;
 }
 
-/** レスポンステキストから taxonomy に存在する slug のみを取り出す。parse 失敗は null */
-function parseTags(text: string, taxonomy: Tag[]): string[] | null {
-  let parsed: unknown;
-  try {
-    parsed = JSON.parse(text);
-  } catch {
-    return null;
-  }
-  const tags = (parsed as { tags?: unknown })?.tags;
-  if (!Array.isArray(tags)) return null;
+/** taxonomy に存在する slug のみを taxonomy の順で返す */
+function knownTags(tags: unknown, taxonomy: Tag[]): string[] {
+  if (!Array.isArray(tags)) return [];
   const known = new Set(taxonomy.map((t) => t.slug));
   const seen = new Set<string>();
   for (const t of tags) {
@@ -43,70 +48,74 @@ function parseTags(text: string, taxonomy: Tag[]): string[] | null {
 }
 
 export interface LlmTagResult {
-  /** llm_tags を更新した記事（tags が0個のままだったものも含む） */
+  /** llm_tags を更新した記事（タグが0個のままだったものも含む） */
   updated: Article[];
   processed: number;
-  parseFailed: number;
-  inputTokens: number;
-  outputTokens: number;
+  /** レスポンスに現れず今回付けられなかった記事数。次回実行で再び対象になる */
+  missed: number;
+  requests: number;
+  quotaHit: boolean;
 }
 
 /**
- * tags も llm_tags も空の記事に LLM でタグを付ける。
- * ANTHROPIC_API_KEY が未設定なら何もせずスキップする。
+ * tags も llm_tags も空の記事に Gemini でタグを付ける。
+ * 1リクエストに BATCH_SIZE 件をまとめ、予算（runner）が尽きたら打ち切って正常に返す。
  */
-export async function tagWithLlm(candidates: Article[], taxonomy: Tag[]): Promise<LlmTagResult> {
-  const empty: LlmTagResult = {
+export async function tagWithLlm(
+  candidates: Article[],
+  taxonomy: Tag[],
+  runner: LlmRunner,
+): Promise<LlmTagResult> {
+  const result: LlmTagResult = {
     updated: [],
     processed: 0,
-    parseFailed: 0,
-    inputTokens: 0,
-    outputTokens: 0,
+    missed: 0,
+    requests: 0,
+    quotaHit: false,
   };
-  if (!process.env.ANTHROPIC_API_KEY) {
-    console.log("LLMタグ付け: APIキー未設定のためスキップ");
-    return empty;
-  }
-  const targets = candidates.slice(0, MAX_LLM_PER_RUN);
-  if (targets.length === 0) {
+  if (candidates.length === 0) {
     console.log("LLMタグ付け: 対象記事なし");
-    return empty;
+    return result;
   }
 
-  const client = new Anthropic();
-  const result: LlmTagResult = { ...empty, updated: [] };
+  for (const batch of chunk(candidates, BATCH_SIZE)) {
+    let answers: TagAnswer[] | null;
+    try {
+      answers = await runner.json<TagAnswer[]>(buildPrompt(batch, taxonomy), RESPONSE_SCHEMA);
+    } catch (e) {
+      if (e instanceof QuotaExceededError) {
+        result.quotaHit = true;
+        break;
+      }
+      throw e;
+    }
+    result.requests++;
 
-  for (const article of targets) {
-    const response = await client.messages.create({
-      model: MODEL,
-      max_tokens: MAX_TOKENS,
-      messages: [{ role: "user", content: buildPrompt(article, taxonomy) }],
-    });
-    result.inputTokens += response.usage.input_tokens;
-    result.outputTokens += response.usage.output_tokens;
-
-    const text = response.content
-      .filter((b): b is Anthropic.TextBlock => b.type === "text")
-      .map((b) => b.text)
-      .join("");
-    const tags = parseTags(text, taxonomy);
-    if (tags === null) {
-      // リトライはしない。次回実行で再び対象になる
-      result.parseFailed++;
-      console.error(`✗ LLMタグ付け: JSONパース失敗 (${article.url}): ${text.slice(0, 80)}`);
+    if (!Array.isArray(answers)) {
+      // バッチごと落とす。リトライはしない（次回実行で再び対象になる）
+      result.missed += batch.length;
+      console.error(`✗ LLMタグ付け: レスポンスが配列でないためバッチ${batch.length}件をスキップ`);
       continue;
     }
-    article.llm_tags = tags;
-    result.updated.push(article);
-    result.processed++;
+
+    const applied = new Set<number>();
+    for (const answer of answers) {
+      const article = batch[answer?.i as number];
+      if (!article || applied.has(answer.i)) continue; // 範囲外・重複は無視
+      article.llm_tags = knownTags(answer.tags, taxonomy);
+      result.updated.push(article);
+      applied.add(answer.i);
+    }
+    result.processed += applied.size;
+    result.missed += batch.length - applied.size;
   }
 
-  const cost =
-    (result.inputTokens / 1_000_000) * PRICE_INPUT_PER_MTOK +
-    (result.outputTokens / 1_000_000) * PRICE_OUTPUT_PER_MTOK;
+  const remaining = candidates.length - result.processed - result.missed;
+  const { input, output } = runner.tokens;
   console.log(
-    `LLMタグ付け: ${result.processed} 件処理` +
-      `（パース失敗 ${result.parseFailed} 件、入力 ${result.inputTokens} tok / 出力 ${result.outputTokens} tok、概算 $${cost.toFixed(4)}）`,
+    `LLMタグ付け: ${result.processed} 件処理（${result.requests} リクエスト、` +
+      `取りこぼし ${result.missed} 件、未着手 ${remaining} 件、入力 ${input} tok / 出力 ${output} tok）` +
+      (result.quotaHit ? " ※利用上限に達したため打ち切り" : ""),
   );
   return result;
 }
