@@ -28,7 +28,11 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
+      # シークレットは自動では環境変数にならないので明示的に渡す。
+      # 未設定でも collect は成功する（LLM タグ付けだけがスキップされる）
       - run: pnpm collect
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
 
       - name: Commit collected articles
         run: |
