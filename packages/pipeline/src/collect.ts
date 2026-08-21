@@ -4,6 +4,7 @@ import { categoryOf, type Article, type Source } from "@curation-fyi/shared";
 import { loadAllSources, loadSources } from "./sources.ts";
 import { loadTaxonomy, ruleTags } from "./tagger/rules.ts";
 import { tagWithLlm } from "./tagger/llm.ts";
+import { translateCandidates, translateWithLlm } from "./translator/llm.ts";
 import { isLlmEnabled, LlmRunner } from "./llm/gemini.ts";
 import { isExcluded } from "./exclude.ts";
 import { fetchRss } from "./fetchers/rss.ts";
@@ -110,7 +111,11 @@ function mergeItems(
  * タグ付け段階。ルールベースで全記事の tags を再計算し、それでも0個の記事を LLM に回す。
  * tags/llm_tags が変わった記事の月を changedMonths に足すことで保存対象に含める。
  */
-async function tagArticles(existing: Map<string, Article>, changedMonths: Set<string>): Promise<void> {
+async function tagArticles(
+  existing: Map<string, Article>,
+  changedMonths: Set<string>,
+  runner: LlmRunner | null,
+): Promise<void> {
   const taxonomy = loadTaxonomy();
   const sourceById = new Map(loadAllSources().map((s) => [s.id, s]));
 
@@ -140,15 +145,38 @@ async function tagArticles(existing: Map<string, Article>, changedMonths: Set<st
       `（未タグ ${untagged.length} 件のうち social ${untagged.length - candidates.length} 件は対象外）`,
   );
 
-  if (!isLlmEnabled()) {
+  if (!runner) {
     console.log("LLMタグ付け: APIキー未設定のためスキップ");
     return;
   }
 
-  // 1回の collect で使えるリクエスト予算を Runner が一括で持つ。
-  // 今後ジョブが増えても（和訳等）同じ Runner を渡して予算を共有する
-  const runner = new LlmRunner();
   const { updated } = await tagWithLlm(candidates, taxonomy, runner);
+  for (const article of updated) {
+    changedMonths.add(article.published_at.slice(0, 7));
+  }
+}
+
+/**
+ * 和訳段階。英語記事に和訳見出しと3行サマリを付ける。
+ * タグ付けと同じ Runner を受け取り、1回の collect のリクエスト予算を共有する
+ * （タグ付けが先に走るので、和訳が使えるのは残りの予算）。
+ */
+async function translateArticles(
+  existing: Map<string, Article>,
+  changedMonths: Set<string>,
+  runner: LlmRunner | null,
+): Promise<void> {
+  const sourceById = new Map(loadAllSources().map((s) => [s.id, s]));
+  const isSocial = (a: Article) => categoryOf(sourceById.get(a.source_id)?.type) === "social";
+  const candidates = translateCandidates(existing.values(), isSocial);
+  console.log(`和訳候補: ${candidates.length} 件（英語・未処理。social は対象外）`);
+
+  if (!runner) {
+    console.log("和訳: APIキー未設定のためスキップ");
+    return;
+  }
+
+  const { updated } = await translateWithLlm(candidates, runner);
   for (const article of updated) {
     changedMonths.add(article.published_at.slice(0, 7));
   }
@@ -192,7 +220,11 @@ export async function collect(): Promise<void> {
     }
   }
 
-  await tagArticles(existing, changedMonths);
+  // 1回の collect で使えるリクエスト予算を Runner が一括で持つ。
+  // タグ付けと和訳が同じ Runner を共有するので、予算管理は1本のまま
+  const runner = isLlmEnabled() ? new LlmRunner() : null;
+  await tagArticles(existing, changedMonths, runner);
+  await translateArticles(existing, changedMonths, runner);
 
   // 変更のあった月に属する記事全件を集めて、その月のファイルだけ全量書き直す
   const toSave: Article[] = [];

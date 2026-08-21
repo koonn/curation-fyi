@@ -9,7 +9,8 @@
     "typecheck": "tsc --noEmit",
     "tag-export": "tsx src/index.ts tag-export",
     "tag-import": "tsx src/index.ts tag-import",
-    "prune-excluded": "tsx src/index.ts prune"
+    "prune-excluded": "tsx src/index.ts prune",
+    "translate": "tsx src/index.ts translate"
   },
   "dependencies": {
     "@curation-fyi/shared": "workspace:*",

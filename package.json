@@ -11,7 +11,8 @@
     "tag-export": "pnpm --filter @curation-fyi/pipeline tag-export",
     "tag-import": "pnpm --filter @curation-fyi/pipeline tag-import",
     "prune-excluded": "pnpm --filter @curation-fyi/pipeline prune-excluded",
-    "preview": "pnpm --filter @curation-fyi/site preview"
+    "preview": "pnpm --filter @curation-fyi/site preview",
+    "translate": "pnpm --filter @curation-fyi/pipeline translate"
   },
   "packageManager": "pnpm@11.21.0",
   "engines": {

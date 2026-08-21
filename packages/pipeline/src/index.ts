@@ -2,6 +2,7 @@ import { collect } from "./collect.ts";
 import { retag } from "./retag.ts";
 import { exportUntagged, importTags } from "./tagger/manual.ts";
 import { prune } from "./prune.ts";
+import { translate } from "./translate.ts";
 
 const [, , command = "collect", ...rest] = process.argv;
 
@@ -27,6 +28,16 @@ switch (command) {
     process.exit(process.exitCode ?? 0);
     break;
   }
+  case "translate": {
+    const limit = flag("limit");
+    await translate({
+      limit: limit === undefined ? undefined : Number(limit),
+      sources: flag("source")?.split(",").filter(Boolean),
+      dryRun: rest.includes("--dry-run"),
+    });
+    process.exit(process.exitCode ?? 0);
+    break;
+  }
   case "tag-import":
     importTags(flag("file"));
     process.exit(process.exitCode ?? 0);
@@ -36,6 +47,6 @@ switch (command) {
     process.exit(process.exitCode ?? 0);
     break;
   default:
-    console.error(`不明なコマンド: ${command}（利用可能: collect, retag, tag-export, tag-import, prune）`);
+    console.error(`不明なコマンド: ${command}（利用可能: collect, retag, translate, tag-export, tag-import, prune）`);
     process.exitCode = 1;
 }

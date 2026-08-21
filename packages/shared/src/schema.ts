@@ -103,6 +103,19 @@ export interface Article {
    * taxonomy を増やして再判定したくなったら `retag --llm-reset` で消す。
    */
   llm_tagged_at?: string;
+  /**
+   * LLM が生成した和訳見出し（英語記事のみ）。未生成なら undefined。
+   * **この有無がそのまま「和訳ジョブが処理したか」のフラグを兼ねる。**
+   * llm_tagged_at のような別フラグが要らないのは、和訳見出しが正当に空になることが
+   * ないため（タグは「該当なし」が正当な結果で、既定値の [] と区別できなかった）。
+   */
+  title_ja?: string;
+  /**
+   * LLM が生成した3行サマリ（日本語）。未生成なら undefined。
+   * 本文が取れずタイトルしか無い等で3行を作らないと判断した場合は [] を入れる
+   * （title_ja が入っていれば処理済みなので、[] でも再処理されない）。
+   */
+  summary_ja?: string[];
   has_code: boolean | null;
   external_ids: ExternalIds;
   metrics: Metrics;
