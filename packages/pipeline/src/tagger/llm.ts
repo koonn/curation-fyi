@@ -54,7 +54,8 @@ export interface LlmTagResult {
   /** レスポンスに現れず今回付けられなかった記事数。次回実行で再び対象になる */
   missed: number;
   requests: number;
-  quotaHit: boolean;
+  /** 打ち切った理由（どの上限に当たったか）。打ち切っていなければ null */
+  quotaDetail: string | null;
 }
 
 /**
@@ -71,7 +72,7 @@ export async function tagWithLlm(
     processed: 0,
     missed: 0,
     requests: 0,
-    quotaHit: false,
+    quotaDetail: null,
   };
   if (candidates.length === 0) {
     console.log("LLMタグ付け: 対象記事なし");
@@ -84,7 +85,7 @@ export async function tagWithLlm(
       answers = await runner.json<TagAnswer[]>(buildPrompt(batch, taxonomy), RESPONSE_SCHEMA);
     } catch (e) {
       if (e instanceof QuotaExceededError) {
-        result.quotaHit = true;
+        result.quotaDetail = e.detail;
         break;
       }
       throw e;
@@ -115,7 +116,7 @@ export async function tagWithLlm(
   console.log(
     `LLMタグ付け: ${result.processed} 件処理（${result.requests} リクエスト、` +
       `取りこぼし ${result.missed} 件、未着手 ${remaining} 件、入力 ${input} tok / 出力 ${output} tok）` +
-      (result.quotaHit ? " ※利用上限に達したため打ち切り" : ""),
+      (result.quotaDetail ? `\n  ※利用上限に達したため打ち切り — ${result.quotaDetail}` : ""),
   );
   return result;
 }

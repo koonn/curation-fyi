@@ -18,9 +18,13 @@ export const MAX_REQUESTS_PER_RUN = 20;
 /** 1リクエストにまとめる記事数 */
 export const BATCH_SIZE = 25;
 
-/** 無料枠の上限に当たったことを表す。捕まえた側は打ち切って正常終了する */
+/**
+ * 無料枠の上限に当たったことを表す。捕まえた側は打ち切って正常終了する。
+ * どの制限（日次・分あたり・トークン数）に当たったかは応答本文にしか出ないので、
+ * detail に残してログに出す（バッチサイズの調整に必要）
+ */
 export class QuotaExceededError extends Error {
-  constructor() {
+  constructor(readonly detail: string) {
     super("Gemini の利用上限に達した");
     this.name = "QuotaExceededError";
   }
@@ -32,6 +36,26 @@ function isQuotaError(e: unknown): boolean {
   if (status === 429) return true;
   const message = e instanceof Error ? e.message : String(e);
   return /\b429\b|RESOURCE_EXHAUSTED|quota/i.test(message);
+}
+
+/**
+ * 429 の本文から、どの制限に当たったかをログ用に取り出す。
+ * 本文は ApiError.message に JSON がそのまま入る（実測で確認）。
+ * ただし 429 の details[] の入れ子は実物で確認できていないので、
+ * 平坦な文字列一致で拾えるものだけを要約に足し、拾えなくても本文全体を残す。
+ */
+function describeQuotaError(e: unknown): string {
+  const raw = e instanceof Error ? e.message : String(e);
+  const ids = [...raw.matchAll(/"(?:quotaId|quotaMetric)"\s*:\s*"([^"]+)"/g)].map((m) => m[1]);
+  const retry = raw.match(/"retryDelay"\s*:\s*"([^"]+)"/)?.[1];
+  const summary = [
+    ids.length > 0 ? `制限: ${[...new Set(ids)].join(", ")}` : null,
+    retry ? `再試行まで ${retry}` : null,
+  ]
+    .filter(Boolean)
+    .join(" / ");
+  const body = raw.length > 800 ? `${raw.slice(0, 800)}…` : raw;
+  return summary ? `${summary} | ${body}` : body;
 }
 
 export function isLlmEnabled(): boolean {
@@ -73,7 +97,11 @@ export class LlmRunner {
    * - パース失敗は null（その分の記事は次回実行で再び対象になる）
    */
   async json<T>(prompt: string, responseSchema: unknown): Promise<T | null> {
-    if (this.remainingRequests === 0) throw new QuotaExceededError();
+    if (this.remainingRequests === 0) {
+      throw new QuotaExceededError(
+        `1実行あたりの予算 ${MAX_REQUESTS_PER_RUN} リクエストを使い切った（API側の上限ではない）`,
+      );
+    }
     this.requests++;
 
     let text: string | undefined;
@@ -88,7 +116,7 @@ export class LlmRunner {
       this.outputTokens += usage?.candidatesTokenCount ?? 0;
       text = response.text;
     } catch (e) {
-      if (isQuotaError(e)) throw new QuotaExceededError();
+      if (isQuotaError(e)) throw new QuotaExceededError(describeQuotaError(e));
       throw e;
     }
 
