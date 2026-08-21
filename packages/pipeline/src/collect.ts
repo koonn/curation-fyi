@@ -127,7 +127,11 @@ async function tagArticles(existing: Map<string, Article>, changedMonths: Set<st
   // 新しい記事から順に LLM に回す（サイトのトップに出る記事を先に埋めるため）。
   // social（HN・はてブ）は技術記事でないものが半数を占め、タグが付かなくて当然のものが多い。
   // /social/ は日付順に読むページでタグを必要としないため、対象から外す
-  const untagged = [...existing.values()].filter((a) => a.tags.length === 0 && a.llm_tags.length === 0);
+  // llm_tagged_at が付いた記事は「LLMが見て該当タグなしと確定させた」もの。
+  // llm_tags: [] は既定値で未判定と区別できないため、時刻の有無で切る（再判定は retag --llm-reset）
+  const untagged = [...existing.values()].filter(
+    (a) => a.tags.length === 0 && a.llm_tags.length === 0 && !a.llm_tagged_at,
+  );
   const candidates = untagged
     .filter((a) => categoryOf(sourceById.get(a.source_id)?.type) !== "social")
     .sort((a, b) => (a.published_at === b.published_at ? 0 : a.published_at < b.published_at ? 1 : -1));

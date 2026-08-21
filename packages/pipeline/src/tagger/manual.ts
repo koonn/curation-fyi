@@ -30,10 +30,14 @@ function resolveFile(file: string): string {
   return path.isAbsolute(file) ? file : path.join(REPO_ROOT, file);
 }
 
-/** tags も llm_tags も空の記事を新しい順に返す（LLM経路の候補選定と同じ規則） */
+/**
+ * tags も llm_tags も空で、LLM が未判定の記事を新しい順に返す（LLM経路の候補選定と同じ規則）。
+ * LLM が「該当タグなし」と確定させた記事も対象外にする——人が見れば付けられる可能性はあるが、
+ * 外すと毎回同じ却下済みの山を書き出すことになる。見直したいときは `retag --llm-reset` を先に打つ。
+ */
 function untagged(existing: Map<string, Article>): Article[] {
   return [...existing.values()]
-    .filter((a) => a.tags.length === 0 && a.llm_tags.length === 0)
+    .filter((a) => a.tags.length === 0 && a.llm_tags.length === 0 && !a.llm_tagged_at)
     .sort((a, b) => (a.published_at === b.published_at ? 0 : a.published_at < b.published_at ? 1 : -1));
 }
 

@@ -394,6 +394,11 @@ const parser = new Parser({
 
 ### 実装（`tagger/llm.ts`）
 
+> **この節は Issue #6（2026-08-21）で失効した。** 実装は Anthropic 1記事1リクエストから
+> **Gemini 無料枠 + 25件バッチ**に載せ替わっており、環境変数も `GEMINI_API_KEY` に変わっている。
+> 現行の仕様は `docs/tagging.md`、実測値と判断の経緯は `.claude/tasks/todo.md` を見ること。
+> 以下は当初の設計として残す。
+
 - 依存: `@anthropic-ai/sdk`（pipeline のみ）
 - 対象: `article.tags.length === 0 && article.llm_tags.length === 0` の記事のみ
 - 1 実行あたり上限 **100 記事**（定数 `MAX_LLM_PER_RUN = 100`）。超過分は次回実行に回る

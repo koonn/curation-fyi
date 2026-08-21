@@ -51,6 +51,8 @@ export interface LlmTagResult {
   /** llm_tags を更新した記事（タグが0個のままだったものも含む） */
   updated: Article[];
   processed: number;
+  /** processed のうち実際にタグが1個以上付いた件数。残りは「該当タグなし」で確定した記事 */
+  tagged: number;
   /** レスポンスに現れず今回付けられなかった記事数。次回実行で再び対象になる */
   missed: number;
   requests: number;
@@ -70,6 +72,7 @@ export async function tagWithLlm(
   const result: LlmTagResult = {
     updated: [],
     processed: 0,
+    tagged: 0,
     missed: 0,
     requests: 0,
     quotaDetail: null,
@@ -79,6 +82,7 @@ export async function tagWithLlm(
     return result;
   }
 
+  const judgedAt = new Date().toISOString();
   for (const batch of chunk(candidates, BATCH_SIZE)) {
     let answers: TagAnswer[] | null;
     try {
@@ -104,6 +108,9 @@ export async function tagWithLlm(
       const article = batch[answer?.i as number];
       if (!article || applied.has(answer.i)) continue; // 範囲外・重複は無視
       article.llm_tags = knownTags(answer.tags, taxonomy);
+      // タグが0個でも「判定した」ことを残す。これが無いと次回また候補に戻る
+      article.llm_tagged_at = judgedAt;
+      if (article.llm_tags.length > 0) result.tagged++;
       result.updated.push(article);
       applied.add(answer.i);
     }
@@ -114,7 +121,8 @@ export async function tagWithLlm(
   const remaining = candidates.length - result.processed - result.missed;
   const { input, output } = runner.tokens;
   console.log(
-    `LLMタグ付け: ${result.processed} 件処理（${result.requests} リクエスト、` +
+    `LLMタグ付け: ${result.processed} 件判定（うちタグ付与 ${result.tagged} 件、` +
+      `該当なし ${result.processed - result.tagged} 件）（${result.requests} リクエスト、` +
       `取りこぼし ${result.missed} 件、未着手 ${remaining} 件、入力 ${input} tok / 出力 ${output} tok）` +
       (result.quotaDetail ? `\n  ※利用上限に達したため打ち切り — ${result.quotaDetail}` : ""),
   );

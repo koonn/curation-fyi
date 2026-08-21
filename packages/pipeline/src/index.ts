@@ -17,7 +17,7 @@ switch (command) {
     process.exit(process.exitCode ?? 0);
     break;
   case "retag":
-    retag();
+    retag(rest.includes("--llm-reset"));
     process.exit(process.exitCode ?? 0);
     break;
   case "tag-export": {

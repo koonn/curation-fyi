@@ -95,6 +95,14 @@ export interface Article {
   tags: string[];
   /** LLM が付けたタグ（tags が空の記事にのみ付く）。表示は union(tags, llm_tags) */
   llm_tags: string[];
+  /**
+   * LLM がこの記事を判定した時刻（ISO）。未判定なら undefined。
+   * llm_tags: [] は記事の生成時に全件へ書かれる既定値なので、
+   * 「LLMが見てタグなしと判断した」と「一度も見ていない」を区別できない。
+   * これが無いと却下済みの記事が毎回候補に戻り、無料枠を再判定で食い潰す。
+   * taxonomy を増やして再判定したくなったら `retag --llm-reset` で消す。
+   */
+  llm_tagged_at?: string;
   has_code: boolean | null;
   external_ids: ExternalIds;
   metrics: Metrics;
