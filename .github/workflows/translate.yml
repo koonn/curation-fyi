@@ -1,0 +1,72 @@
+name: translate
+
+# 英語記事の和訳見出し・3行サマリを手動で生成する。
+# ローカルに GEMINI_API_KEY を置かずに実行するための経路で、バックフィルにも使う。
+on:
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: "処理する記事数の上限"
+        required: false
+        default: "10"
+      source:
+        description: "ソースを絞る（カンマ区切り。空なら全ソース）"
+        required: false
+        default: ""
+      dry_run:
+        description: "保存せず結果をログに出すだけにする"
+        type: boolean
+        required: false
+        default: true
+
+permissions:
+  contents: write
+
+# collect と同じグループにする。data/articles は月ファイルを全量書き直す方式なので、
+# collect と同時に走らせると互いの書き込みを失う
+concurrency:
+  group: collect
+  cancel-in-progress: false
+
+jobs:
+  translate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Run translate
+        run: |
+          args="--limit ${{ inputs.limit }}"
+          if [ -n "${{ inputs.source }}" ]; then
+            args="$args --source ${{ inputs.source }}"
+          fi
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            args="$args --dry-run"
+          fi
+          echo "pnpm translate $args"
+          pnpm translate $args
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+
+      - name: Commit translations
+        if: ${{ inputs.dry_run == false }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/
+          if git diff --cached --quiet; then
+            echo "変更なし"
+          else
+            git commit -m "chore: translate articles ($(date -u +%Y-%m-%dT%H:%M))"
+            git push
+          fi
