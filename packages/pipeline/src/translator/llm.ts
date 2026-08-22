@@ -76,6 +76,8 @@ export interface TranslateResult {
   shortSummary: number;
   /** processed のうちサマリが空だった件数。「情報が足りない」とモデルが判断したもの */
   emptySummary: number;
+  /** やり直しの結果が前回より短かったため、前回を残した件数 */
+  kept: number;
   /** レスポンスに現れなかった・見出しが空で捨てた件数。次回実行で再び対象になる */
   missed: number;
   requests: number;
@@ -98,6 +100,7 @@ export async function translateWithLlm(
     processed: 0,
     shortSummary: 0,
     emptySummary: 0,
+    kept: 0,
     missed: 0,
     requests: 0,
     quotaDetail: null,
@@ -136,9 +139,16 @@ export async function translateWithLlm(
       if (title === "") continue;
       const lines = cleanLines(answer.summary_ja);
       article.title_ja = title;
-      article.summary_ja = lines;
-      if (lines.length === 0) result.emptySummary++;
-      else if (lines.length < SUMMARY_LINES) result.shortSummary++;
+      // **やり直しで結果が悪くなることがある**（モデルは非決定的で、同じ入力でも
+      // 行数が減ることがある）。前回より行数が少ないなら前回を残す——上書きは
+      // 情報が増える方向にだけ動かす。実測: 無条件上書きにしていた実行で、
+      // 1〜2行あった記事14件が空で塗り潰された
+      const previous = article.summary_ja ?? [];
+      if (lines.length >= previous.length) article.summary_ja = lines;
+      else result.kept++;
+      const applied_lines = article.summary_ja ?? [];
+      if (applied_lines.length === 0) result.emptySummary++;
+      else if (applied_lines.length < SUMMARY_LINES) result.shortSummary++;
       result.updated.push(article);
       applied.add(answer.i);
     }
@@ -152,6 +162,7 @@ export async function translateWithLlm(
   console.log(
     `和訳: ${result.processed} 件処理（${result.requests} リクエスト、` +
       `サマリ${SUMMARY_LINES}行未満 ${result.shortSummary} 件、サマリ空 ${result.emptySummary} 件、` +
+      (result.kept > 0 ? `前回より短いため据え置き ${result.kept} 件、` : "") +
       `取りこぼし ${result.missed} 件、未着手 ${remaining} 件、入力 ${input} tok / 出力 ${output} tok）` +
       (waits.count > 0 ? `\n  上限に当たって ${waits.count} 回・計 ${waits.seconds} 秒待った` : "") +
       (result.quotaDetail ? `\n  ※利用上限に達したため打ち切り — ${result.quotaDetail}` : ""),
