@@ -3,10 +3,12 @@ name: deploy
 on:
   push:
     branches: [main]
-  # collect が GITHUB_TOKEN で push したコミットは push イベントを起こさない
-  # （ワークフローの再帰を防ぐGitHubの仕様）。収集の完了自体を契機にする
+  # collect / translate が GITHUB_TOKEN で push したコミットは push イベントを起こさない
+  # （ワークフローの再帰を防ぐGitHubの仕様）。それぞれの完了自体を契機にする。
+  # data/ を書くワークフローを増やしたら、必ずここにも足すこと——足し忘れても
+  # エラーにはならず「本番だけ古いまま」という形で出るので気づきにくい
   workflow_run:
-    workflows: [collect]
+    workflows: [collect, translate]
     types: [completed]
   workflow_dispatch:
 
