@@ -197,7 +197,12 @@ async function translateArticles(
   }
 }
 
-export async function collect(): Promise<void> {
+/**
+ * refresh を立てると条件付きGET（ETag / If-Modified-Since）を1回だけ外す。
+ * 取り出しの実装を直したとき、304 を返すフィードは中身を取得しないので過去分に効かない。
+ * そのための「もう一度だけ全部取り直す」手段（`pnpm collect --refresh`）。
+ */
+export async function collect({ refresh = false } = {}): Promise<void> {
   const sources = loadSources();
   const existing = loadExisting();
   const feedState = loadFeedState();
@@ -211,6 +216,11 @@ export async function collect(): Promise<void> {
   for (const source of sources) {
     const sourceState = feedState[source.id] ?? defaultSourceState();
     feedState[source.id] = sourceState;
+    if (refresh) {
+      // 条件付きGETのヘッダを落として無条件に取りに行く。値は応答から入れ直される
+      sourceState.etag = null;
+      sourceState.last_modified = null;
+    }
     try {
       const outcome = await fetchItems(source, sourceState);
       const { added, merged, skipped, excluded, summaryFilled } = mergeItems(outcome.items, source, existing, fetchedAt, changedMonths);

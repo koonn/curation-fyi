@@ -13,7 +13,7 @@ function flag(name: string): string | undefined {
 
 switch (command) {
   case "collect":
-    await collect();
+    await collect({ refresh: rest.includes("--refresh") });
     // フェッチ失敗時に残るソケットがイベントループを生かし続け、CIでハングするため明示的に終了する
     process.exit(process.exitCode ?? 0);
     break;
