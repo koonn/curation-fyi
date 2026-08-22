@@ -181,10 +181,8 @@ async function translateArticles(
   changedMonths: Set<string>,
   runner: LlmRunner | null,
 ): Promise<void> {
-  const sourceById = new Map(loadAllSources().map((s) => [s.id, s]));
-  const isSocial = (a: Article) => categoryOf(sourceById.get(a.source_id)?.type) === "social";
-  const candidates = translateCandidates(existing.values(), isSocial);
-  console.log(`和訳候補: ${candidates.length} 件（英語・未処理。social は対象外）`);
+  const candidates = translateCandidates(existing.values());
+  console.log(`和訳候補: ${candidates.length} 件（英語・未処理。social も対象）`);
 
   if (!runner) {
     console.log("和訳: APIキー未設定のためスキップ");

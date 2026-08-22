@@ -151,12 +151,14 @@ export async function translateWithLlm(
   return result;
 }
 
-/** 和訳の候補。英語かつ未処理で、social（HN・はてブ）は対象外。新しい順 */
-export function translateCandidates(
-  articles: Iterable<Article>,
-  isSocial: (article: Article) => boolean,
-): Article[] {
+/**
+ * 和訳の候補。英語かつ未処理のもの、新しい順。
+ * **タグ付けと違い social（HN）も対象にする**——/social/ は英語の見出しが並ぶページなので、
+ * 和訳の効果が最も大きい。ただし HN はリンク集で本文を持たない（Algolia API が
+ * リンク投稿に本文を返さない）ため、付くのは見出しだけで3行サマリは空になる。
+ */
+export function translateCandidates(articles: Iterable<Article>): Article[] {
   return [...articles]
-    .filter((a) => a.language === "en" && !a.title_ja && !isSocial(a))
+    .filter((a) => a.language === "en" && !a.title_ja)
     .sort((a, b) => (a.published_at === b.published_at ? 0 : a.published_at < b.published_at ? 1 : -1));
 }

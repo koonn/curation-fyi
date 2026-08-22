@@ -1,6 +1,4 @@
-import { categoryOf, type Article } from "@curation-fyi/shared";
 import { isLlmEnabled, LlmRunner } from "./llm/gemini.ts";
-import { loadAllSources } from "./sources.ts";
 import { loadExisting, saveAll } from "./store.ts";
 import { translateCandidates, translateWithLlm } from "./translator/llm.ts";
 
@@ -23,10 +21,7 @@ export async function translate({ limit, sources, dryRun }: TranslateOptions): P
   }
 
   const existing = loadExisting();
-  const sourceById = new Map(loadAllSources().map((s) => [s.id, s]));
-  const isSocial = (a: Article) => categoryOf(sourceById.get(a.source_id)?.type) === "social";
-
-  let candidates = translateCandidates(existing.values(), isSocial);
+  let candidates = translateCandidates(existing.values());
   if (sources?.length) candidates = candidates.filter((a) => sources.includes(a.source_id));
   const total = candidates.length;
   if (limit !== undefined) candidates = candidates.slice(0, limit);
