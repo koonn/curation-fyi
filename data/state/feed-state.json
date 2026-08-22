@@ -9,186 +9,186 @@
     "etag": null,
     "last_modified": null,
     "consecutive_failures": 0,
-    "last_success": "2026-08-22T01:42:45.403Z"
+    "last_success": "2026-08-22T01:45:50.126Z"
   },
   "cloudflare-blog": {
     "etag": null,
     "last_modified": "Fri, 21 Aug 2026 23:44:57 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-08-22T01:42:45.403Z"
+    "last_success": "2026-08-22T01:45:50.126Z"
   },
   "stripe-blog": {
     "etag": null,
     "last_modified": null,
     "consecutive_failures": 0,
-    "last_success": "2026-08-22T01:42:45.403Z"
+    "last_success": "2026-08-22T01:45:50.126Z"
   },
   "martinfowler": {
     "etag": "\"30d3d-6596aa8671fc0\"",
     "last_modified": "Wed, 19 Aug 2026 18:34:47 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-08-22T01:42:45.403Z"
+    "last_success": "2026-08-22T01:45:50.126Z"
   },
   "jxck": {
     "etag": "W/\"6a880c4a-358b9\"",
     "last_modified": "Fri, 21 Aug 2026 08:28:58 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-08-22T01:42:45.403Z"
+    "last_success": "2026-08-22T01:45:50.126Z"
   },
   "hn-frontpage": {
     "etag": null,
     "last_modified": null,
     "consecutive_failures": 0,
-    "last_success": "2026-08-22T01:42:45.403Z"
+    "last_success": "2026-08-22T01:45:50.126Z"
   },
   "hatena-hotentry-it": {
     "etag": null,
     "last_modified": null,
     "consecutive_failures": 0,
-    "last_success": "2026-08-22T01:42:45.403Z"
+    "last_success": "2026-08-22T01:45:50.126Z"
   },
   "arxiv-cs": {
     "etag": null,
     "last_modified": null,
-    "consecutive_failures": 2,
+    "consecutive_failures": 3,
     "last_success": "2026-08-21T18:36:07.253Z"
   },
   "github-engineering": {
     "etag": "W/\"f4e4088fedb36d75951b8ad9989eb70b\"",
     "last_modified": "Sat, 22 Aug 2026 00:55:50 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-08-22T01:42:45.403Z"
+    "last_success": "2026-08-22T01:45:50.126Z"
   },
   "netflix-techblog": {
     "etag": null,
     "last_modified": null,
     "consecutive_failures": 0,
-    "last_success": "2026-08-22T01:42:45.403Z"
+    "last_success": "2026-08-22T01:45:50.126Z"
   },
   "airbnb-engineering": {
     "etag": null,
     "last_modified": null,
     "consecutive_failures": 0,
-    "last_success": "2026-08-22T01:42:45.403Z"
+    "last_success": "2026-08-22T01:45:50.126Z"
   },
   "slack-engineering": {
     "etag": "W/\"9e62e1ce5207e2161c803dac900dd615\"",
     "last_modified": "Tue, 14 Jul 2026 16:10:08 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-08-22T01:42:45.403Z"
+    "last_success": "2026-08-22T01:45:50.126Z"
   },
   "spotify-engineering": {
     "etag": null,
     "last_modified": null,
     "consecutive_failures": 0,
-    "last_success": "2026-08-22T01:42:45.403Z"
+    "last_success": "2026-08-22T01:45:50.126Z"
   },
   "dropbox-tech": {
     "etag": null,
     "last_modified": null,
     "consecutive_failures": 0,
-    "last_success": "2026-08-22T01:42:45.403Z"
+    "last_success": "2026-08-22T01:45:50.126Z"
   },
   "meta-engineering": {
     "etag": "W/\"32b0ae1dcb7294351cd804dc061d097a\"",
     "last_modified": "Fri, 21 Aug 2026 17:31:08 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-08-22T01:42:45.403Z"
+    "last_success": "2026-08-22T01:45:50.126Z"
   },
   "discord-engineering": {
     "etag": null,
-    "last_modified": "Thu, 20 Aug 2026 16:07:12 GMT",
+    "last_modified": "Mon, 17 Aug 2026 17:17:19 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-08-22T01:42:45.403Z"
+    "last_success": "2026-08-22T01:45:50.126Z"
   },
   "vercel-blog": {
     "etag": "W/\"195f25c227163e97062644a099756ed4\"",
     "last_modified": null,
     "consecutive_failures": 0,
-    "last_success": "2026-08-22T01:42:45.403Z"
+    "last_success": "2026-08-22T01:45:50.126Z"
   },
   "line-yahoo-tech": {
     "etag": "W/\"0bbbb8e1df610e4aef5d0f3f7cd49bd7\"",
     "last_modified": "Fri, 21 Aug 2026 02:04:46 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-08-22T01:42:45.403Z"
+    "last_success": "2026-08-22T01:45:50.126Z"
   },
   "cyberagent-developers": {
     "etag": "\"eac6fecb9ba1a42fe05802a6615af8f9-gzip\"",
     "last_modified": null,
     "consecutive_failures": 0,
-    "last_success": "2026-08-22T01:42:45.403Z"
+    "last_success": "2026-08-22T01:45:50.126Z"
   },
   "hatena-developer": {
     "etag": null,
     "last_modified": null,
     "consecutive_failures": 0,
-    "last_success": "2026-08-22T01:42:45.403Z"
+    "last_success": "2026-08-22T01:45:50.126Z"
   },
   "zozo-techblog": {
     "etag": null,
     "last_modified": null,
     "consecutive_failures": 0,
-    "last_success": "2026-08-22T01:42:45.403Z"
+    "last_success": "2026-08-22T01:45:50.126Z"
   },
   "moneyforward-dev": {
     "etag": null,
     "last_modified": null,
     "consecutive_failures": 0,
-    "last_success": "2026-08-22T01:42:45.403Z"
+    "last_success": "2026-08-22T01:45:50.126Z"
   },
   "smarthr-tech": {
     "etag": null,
     "last_modified": null,
     "consecutive_failures": 0,
-    "last_success": "2026-08-22T01:42:45.403Z"
+    "last_success": "2026-08-22T01:45:50.126Z"
   },
   "dena-engineering": {
     "etag": "W/\"6a82b0a2-c7e86\"",
     "last_modified": "Mon, 17 Aug 2026 06:56:34 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-08-22T01:42:45.403Z"
+    "last_success": "2026-08-22T01:45:50.126Z"
   },
   "freee-developers": {
     "etag": null,
     "last_modified": null,
     "consecutive_failures": 0,
-    "last_success": "2026-08-22T01:42:45.403Z"
+    "last_success": "2026-08-22T01:45:50.126Z"
   },
   "simonwillison": {
     "etag": null,
     "last_modified": "Fri, 21 Aug 2026 17:16:13 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-08-22T01:42:45.403Z"
+    "last_success": "2026-08-22T01:45:50.126Z"
   },
   "overreacted": {
     "etag": "W/\"e85b2c5442ac458fb968d38fd674e6bd\"",
     "last_modified": null,
     "consecutive_failures": 0,
-    "last_success": "2026-08-22T01:42:45.403Z"
+    "last_success": "2026-08-22T01:45:50.126Z"
   },
   "naoya": {
     "etag": null,
     "last_modified": null,
     "consecutive_failures": 0,
-    "last_success": "2026-08-22T01:42:45.403Z"
+    "last_success": "2026-08-22T01:45:50.126Z"
   },
   "azukiazusa": {
     "etag": "W/\"7bac253b423e9ed8c2d7c2dca38d827f\"",
     "last_modified": null,
     "consecutive_failures": 0,
-    "last_success": "2026-08-22T01:42:45.403Z"
+    "last_success": "2026-08-22T01:45:50.126Z"
   },
   "acm-queue": {
     "etag": "W/\"1538-65912299b279f\"",
     "last_modified": "Sat, 15 Aug 2026 09:00:02 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-08-22T01:42:45.403Z"
+    "last_success": "2026-08-22T01:45:50.126Z"
   },
   "analyzecore": {
     "etag": "\"bf03f916c599b911564c9cbfb1669ab5\"",
     "last_modified": null,
     "consecutive_failures": 0,
-    "last_success": "2026-08-22T01:42:45.403Z"
+    "last_success": "2026-08-22T01:45:50.126Z"
   }
 }
