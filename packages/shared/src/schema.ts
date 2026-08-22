@@ -48,12 +48,31 @@ export interface Source {
   default_tags?: string[];
   /** 収集対象から外す条件。製品告知など、キュレーションの対象外を弾く */
   exclude?: SourceExclude;
+  /** fetcher: custom:html_list のときの設定 */
+  html_list?: HtmlListConfig;
   /**
    * URLのフラグメント（#以降）を重複排除キーに残す。既定は除去。
    * 1ページの中を #anchor で区切って各記事を指すフィード（Anthropic の release notes 等）だけ true にする。
    */
   keep_url_fragment?: boolean;
   enabled: boolean;
+}
+
+/**
+ * RSS/Atom を持たないサイトを一覧ページのHTMLから収集するときの設定。
+ * 一覧から URL と公開日を、記事ページから og:title / og:description を取る。
+ */
+export interface HtmlListConfig {
+  /** 一覧ページ。省略時は site_url */
+  list_url?: string;
+  /** href がこの正規表現にマッチするものを記事とみなす */
+  link_pattern: string;
+  /** 記事ページのタイトルから落とす定型（サイト名の接頭・接尾）の正規表現 */
+  title_strip?: string;
+  /** 一覧に日付が無く slug に YYMMDD が埋まっている形式（DeepSeek）。3つのキャプチャが YY/MM/DD */
+  date_from_slug?: string;
+  /** 1回の収集で見る上限（既定40） */
+  max_items?: number;
 }
 
 export interface SourceExclude {

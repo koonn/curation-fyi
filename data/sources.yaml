@@ -445,6 +445,46 @@
   keep_url_fragment: true
   enabled: true
 
+# 以下4件は RSS/Atom を持たないため、一覧ページのHTMLから収集する（fetcher: custom:html_list）。
+# 一覧から URL と公開日、記事ページから og:title / og:description を取る
+- id: manus
+  name: Manus Blog
+  type: company_blog
+  language: en
+  site_url: https://manus.im/blog
+  fetcher: custom:html_list
+  html_list:
+    link_pattern: "^/blog/[a-z0-9-]+$"
+    # 一覧が全112件を返すので、初回に全部取る（2回目以降は未知のURLだけ記事ページを見る）
+    max_items: 150
+  enabled: true
+
+- id: napkin-ai
+  name: Napkin AI Blog
+  type: company_blog
+  language: en
+  site_url: https://www.napkin.ai/blog
+  fetcher: custom:html_list
+  html_list:
+    link_pattern: "^/blog/[a-z0-9-]+"
+    title_strip: "^Napkin AI - "
+  enabled: true
+
+- id: deepseek-news
+  name: DeepSeek News
+  type: company_blog
+  language: en
+  site_url: https://api-docs.deepseek.com/news/
+  fetcher: custom:html_list
+  html_list:
+    # /news/ のトップは当日分しかリンクしない。個別ページのサイドバーが全件を持つので
+    # そちらを一覧として使う。日付は slug（news260821 = 2026-08-21）から取る
+    list_url: https://api-docs.deepseek.com/news/news260821
+    link_pattern: "^/news/news\\d{6}$"
+    date_from_slug: "news(\\d{2})(\\d{2})(\\d{2})$"
+    title_strip: " \\| DeepSeek API Docs$"
+  enabled: true
+
 # 追加を見送った候補（2026-08-22 実測）。再検討するときは同じURLを測り直すこと
 #
 # - Uber Engineering: 全パスが 406 / 404。2026-08-16 の診断（Cloudflare の bot 判定と推測）を再現。

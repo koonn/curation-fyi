@@ -11,6 +11,7 @@ import { fetchRss } from "./fetchers/rss.ts";
 import { fetchHackernews } from "./fetchers/hackernews.ts";
 import { fetchHatena } from "./fetchers/hatena.ts";
 import { fetchArxiv } from "./fetchers/arxiv.ts";
+import { fetchHtmlList } from "./fetchers/htmlList.ts";
 import type { FetchedItem } from "./fetchers/types.ts";
 import { loadExisting, saveAll } from "./store.ts";
 import { defaultSourceState, loadFeedState, saveFeedState, type SourceState } from "./state.ts";
@@ -24,7 +25,11 @@ interface FetchOutcome {
   lastModified?: string | null;
 }
 
-async function fetchItems(source: Source, state: SourceState): Promise<FetchOutcome> {
+async function fetchItems(
+  source: Source,
+  state: SourceState,
+  known: { has(url: string): boolean },
+): Promise<FetchOutcome> {
   switch (source.fetcher) {
     case "rss":
       return fetchRss(source, state);
@@ -34,6 +39,8 @@ async function fetchItems(source: Source, state: SourceState): Promise<FetchOutc
       return { items: await fetchHatena(source), notModified: false };
     case "arxiv_api":
       return { items: await fetchArxiv(source), notModified: false };
+    case "custom:html_list":
+      return fetchHtmlList(source, known);
     default:
       throw new Error(`未対応のfetcher: ${source.fetcher} (${source.id})`);
   }
@@ -220,7 +227,7 @@ export async function collect({ refresh = false } = {}): Promise<void> {
       sourceState.last_modified = null;
     }
     try {
-      const outcome = await fetchItems(source, sourceState);
+      const outcome = await fetchItems(source, sourceState, existing);
       const { added, merged, skipped, excluded, summaryFilled } = mergeItems(outcome.items, source, existing, fetchedAt, changedMonths);
       totalAdded += added;
       results.push({
