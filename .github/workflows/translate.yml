@@ -23,6 +23,11 @@ on:
         type: boolean
         required: false
         default: false
+      redo_all:
+        description: "全件を作り直す（前回の値を信用せず上書き。タイトル照合が無かった頃の出力の入れ替え用）"
+        type: boolean
+        required: false
+        default: false
       redo_short:
         description: "サマリが3行に満たない記事も対象に戻す（材料が増えたときの作り直し）"
         type: boolean
@@ -68,6 +73,9 @@ jobs:
           fi
           if [ "${{ inputs.redo_short }}" = "true" ]; then
             args="$args --redo-short"
+          fi
+          if [ "${{ inputs.redo_all }}" = "true" ]; then
+            args="$args --redo-all"
           fi
           echo "pnpm translate $args"
           pnpm translate $args

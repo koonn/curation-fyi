@@ -11,6 +11,8 @@ interface TranslateOptions {
   fetchBodies?: boolean;
   /** サマリが3行に満たない記事も対象に戻す（材料が増えたときの作り直し） */
   redoShort?: boolean;
+  /** 全件を作り直す。前回の値は信用せず上書きする（照合が無かった頃の出力の入れ替え用） */
+  redoAll?: boolean;
 }
 
 /**
@@ -24,6 +26,7 @@ export async function translate({
   dryRun,
   fetchBodies: shouldFetchBodies,
   redoShort,
+  redoAll,
 }: TranslateOptions): Promise<void> {
   if (!isLlmEnabled()) {
     console.error("translate: GEMINI_API_KEY が未設定のため実行できない");
@@ -32,7 +35,7 @@ export async function translate({
   }
 
   const existing = loadExisting();
-  let candidates = translateCandidates(existing.values(), { redoShort });
+  let candidates = translateCandidates(existing.values(), { redoShort, redoAll });
   if (sources?.length) candidates = candidates.filter((a) => sources.includes(a.source_id));
   const total = candidates.length;
   if (limit !== undefined) candidates = candidates.slice(0, limit);
@@ -52,7 +55,7 @@ export async function translate({
   // やり直しの対象のうち、前回より良い材料が無いものは投げても結果が変わらない。
   // リクエスト予算を使わずに落とす（一度も処理していない記事は見出しのために残す）。
   // 「良い材料がある」＝本文が取れた、または元から使える長さの要約を持っている
-  if (redoShort && shouldFetchBodies) {
+  if (redoShort && !redoAll && shouldFetchBodies) {
     const before = candidates.length;
     candidates = candidates.filter(
       (a) =>
@@ -66,7 +69,7 @@ export async function translate({
   }
 
   const runner = new LlmRunner();
-  const { updated } = await translateWithLlm(candidates, runner, bodies);
+  const { updated } = await translateWithLlm(candidates, runner, bodies, { force: redoAll });
 
   // 目視用の出力。原文と和訳を並べる
   for (const [n, a] of updated.entries()) {

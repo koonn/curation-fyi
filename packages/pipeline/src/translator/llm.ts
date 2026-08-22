@@ -138,6 +138,7 @@ export async function translateWithLlm(
   candidates: Article[],
   runner: LlmRunner,
   bodies: Map<string, string> = new Map(),
+  { force = false } = {},
 ): Promise<TranslateResult> {
   const result: TranslateResult = {
     updated: [],
@@ -202,8 +203,9 @@ export async function translateWithLlm(
         // 行数が減ることがある）。前回より行数が少ないなら前回を残す——上書きは
         // 情報が増える方向にだけ動かす。実測: 無条件上書きにしていた実行で、
         // 1〜2行あった記事14件が空で塗り潰された
+        // force のときは前回を信用しない（照合が無かった頃の値を入れ替えるため）
         const previous = article.summary_ja ?? [];
-        if (lines.length >= previous.length) article.summary_ja = lines;
+        if (force || lines.length >= previous.length) article.summary_ja = lines;
         else result.kept++;
         const settled = article.summary_ja ?? [];
         if (settled.length === 0) result.emptySummary++;
@@ -245,7 +247,7 @@ export async function translateWithLlm(
  */
 export function translateCandidates(
   articles: Iterable<Article>,
-  { redoShort = false } = {},
+  { redoShort = false, redoAll = false } = {},
 ): Article[] {
   return [...articles]
     .filter((a) => {
@@ -255,6 +257,9 @@ export function translateCandidates(
       //   区別できる（既定値として書かれることがないため。L159 の落とし穴を避けている）
       const fresh = a.language === "en" ? !a.title_ja : a.summary_ja === undefined;
       if (a.language !== "en" && a.language !== "ja") return false;
+      // redoAll: 過去の生成物を信用せず全件作り直す（タイトル照合が無かった頃の
+      // 出力には記事間のずれが混ざっているため）
+      if (redoAll) return true;
       // redoShort のときは「サマリが SUMMARY_LINES 行に満たない」記事も対象に戻す
       // （リンク先の本文が取れるようになった等、材料が増えたときの作り直し）
       return fresh || (redoShort && (a.summary_ja?.length ?? 0) < SUMMARY_LINES);

@@ -36,6 +36,7 @@ switch (command) {
       dryRun: rest.includes("--dry-run"),
       fetchBodies: rest.includes("--fetch-bodies"),
       redoShort: rest.includes("--redo-short"),
+      redoAll: rest.includes("--redo-all"),
     });
     process.exit(process.exitCode ?? 0);
     break;
