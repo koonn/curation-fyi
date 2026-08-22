@@ -10,9 +10,12 @@ export function GET() {
     .map((a) => ({
       u: a.url,
       t: a.title,
-      // 和訳見出し。入れないとフィルタした瞬間に英語見出しへ戻る。
-      // summary_ja は入れない（FilterBar は要約を描かないので転送量が増えるだけ）
+      // 和訳見出しと3行サマリ。**入れないとフィルタした瞬間に見出しが英語へ戻り、
+      // 要約が丸ごと消える**（FilterBar はサーバー生成の一覧を隠して自前のカードを描くため）。
+      // gzip で +82KB になるが、recent.json はフィルタが立ったときだけ取りに行くので、
+      // 負担するのは実際にフィルタを使う利用者だけ
       ...(a.title_ja ? { j: a.title_ja } : {}),
+      ...(a.summary_ja?.length ? { m: a.summary_ja } : {}),
       d: a.published_at.slice(0, 10),
       l: a.language,
       s: a.source_id,

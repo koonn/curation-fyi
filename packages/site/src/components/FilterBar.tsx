@@ -7,6 +7,8 @@ interface RecentItem {
   t: string;
   /** 和訳見出し。英語記事で生成済みのものだけ入る */
   j?: string;
+  /** 3行サマリ。生成済みのものだけ入る */
+  m?: string[];
   d: string;
   l: string;
   s: string;
@@ -174,6 +176,16 @@ export default function FilterBar({ tags, sources, types, serverListId }: Props)
                   </a>
                 </h2>
                 {it.j && <p class="mt-0.5 text-xs leading-snug text-slate-500">{it.t}</p>}
+                {it.m && it.m.length > 0 && (
+                  <ul class="mt-1.5 space-y-0.5 text-sm text-slate-600">
+                    {it.m.map((line) => (
+                      <li class="flex gap-1">
+                        <span aria-hidden="true">・</span>
+                        <span>{line}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
                 {it.g.length > 0 && (
                   <div class="mt-2 flex flex-wrap gap-1.5">
                     {it.g.map((slug) => (
