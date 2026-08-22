@@ -140,10 +140,12 @@ export async function translateWithLlm(
 
   const remaining = candidates.length - result.processed - result.missed;
   const { input, output } = runner.tokens;
+  const waits = runner.waits;
   console.log(
     `和訳: ${result.processed} 件処理（${result.requests} リクエスト、` +
       `サマリ${SUMMARY_LINES}行未満 ${result.shortSummary} 件、サマリ空 ${result.emptySummary} 件、` +
       `取りこぼし ${result.missed} 件、未着手 ${remaining} 件、入力 ${input} tok / 出力 ${output} tok）` +
+      (waits.count > 0 ? `\n  上限に当たって ${waits.count} 回・計 ${waits.seconds} 秒待った` : "") +
       (result.quotaDetail ? `\n  ※利用上限に達したため打ち切り — ${result.quotaDetail}` : ""),
   );
   return result;

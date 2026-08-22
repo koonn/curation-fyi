@@ -120,10 +120,12 @@ export async function tagWithLlm(
 
   const remaining = candidates.length - result.processed - result.missed;
   const { input, output } = runner.tokens;
+  const waits = runner.waits;
   console.log(
     `LLMタグ付け: ${result.processed} 件判定（うちタグ付与 ${result.tagged} 件、` +
       `該当なし ${result.processed - result.tagged} 件）（${result.requests} リクエスト、` +
       `取りこぼし ${result.missed} 件、未着手 ${remaining} 件、入力 ${input} tok / 出力 ${output} tok）` +
+      (waits.count > 0 ? `\n  上限に当たって ${waits.count} 回・計 ${waits.seconds} 秒待った` : "") +
       (result.quotaDetail ? `\n  ※利用上限に達したため打ち切り — ${result.quotaDetail}` : ""),
   );
   return result;
