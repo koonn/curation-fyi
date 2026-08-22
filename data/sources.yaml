@@ -391,6 +391,60 @@
   fetcher: rss
   enabled: true
 
+- id: openai-news
+  name: OpenAI News
+  type: company_blog
+  language: en
+  site_url: https://openai.com/news/
+  feed_url: https://openai.com/news/rss.xml
+  fetcher: rss
+  # 2015年まで遡って1,143件を持つフィード。顧客事例・広報も含むが、
+  # 全件取り込む判断（2026-08-22、ユーザー確認済み）
+  enabled: true
+
+- id: openai-developers
+  name: OpenAI Developers
+  type: company_blog
+  language: en
+  site_url: https://developers.openai.com/
+  feed_url: https://developers.openai.com/rss.xml
+  fetcher: rss
+  enabled: true
+
+- id: palantir-blog
+  name: Palantir Blog
+  type: company_blog
+  language: en
+  site_url: https://blog.palantir.com/
+  feed_url: https://blog.palantir.com/feed
+  fetcher: rss
+  enabled: true
+
+- id: cursor-changelog
+  name: Cursor Changelog
+  type: company_blog
+  language: en
+  site_url: https://cursor.com/changelog
+  fetcher: rss
+  feed_url: https://cursor.com/changelog/rss.xml
+  # Cursor は blog にフィードが無く changelog だけが持っている。Discord/Vercel の
+  # changelog は除外してきたが、Cursor はこれを入れる判断（2026-08-22、ユーザー確認済み）
+  enabled: true
+
+- id: anthropic-release-notes
+  name: Claude Platform release notes
+  type: company_blog
+  language: en
+  site_url: https://platform.claude.com/docs/en/release-notes/overview
+  feed_url: https://platform.claude.com/docs/en/release-notes/feed.xml
+  fetcher: rss
+  # anthropic.com/news・/engineering はどちらもフィードを持たない（2026-08-22 実測。
+  # 宣言リンクも無く、rss.xml/feed/atom.xml/index.xml が全て404）。取れるのは
+  # docs 側の release notes だけで、これは1ページ内の #anchor で各回を指すため
+  # フラグメントを残さないと1件に潰れる
+  keep_url_fragment: true
+  enabled: true
+
 # 追加を見送った候補（2026-08-22 実測）。再検討するときは同じURLを測り直すこと
 #
 # - Uber Engineering: 全パスが 406 / 404。2026-08-16 の診断（Cloudflare の bot 判定と推測）を再現。

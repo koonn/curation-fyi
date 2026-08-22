@@ -48,6 +48,11 @@ export interface Source {
   default_tags?: string[];
   /** 収集対象から外す条件。製品告知など、キュレーションの対象外を弾く */
   exclude?: SourceExclude;
+  /**
+   * URLのフラグメント（#以降）を重複排除キーに残す。既定は除去。
+   * 1ページの中を #anchor で区切って各記事を指すフィード（Anthropic の release notes 等）だけ true にする。
+   */
+  keep_url_fragment?: boolean;
   enabled: boolean;
 }
 

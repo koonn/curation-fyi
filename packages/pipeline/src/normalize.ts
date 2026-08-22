@@ -7,12 +7,16 @@ const TRACKING_PARAMS = /^(utm_|fbclid$|gclid$|ref$|source$)/;
  * 重複排除キーとしてのURL正規化。
  * https強制・ホスト小文字化・トラッキングパラメータ除去・フラグメント除去・
  * 末尾スラッシュ統一（ルート以外は除去）。
+ *
+ * keepFragment はフラグメントだけが記事を区別するフィード向けの例外。
+ * Anthropic の release notes は全133件が同じページの #anchor 違いなので、
+ * 既定の除去を通すと1件に潰れる（132件が同一フィード内重複として捨てられる）。
  */
-export function normalizeUrl(input: string): string {
+export function normalizeUrl(input: string, options?: { keepFragment?: boolean }): string {
   const u = new URL(input.trim());
   u.protocol = "https:";
   u.hostname = u.hostname.toLowerCase();
-  u.hash = "";
+  if (!options?.keepFragment) u.hash = "";
   for (const key of [...u.searchParams.keys()]) {
     if (TRACKING_PARAMS.test(key)) u.searchParams.delete(key);
   }

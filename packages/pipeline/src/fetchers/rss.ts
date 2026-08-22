@@ -99,7 +99,7 @@ export async function fetchRss(source: Source, state: SourceState): Promise<RssF
     const title = item.title.trim();
     const summary = toSummary(snippetOf(item));
     items.push({
-      url: normalizeUrl(item.link),
+      url: normalizeUrl(item.link, { keepFragment: source.keep_url_fragment }),
       title,
       summary,
       published_at: publishedAt,
