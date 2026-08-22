@@ -23,8 +23,8 @@ on:
         type: boolean
         required: false
         default: false
-      redo_empty:
-        description: "「見出しは付いたがサマリが空」の記事も対象に戻す（材料が増えたときの作り直し）"
+      redo_short:
+        description: "サマリが3行に満たない記事も対象に戻す（材料が増えたときの作り直し）"
         type: boolean
         required: false
         default: false
@@ -66,8 +66,8 @@ jobs:
           if [ "${{ inputs.fetch_bodies }}" = "true" ]; then
             args="$args --fetch-bodies"
           fi
-          if [ "${{ inputs.redo_empty }}" = "true" ]; then
-            args="$args --redo-empty"
+          if [ "${{ inputs.redo_short }}" = "true" ]; then
+            args="$args --redo-short"
           fi
           echo "pnpm translate $args"
           pnpm translate $args

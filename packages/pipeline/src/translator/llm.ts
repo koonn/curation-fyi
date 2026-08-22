@@ -32,12 +32,13 @@ interface TranslateAnswer {
 function buildPrompt(articles: Article[], bodies: Map<string, string>): string {
   const list = articles
     .map((a, i) => {
-      // フィードの要約が無ければ、リンク先から取った本文を使う（HN はこちらが主）
-      const body = a.summary ? null : bodies.get(a.url);
-      const material = a.summary
-        ? `\n   要約: ${a.summary}`
-        : body
-          ? `\n   本文（抜粋）: ${body}`
+      // リンク先の本文が取れていればそれを使う（フィードの要約より情報量が多い）。
+      // 取得は「要約が無い or 短すぎる」記事にしか走らないので、優先して問題ない
+      const body = bodies.get(a.url);
+      const material = body
+        ? `\n   本文（抜粋）: ${body}`
+        : a.summary
+          ? `\n   要約: ${a.summary}`
           : "\n   要約: （フィードに無し。タイトルのみ）";
       return `${i}. タイトル: ${a.title}${material}`;
     })
@@ -166,15 +167,15 @@ export async function translateWithLlm(
  */
 export function translateCandidates(
   articles: Iterable<Article>,
-  { redoEmpty = false } = {},
+  { redoShort = false } = {},
 ): Article[] {
   return [...articles]
     .filter(
       (a) =>
         a.language === "en" &&
-        // 未処理のもの。redoEmpty のときは「見出しは付いたがサマリが空」も対象に戻す
-        // （リンク先の本文が取れるようになった等、材料が増えたときに作り直すため）
-        (!a.title_ja || (redoEmpty && !a.summary_ja?.length)),
+        // 未処理のもの。redoShort のときは「サマリが SUMMARY_LINES 行に満たない」記事も
+        // 対象に戻す（リンク先の本文が取れるようになった等、材料が増えたときの作り直し）
+        (!a.title_ja || (redoShort && (a.summary_ja?.length ?? 0) < SUMMARY_LINES)),
     )
     .sort((a, b) => (a.published_at === b.published_at ? 0 : a.published_at < b.published_at ? 1 : -1));
 }

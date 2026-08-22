@@ -35,7 +35,7 @@ switch (command) {
       sources: flag("source")?.split(",").filter(Boolean),
       dryRun: rest.includes("--dry-run"),
       fetchBodies: rest.includes("--fetch-bodies"),
-      redoEmpty: rest.includes("--redo-empty"),
+      redoShort: rest.includes("--redo-short"),
     });
     process.exit(process.exitCode ?? 0);
     break;

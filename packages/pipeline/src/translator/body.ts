@@ -18,6 +18,16 @@ const MIN_SCOPED_CHARS = 500;
 const MAX_CHARS = 2_000;
 const CONCURRENCY = 8;
 
+/**
+ * これ未満の要約は3行サマリの材料にならないので、リンク先の本文を取りに行く。
+ * 実測（英語記事・打ち切られていない要約で3行になった割合）:
+ *   0-50字 0% / 50-100字 5% / 100-150字 8% / 150-200字 47% / 200-300字 56%
+ * **150字に崖がある。** 上限300字での打ち切りが原因という当初の見立ては誤りで、
+ * 打ち切られた要約はむしろ最も成績が良い（76%）。悪いのは「フィードが完結した
+ * 短い要約を出している」群だった。
+ */
+export const MIN_USABLE_SUMMARY = 150;
+
 /** タグと実体参照を落として本文だけにする */
 function clean(html: string): string {
   return html
@@ -132,7 +142,8 @@ export async function fetchBodies(
   articles: Article[],
   { concurrency = CONCURRENCY, maxChars = MAX_CHARS } = {},
 ): Promise<{ bodies: Map<string, string>; stats: FetchBodiesStats }> {
-  const targets = articles.filter((a) => !a.summary);
+  // 要約が無い記事に加えて、短すぎて材料にならない要約の記事も取りに行く
+  const targets = articles.filter((a) => !a.summary || a.summary.length < MIN_USABLE_SUMMARY);
   const bodies = new Map<string, string>();
   const stats: FetchBodiesStats = {
     attempted: targets.length,
