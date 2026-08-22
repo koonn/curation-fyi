@@ -5,6 +5,8 @@ import { href } from "../lib/url";
 interface RecentItem {
   u: string;
   t: string;
+  /** 和訳見出し。英語記事で生成済みのものだけ入る */
+  j?: string;
   d: string;
   l: string;
   s: string;
@@ -168,9 +170,10 @@ export default function FilterBar({ tags, sources, types, serverListId }: Props)
                 </div>
                 <h2 class="text-base font-semibold leading-snug">
                   <a href={it.u} target="_blank" rel="noopener" class="hover:underline">
-                    {it.t}
+                    {it.j ?? it.t}
                   </a>
                 </h2>
+                {it.j && <p class="mt-0.5 text-xs leading-snug text-slate-500">{it.t}</p>}
                 {it.g.length > 0 && (
                   <div class="mt-2 flex flex-wrap gap-1.5">
                     {it.g.map((slug) => (

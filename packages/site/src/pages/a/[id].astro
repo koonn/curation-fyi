@@ -2,7 +2,14 @@
 import type { GetStaticPaths } from "astro";
 import type { Article } from "@curation-fyi/shared";
 import { href } from "../../lib/url";
-import { displayTags, loadArticles, loadSourceMap, loadTagMap } from "../../lib/load-articles";
+import {
+  displaySummaryLines,
+  displayTags,
+  displayTitle,
+  loadArticles,
+  loadSourceMap,
+  loadTagMap,
+} from "../../lib/load-articles";
 
 /**
  * Pagefind に「1ページ1記事」でインデックスさせるためだけの薄いページ。
@@ -26,6 +33,10 @@ export const getStaticPaths: GetStaticPaths = () => {
 type Props = { article: Article; sourceName: string; tagNames: string[] };
 const { article, sourceName, tagNames } = Astro.props;
 const date = article.published_at.slice(0, 10);
+// 和訳も索引に載せる。載せないと日本語で検索しても英語記事が引けない。
+// 原題と原文の要約も残すので、英語の語からも従来どおり引ける
+const title = displayTitle(article);
+const summaryLines = displaySummaryLines(article);
 
 // lang はサイトと同じ ja に固定する。記事ごとの言語にすると Pagefind が ja/en の
 // 2インデックスを作り、lang="ja" の /search/ からは ja しか引けない
@@ -41,7 +52,9 @@ const date = article.published_at.slice(0, 10);
   </head>
   <body>
     <main data-pagefind-body>
-      <h1>{article.title}</h1>
+      <h1>{title.main}</h1>
+      {title.sub && <p>{title.sub}</p>}
+      {summaryLines.length > 0 && <p>{summaryLines.join(" ")}</p>}
       {article.summary && <p>{article.summary}</p>}
       <p>{sourceName} · {date} · {article.language}{tagNames.length > 0 && ` · ${tagNames.join(" ")}`}</p>
       <p><a href={article.url} data-pagefind-meta="url[href]">原文を読む</a></p>

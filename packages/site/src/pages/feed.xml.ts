@@ -1,6 +1,6 @@
 import rss from "@astrojs/rss";
 import type { APIContext } from "astro";
-import { articlesIn, loadSourceMap } from "../lib/load-articles";
+import { articlesIn, displaySummaryLines, displayTitle, loadSourceMap } from "../lib/load-articles";
 
 export function GET(context: APIContext) {
   const sourceMap = loadSourceMap();
@@ -12,10 +12,11 @@ export function GET(context: APIContext) {
     description: "Tech企業ブログ・個人ブログの新着記事",
     site: context.site ?? "https://curation-fyi.pages.dev",
     items: articles.map((a) => ({
-      title: a.title,
+      // 和訳があれば和訳を見出しにする（サイトの表示と揃える）
+      title: displayTitle(a).main,
       link: a.url,
       pubDate: new Date(a.published_at),
-      description: a.summary ?? undefined,
+      description: displaySummaryLines(a).join(" ") || a.summary || undefined,
       categories: [sourceMap.get(a.source_id)?.name ?? a.source_id],
     })),
   });

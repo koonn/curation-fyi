@@ -10,6 +10,9 @@ export function GET() {
     .map((a) => ({
       u: a.url,
       t: a.title,
+      // 和訳見出し。入れないとフィルタした瞬間に英語見出しへ戻る。
+      // summary_ja は入れない（FilterBar は要約を描かないので転送量が増えるだけ）
+      ...(a.title_ja ? { j: a.title_ja } : {}),
       d: a.published_at.slice(0, 10),
       l: a.language,
       s: a.source_id,

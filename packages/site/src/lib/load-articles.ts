@@ -71,6 +71,22 @@ export function displayTags(article: Article): string[] {
   return [...new Set([...article.tags, ...(article.llm_tags ?? [])])];
 }
 
+/**
+ * 表示用の見出し。和訳があれば和訳を主・原題を副にする。
+ * 和訳を持たない記事（日本語記事・未処理の英語記事）は sub が null になり、
+ * 呼び出し側は原題だけを従来どおり出す
+ */
+export function displayTitle(article: Article): { main: string; sub: string | null } {
+  return article.title_ja
+    ? { main: article.title_ja, sub: article.title }
+    : { main: article.title, sub: null };
+}
+
+/** 表示用の3行サマリ。無い記事は空配列（呼び出し側はフィード由来の summary に落とす） */
+export function displaySummaryLines(article: Article): string[] {
+  return article.summary_ja ?? [];
+}
+
 /** 直近7日の盛り上がりスコア。metrics が無ければ 0 */
 export function score(article: Article): number {
   return (article.metrics.hn_points ?? 0) + (article.metrics.hatebu_count ?? 0);

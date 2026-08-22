@@ -1,6 +1,6 @@
 ---
 import type { Article, Source, Tag } from "@curation-fyi/shared";
-import { displayTags } from "../lib/load-articles";
+import { displayTags, displaySummaryLines, displayTitle } from "../lib/load-articles";
 import { href } from "../lib/url";
 
 interface Props {
@@ -18,6 +18,8 @@ const indexAttrs = indexable ? { "data-pagefind-body": true } : {};
 
 const date = article.published_at.slice(0, 10);
 const tags = displayTags(article);
+const title = displayTitle(article);
+const summaryLines = displaySummaryLines(article);
 const hn = article.metrics.hn_points ?? 0;
 const hatebu = article.metrics.hatebu_count ?? 0;
 ---
@@ -49,10 +51,22 @@ const hatebu = article.metrics.hatebu_count ?? 0;
       class="hover:underline"
       data-pagefind-meta="url[href]"
     >
-      {article.title}
+      {title.main}
     </a>
   </h2>
-  {article.summary && <p class="mt-1 line-clamp-2 text-sm text-slate-600">{article.summary}</p>}
+  {title.sub && <p class="mt-0.5 text-xs leading-snug text-slate-500">{title.sub}</p>}
+  {summaryLines.length > 0 ? (
+    <ul class="mt-1.5 space-y-0.5 text-sm text-slate-600">
+      {summaryLines.map((line) => (
+        <li class="flex gap-1">
+          <span aria-hidden="true">・</span>
+          <span>{line}</span>
+        </li>
+      ))}
+    </ul>
+  ) : (
+    article.summary && <p class="mt-1 line-clamp-2 text-sm text-slate-600">{article.summary}</p>
+  )}
   {tags.length > 0 && (
     <div class="mt-2 flex flex-wrap gap-1.5">
       {tags.map((slug) => (
