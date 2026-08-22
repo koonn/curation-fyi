@@ -37,6 +37,7 @@ switch (command) {
       fetchBodies: rest.includes("--fetch-bodies"),
       redoShort: rest.includes("--redo-short"),
       redoAll: rest.includes("--redo-all"),
+      offset: flag("offset") === undefined ? undefined : Number(flag("offset")),
     });
     process.exit(process.exitCode ?? 0);
     break;

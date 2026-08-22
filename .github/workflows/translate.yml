@@ -23,6 +23,10 @@ on:
         type: boolean
         required: false
         default: false
+      offset:
+        description: "候補の先頭から読み飛ばす件数（redo_all で全件を順に舐めるとき）"
+        required: false
+        default: "0"
       redo_all:
         description: "全件を作り直す（前回の値を信用せず上書き。タイトル照合が無かった頃の出力の入れ替え用）"
         type: boolean
@@ -62,6 +66,9 @@ jobs:
       - name: Run translate
         run: |
           args="--limit ${{ inputs.limit }}"
+          if [ "${{ inputs.offset }}" != "0" ] && [ -n "${{ inputs.offset }}" ]; then
+            args="$args --offset ${{ inputs.offset }}"
+          fi
           if [ -n "${{ inputs.source }}" ]; then
             args="$args --source ${{ inputs.source }}"
           fi

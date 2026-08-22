@@ -13,6 +13,8 @@ interface TranslateOptions {
   redoShort?: boolean;
   /** 全件を作り直す。前回の値は信用せず上書きする（照合が無かった頃の出力の入れ替え用） */
   redoAll?: boolean;
+  /** 候補の先頭から読み飛ばす件数。redoAll で全件を順に舐めるときに使う */
+  offset?: number;
 }
 
 /**
@@ -27,6 +29,7 @@ export async function translate({
   fetchBodies: shouldFetchBodies,
   redoShort,
   redoAll,
+  offset,
 }: TranslateOptions): Promise<void> {
   if (!isLlmEnabled()) {
     console.error("translate: GEMINI_API_KEY が未設定のため実行できない");
@@ -38,12 +41,13 @@ export async function translate({
   let candidates = translateCandidates(existing.values(), { redoShort, redoAll });
   if (sources?.length) candidates = candidates.filter((a) => sources.includes(a.source_id));
   const total = candidates.length;
+  if (offset) candidates = candidates.slice(offset);
   if (limit !== undefined) candidates = candidates.slice(0, limit);
 
   console.log(
     `translate: 候補 ${total} 件のうち ${candidates.length} 件を処理する` +
       (sources?.length ? `（ソース: ${sources.join(", ")}）` : "") +
-      (dryRun ? " ※dry-run（保存しない）" : ""),
+      (offset ? `（先頭 ${offset} 件を読み飛ばし）` : "") + (dryRun ? " ※dry-run（保存しない）" : ""),
   );
   const noSummary = candidates.filter((a) => !a.summary).length;
   console.log(`  うち要約がフィードに無い（タイトルのみ）記事: ${noSummary} 件`);

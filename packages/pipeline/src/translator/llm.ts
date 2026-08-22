@@ -264,5 +264,12 @@ export function translateCandidates(
       // （リンク先の本文が取れるようになった等、材料が増えたときの作り直し）
       return fresh || (redoShort && (a.summary_ja?.length ?? 0) < SUMMARY_LINES);
     })
-    .sort((a, b) => (a.published_at === b.published_at ? 0 : a.published_at < b.published_at ? 1 : -1));
+    .sort((a, b) => {
+      if (a.published_at === b.published_at) return 0;
+      // 通常は新しい順（トップに出る記事から埋める）。
+      // **redoAll のときは古い順**——全件を offset で順に舐めるため、新着が届いても
+      // 既に処理した範囲の位置がずれないようにする（新着は末尾に付く）
+      const older = a.published_at < b.published_at;
+      return redoAll ? (older ? -1 : 1) : older ? 1 : -1;
+    });
 }
