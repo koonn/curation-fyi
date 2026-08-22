@@ -5,31 +5,43 @@ import { BATCH_SIZE, chunk, type LlmRunner, QuotaExceededError } from "../llm/ge
 /** サマリの行数。カードの表示もこの数を前提にする */
 const SUMMARY_LINES = 3;
 
-/** レスポンスの形。記事は index で対応づける（順序ズレ・件数不足で他の記事を巻き込まないため） */
-const RESPONSE_SCHEMA = {
+/**
+ * 英語記事は「見出しの和訳＋3行サマリ」、日本語記事は「3行サマリ」だけを作る。
+ * 日本語記事は原文で読めるので見出しの訳は要らないが、**読む時間を減らす**という
+ * 目的にはサマリが効く。
+ */
+type Mode = "translate" | "summarize";
+
+const SUMMARY_FIELD = {
   type: Type.ARRAY,
-  items: {
-    type: Type.OBJECT,
-    properties: {
-      i: { type: Type.INTEGER, description: "記事番号" },
-      title_ja: { type: Type.STRING, description: "和訳した見出し" },
-      summary_ja: {
-        type: Type.ARRAY,
-        items: { type: Type.STRING },
-        description: `要点を${SUMMARY_LINES}行。情報が足りなければ行を減らすか空にする`,
-      },
-    },
-    required: ["i", "title_ja", "summary_ja"],
-  },
+  items: { type: Type.STRING },
+  description: `要点を${SUMMARY_LINES}行。情報が足りなければ行を減らすか空にする`,
 };
+
+/** レスポンスの形。記事は index で対応づける（順序ズレ・件数不足で他の記事を巻き込まないため） */
+function responseSchema(mode: Mode): unknown {
+  const translate = mode === "translate";
+  return {
+    type: Type.ARRAY,
+    items: {
+      type: Type.OBJECT,
+      properties: {
+        i: { type: Type.INTEGER, description: "記事番号" },
+        ...(translate ? { title_ja: { type: Type.STRING, description: "和訳した見出し" } } : {}),
+        summary_ja: SUMMARY_FIELD,
+      },
+      required: translate ? ["i", "title_ja", "summary_ja"] : ["i", "summary_ja"],
+    },
+  };
+}
 
 interface TranslateAnswer {
   i: number;
-  title_ja: string;
+  title_ja?: string;
   summary_ja: string[];
 }
 
-function buildPrompt(articles: Article[], bodies: Map<string, string>): string {
+function buildPrompt(articles: Article[], bodies: Map<string, string>, mode: Mode): string {
   const list = articles
     .map((a, i) => {
       // リンク先の本文が取れていればそれを使う（フィードの要約より情報量が多い）。
@@ -43,16 +55,31 @@ function buildPrompt(articles: Article[], bodies: Map<string, string>): string {
       return `${i}. タイトル: ${a.title}${material}`;
     })
     .join("\n");
+  const caution = `summary_ja の注意:
+- **見出しの言い換えを並べない**。見出しから分かること以外の中身を書く
+- **与えられた情報に書かれていないことは書かない**。推測で補わない
+- タイトルしか無く要点が取れない場合は、無理に${SUMMARY_LINES}行にせず、行を減らすか空配列にする`;
+  const common = `記事番号 i は入力のものをそのまま返し、全 ${articles.length} 件を漏れなく1件ずつ返してください。`;
+
+  if (mode === "summarize") {
+    return `以下は日本語の技術記事です。それぞれについて内容の要点を日本語で作ってください。
+${common}
+
+summary_ja: 内容の要点を${SUMMARY_LINES}行。各行は40字程度の短い文にする
+
+${caution}
+
+記事:
+${list}`;
+  }
+
   return `以下は英語の技術記事です。それぞれについて次の2つを日本語で作ってください。
-記事番号 i は入力のものをそのまま返し、全 ${articles.length} 件を漏れなく1件ずつ返してください。
+${common}
 
 1. title_ja: 見出しの和訳。直訳ではなく、日本語の技術記事の見出しとして自然な形にする
 2. summary_ja: 内容の要点を${SUMMARY_LINES}行。各行は40字程度の短い文にする
 
-summary_ja の注意:
-- **見出しの言い換えを並べない**。見出しから分かること以外の中身を書く
-- **与えられた情報に書かれていないことは書かない**。推測で補わない
-- タイトルしか無く要点が取れない場合は、無理に${SUMMARY_LINES}行にせず、行を減らすか空配列にする
+${caution}
 
 記事:
 ${list}`;
@@ -110,51 +137,64 @@ export async function translateWithLlm(
     return result;
   }
 
-  for (const batch of chunk(candidates, BATCH_SIZE)) {
-    let answers: TranslateAnswer[] | null;
-    try {
-      answers = await runner.json<TranslateAnswer[]>(buildPrompt(batch, bodies), RESPONSE_SCHEMA);
-    } catch (e) {
-      if (e instanceof QuotaExceededError) {
-        result.quotaDetail = e.detail;
-        break;
+  /** 1つの言語ぶんをバッチで処理する。上限に当たったら quotaDetail を立てて止まる */
+  const runBatches = async (articles: Article[], mode: Mode): Promise<void> => {
+    const schema = responseSchema(mode);
+    for (const batch of chunk(articles, BATCH_SIZE)) {
+      if (result.quotaDetail) return;
+      let answers: TranslateAnswer[] | null;
+      try {
+        answers = await runner.json<TranslateAnswer[]>(buildPrompt(batch, bodies, mode), schema);
+      } catch (e) {
+        if (e instanceof QuotaExceededError) {
+          result.quotaDetail = e.detail;
+          return;
+        }
+        throw e;
       }
-      throw e;
-    }
-    result.requests++;
+      result.requests++;
 
-    if (!Array.isArray(answers)) {
-      // バッチごと落とす。リトライはしない（次回実行で再び対象になる）
-      result.missed += batch.length;
-      console.error(`✗ 和訳: レスポンスが配列でないためバッチ${batch.length}件をスキップ`);
-      continue;
-    }
+      if (!Array.isArray(answers)) {
+        // バッチごと落とす。リトライはしない（次回実行で再び対象になる）
+        result.missed += batch.length;
+        console.error(`✗ 和訳: レスポンスが配列でないためバッチ${batch.length}件をスキップ`);
+        continue;
+      }
 
-    const applied = new Set<number>();
-    for (const answer of answers) {
-      const article = batch[answer?.i as number];
-      if (!article || applied.has(answer.i)) continue; // 範囲外・重複は無視
-      const title = typeof answer.title_ja === "string" ? answer.title_ja.trim() : "";
-      // 見出しが空なら書き込まない＝この記事だけ次回に残る（他は巻き込まない）
-      if (title === "") continue;
-      const lines = cleanLines(answer.summary_ja);
-      article.title_ja = title;
-      // **やり直しで結果が悪くなることがある**（モデルは非決定的で、同じ入力でも
-      // 行数が減ることがある）。前回より行数が少ないなら前回を残す——上書きは
-      // 情報が増える方向にだけ動かす。実測: 無条件上書きにしていた実行で、
-      // 1〜2行あった記事14件が空で塗り潰された
-      const previous = article.summary_ja ?? [];
-      if (lines.length >= previous.length) article.summary_ja = lines;
-      else result.kept++;
-      const applied_lines = article.summary_ja ?? [];
-      if (applied_lines.length === 0) result.emptySummary++;
-      else if (applied_lines.length < SUMMARY_LINES) result.shortSummary++;
-      result.updated.push(article);
-      applied.add(answer.i);
+      const applied = new Set<number>();
+      for (const answer of answers) {
+        const article = batch[answer?.i as number];
+        if (!article || applied.has(answer.i)) continue; // 範囲外・重複は無視
+        if (mode === "translate") {
+          const title = typeof answer.title_ja === "string" ? answer.title_ja.trim() : "";
+          // 見出しが空なら書き込まない＝この記事だけ次回に残る（他は巻き込まない）
+          if (title === "") continue;
+          article.title_ja = title;
+        }
+        const lines = cleanLines(answer.summary_ja);
+        // **やり直しで結果が悪くなることがある**（モデルは非決定的で、同じ入力でも
+        // 行数が減ることがある）。前回より行数が少ないなら前回を残す——上書きは
+        // 情報が増える方向にだけ動かす。実測: 無条件上書きにしていた実行で、
+        // 1〜2行あった記事14件が空で塗り潰された
+        const previous = article.summary_ja ?? [];
+        if (lines.length >= previous.length) article.summary_ja = lines;
+        else result.kept++;
+        const settled = article.summary_ja ?? [];
+        if (settled.length === 0) result.emptySummary++;
+        else if (settled.length < SUMMARY_LINES) result.shortSummary++;
+        result.updated.push(article);
+        applied.add(answer.i);
+      }
+      result.processed += applied.size;
+      result.missed += batch.length - applied.size;
     }
-    result.processed += applied.size;
-    result.missed += batch.length - applied.size;
-  }
+  };
+
+  // 英語は見出しの和訳つき、日本語はサマリだけ。プロンプトと応答の形が違うので分けて回す
+  const english = candidates.filter((a) => a.language === "en");
+  const japanese = candidates.filter((a) => a.language === "ja");
+  if (english.length > 0) await runBatches(english, "translate");
+  if (japanese.length > 0) await runBatches(japanese, "summarize");
 
   const remaining = candidates.length - result.processed - result.missed;
   const { input, output } = runner.tokens;
@@ -181,12 +221,16 @@ export function translateCandidates(
   { redoShort = false } = {},
 ): Article[] {
   return [...articles]
-    .filter(
-      (a) =>
-        a.language === "en" &&
-        // 未処理のもの。redoShort のときは「サマリが SUMMARY_LINES 行に満たない」記事も
-        // 対象に戻す（リンク先の本文が取れるようになった等、材料が増えたときの作り直し）
-        (!a.title_ja || (redoShort && (a.summary_ja?.length ?? 0) < SUMMARY_LINES)),
-    )
+    .filter((a) => {
+      // 未処理かどうかの見方が言語で違う。
+      // 英語: title_ja の有無（和訳見出しは正当に空にならないのでフラグを兼ねられる）
+      // 日本語: summary_ja のキーの有無。**undefined＝未処理 / [] ＝処理したが該当なし**で
+      //   区別できる（既定値として書かれることがないため。L159 の落とし穴を避けている）
+      const fresh = a.language === "en" ? !a.title_ja : a.summary_ja === undefined;
+      if (a.language !== "en" && a.language !== "ja") return false;
+      // redoShort のときは「サマリが SUMMARY_LINES 行に満たない」記事も対象に戻す
+      // （リンク先の本文が取れるようになった等、材料が増えたときの作り直し）
+      return fresh || (redoShort && (a.summary_ja?.length ?? 0) < SUMMARY_LINES);
+    })
     .sort((a, b) => (a.published_at === b.published_at ? 0 : a.published_at < b.published_at ? 1 : -1));
 }
