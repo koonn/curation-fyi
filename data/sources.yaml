@@ -305,3 +305,104 @@
   feed_url: https://www.analyzecore.com/feed/
   fetcher: rss
   enabled: true
+
+- id: amazon-science
+  name: Amazon Science
+  type: company_blog
+  language: en
+  site_url: https://www.amazon.science/
+  feed_url: https://www.amazon.science/index.rss
+  fetcher: rss
+  # 1本のフィードに /blog（20件）・/news（3件）・/research-awards（2件）が同居する。
+  # research-awards は受賞者の発表でキュレーション対象外（2026-08-22 に25件の内訳を実測）
+  exclude:
+    url_contains: ["/research-awards/"]
+  enabled: true
+
+- id: google-research
+  name: Google Research Blog
+  type: company_blog
+  language: en
+  site_url: https://research.google/blog/
+  feed_url: https://research.google/blog/rss/
+  fetcher: rss
+  enabled: true
+
+- id: google-deepmind
+  name: Google DeepMind Blog
+  type: company_blog
+  language: en
+  site_url: https://deepmind.google/discover/blog/
+  feed_url: https://deepmind.google/blog/rss.xml
+  fetcher: rss
+  enabled: true
+
+- id: nvidia-developer
+  name: NVIDIA Technical Blog
+  type: company_blog
+  language: en
+  site_url: https://developer.nvidia.com/blog/
+  feed_url: https://developer.nvidia.com/blog/feed/
+  fetcher: rss
+  enabled: true
+
+- id: apple-machine-learning
+  name: Apple Machine Learning Research
+  type: company_blog
+  language: en
+  site_url: https://machinelearning.apple.com/
+  feed_url: https://machinelearning.apple.com/rss.xml
+  fetcher: rss
+  enabled: true
+
+- id: aws-architecture
+  name: AWS Architecture Blog
+  type: company_blog
+  language: en
+  site_url: https://aws.amazon.com/blogs/architecture/
+  feed_url: https://aws.amazon.com/blogs/architecture/feed/
+  fetcher: rss
+  enabled: true
+
+- id: microsoft-devblogs
+  name: Microsoft for Developers
+  type: company_blog
+  language: en
+  site_url: https://devblogs.microsoft.com/
+  feed_url: https://devblogs.microsoft.com/feed/
+  fetcher: rss
+  enabled: true
+
+- id: microsoft-research
+  name: Microsoft Research Blog
+  type: company_blog
+  language: en
+  site_url: https://www.microsoft.com/en-us/research/blog/
+  feed_url: https://www.microsoft.com/en-us/research/feed/
+  fetcher: rss
+  enabled: true
+
+- id: karpathy
+  name: Andrej Karpathy
+  type: personal_blog
+  language: en
+  site_url: https://karpathy.bearblog.dev/blog/
+  feed_url: https://karpathy.bearblog.dev/feed/
+  fetcher: rss
+  enabled: true
+
+# 追加を見送った候補（2026-08-22 実測）。再検討するときは同じURLを測り直すこと
+#
+# - Uber Engineering: 全パスが 406 / 404。2026-08-16 の診断（Cloudflare の bot 判定と推測）を再現。
+#   https://www.uber.com/blog/engineering/rss/ → 406、https://eng.uber.com/feed/ → 404
+# - Google Developers Blog (developers.googleblog.com/feeds/posts/default) と
+#   blog.google/technology/developers/rss: **item に日付が1件も無い**（pubDate 0件）。
+#   fetchers/rss.ts は published_at を作れない item を無言で捨てるため、登録しても収集0件になる
+# - blogs.nvidia.com/feed/: GeForce NOW の週次告知・CEO受賞など広報記事が主体。技術記事は
+#   developer.nvidia.com/blog 側にある
+# - developer.apple.com/news/rss/news.rss: EU規制対応・利用規約更新・年齢レーティングなど
+#   開発者向けの事務連絡が主体（142件）。Discord の Changelog と同じ理由で対象外
+# - aws.amazon.com/blogs/aws/feed/: 製品告知と AWS Weekly Roundup が主体。技術記事は
+#   architecture 側にある
+# - security.googleblog.com / android-developers.googleblog.com: どちらも200で日付あり。
+#   質は悪くないが1社1〜2本に留める方針で今回は入れていない
