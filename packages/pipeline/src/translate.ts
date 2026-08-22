@@ -9,6 +9,8 @@ interface TranslateOptions {
   dryRun?: boolean;
   /** フィードに要約が無い記事について、リンク先の本文を取りに行く（HN 向け） */
   fetchBodies?: boolean;
+  /** 「見出しは付いたがサマリが空」の記事も対象に戻す（材料が増えたときの作り直し） */
+  redoEmpty?: boolean;
 }
 
 /**
@@ -21,6 +23,7 @@ export async function translate({
   sources,
   dryRun,
   fetchBodies: shouldFetchBodies,
+  redoEmpty,
 }: TranslateOptions): Promise<void> {
   if (!isLlmEnabled()) {
     console.error("translate: GEMINI_API_KEY が未設定のため実行できない");
@@ -29,7 +32,7 @@ export async function translate({
   }
 
   const existing = loadExisting();
-  let candidates = translateCandidates(existing.values());
+  let candidates = translateCandidates(existing.values(), { redoEmpty });
   if (sources?.length) candidates = candidates.filter((a) => sources.includes(a.source_id));
   const total = candidates.length;
   if (limit !== undefined) candidates = candidates.slice(0, limit);
@@ -45,6 +48,16 @@ export async function translate({
   // 取得の失敗でリクエスト予算を無駄にしないよう、LLM を呼ぶ前にまとめて取りに行く。
   // 取れなかった記事は「タイトルのみ」として同じバッチに乗る（従来どおりサマリは空になる）
   const bodies = shouldFetchBodies ? (await fetchBodies(candidates)).bodies : new Map<string, string>();
+
+  // やり直しの対象のうち本文が取れなかったものは、投げても前回と同じ空サマリにしかならない。
+  // リクエスト予算を使わずに落とす（一度も処理していない記事は見出しのために残す）
+  if (redoEmpty && shouldFetchBodies) {
+    const before = candidates.length;
+    candidates = candidates.filter((a) => !a.title_ja || a.summary || bodies.has(a.url));
+    if (before !== candidates.length) {
+      console.log(`  やり直しのうち本文が取れなかった ${before - candidates.length} 件を除外した`);
+    }
+  }
 
   const runner = new LlmRunner();
   const { updated } = await translateWithLlm(candidates, runner, bodies);

@@ -164,8 +164,17 @@ export async function translateWithLlm(
  * 和訳の効果が最も大きい。ただし HN はリンク集で本文を持たない（Algolia API が
  * リンク投稿に本文を返さない）ため、付くのは見出しだけで3行サマリは空になる。
  */
-export function translateCandidates(articles: Iterable<Article>): Article[] {
+export function translateCandidates(
+  articles: Iterable<Article>,
+  { redoEmpty = false } = {},
+): Article[] {
   return [...articles]
-    .filter((a) => a.language === "en" && !a.title_ja)
+    .filter(
+      (a) =>
+        a.language === "en" &&
+        // 未処理のもの。redoEmpty のときは「見出しは付いたがサマリが空」も対象に戻す
+        // （リンク先の本文が取れるようになった等、材料が増えたときに作り直すため）
+        (!a.title_ja || (redoEmpty && !a.summary_ja?.length)),
+    )
     .sort((a, b) => (a.published_at === b.published_at ? 0 : a.published_at < b.published_at ? 1 : -1));
 }
