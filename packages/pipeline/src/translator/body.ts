@@ -57,11 +57,34 @@ function scoped(html: string): string {
   return paragraphs.join(" ");
 }
 
+/**
+ * JS描画のページが本文の代わりに返す定型文。
+ * これを落としてから長さを見ないと、**下限は超えるが中身が無い**テキストが本文として通る。
+ * 実測: grapheneos.social（Mastodon）は抽出223字のうち大半がこの文で、
+ * 生成されたサマリが「JavaScriptの有効化が必要」という閲覧要件の説明になっていた。
+ */
+const BOILERPLATE: RegExp[] = [
+  /to use the [^.]{0,40}web application,?\s*please enable javascript\.?/gi,
+  /please enable javascript[^.]{0,80}\.?/gi,
+  /javascript is (?:required|disabled|not enabled)[^.]{0,80}\.?/gi,
+  /you need to enable javascript to run this app\.?/gi,
+  /(?:your |the )?browser (?:does not support|is not supported|doesn't support)[^.]{0,80}\.?/gi,
+  /enable javascript (?:and cookies )?to continue\.?/gi,
+  /alternatively,? (?:you can )?(?:try|use|install) (?:one of )?the (?:native |official )?apps?[^.]{0,60}\.?/gi,
+];
+
+/** 定型文を落とす。落とした結果が短ければ、呼び出し側の下限で弾かれる */
+function stripBoilerplate(text: string): string {
+  let out = text;
+  for (const re of BOILERPLATE) out = out.replace(re, " ");
+  return out.replace(/\s+/g, " ").trim();
+}
+
 /** HTML から要約の材料になるテキストを取り出す */
 export function extractBody(html: string, maxChars = MAX_CHARS): string {
   const picked = scoped(html);
   const text = picked.length >= MIN_SCOPED_CHARS ? picked : naive(html);
-  return text.slice(0, maxChars);
+  return stripBoilerplate(text).slice(0, maxChars);
 }
 
 export interface FetchBodiesStats {
