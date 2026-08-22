@@ -29,11 +29,39 @@ interface RssItem {
   isoDate?: string;
   pubDate?: string;
   content?: string;
+  /** Atom の <summary>。HTML が入る */
+  summary?: string;
   "content:encoded"?: string;
 }
 
+/** HTMLタグを落として本文だけにする */
+function stripTags(html: string): string {
+  return html
+    .replace(/<(script|style)[\s\S]*?<\/\1>/gi, " ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#0?39;/g, "'");
+}
+
+/**
+ * 要約の材料になるテキストを取り出す。
+ * **rss-parser は <content> からしか contentSnippet を作らない**ので、
+ * Atom で <summary> だけを持つフィード（simonwillison 等）では contentSnippet が空になり、
+ * 本文があるのに要約なしとして保存されていた（実測: 55件すべて summary: null。
+ * 実際には <summary> に 388〜753字の本文があった）。その場合はタグを落として使う。
+ */
+function snippetOf(item: RssItem): string | undefined {
+  if (item.contentSnippet?.trim()) return item.contentSnippet;
+  if (item.summary?.trim()) return stripTags(item.summary);
+  return undefined;
+}
+
 function detectHasCode(item: RssItem): boolean | null {
-  const body = item["content:encoded"] ?? item.content;
+  const body = item["content:encoded"] ?? item.content ?? item.summary;
   if (!body) return null;
   return CODE_BLOCK.test(body);
 }
@@ -69,7 +97,7 @@ export async function fetchRss(source: Source, state: SourceState): Promise<RssF
     const publishedAt = item.isoDate ?? (item.pubDate ? new Date(item.pubDate).toISOString() : null);
     if (!publishedAt) continue;
     const title = item.title.trim();
-    const summary = toSummary(item.contentSnippet);
+    const summary = toSummary(snippetOf(item));
     items.push({
       url: normalizeUrl(item.link),
       title,

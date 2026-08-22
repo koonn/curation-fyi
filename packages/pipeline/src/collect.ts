@@ -45,6 +45,8 @@ interface SourceResult {
   merged: number;
   skipped: number;
   excluded: number;
+  /** 既存記事のうち、取り出しが直って要約を埋められた件数 */
+  summaryFilled: number;
   notModified: boolean;
   error?: Error;
 }
@@ -55,11 +57,12 @@ function mergeItems(
   existing: Map<string, Article>,
   fetchedAt: string,
   changedMonths: Set<string>,
-): { added: number; merged: number; skipped: number; excluded: number } {
+): { added: number; merged: number; skipped: number; excluded: number; summaryFilled: number } {
   const seenInFeed = new Set<string>(); // 同一フィード内の同一URL（更新entry等）を弾く
   let added = 0;
   let merged = 0;
   let skipped = 0;
+  let summaryFilled = 0;
   let excluded = 0;
   for (const item of items) {
     if (seenInFeed.has(item.url)) {
@@ -100,11 +103,23 @@ function mergeItems(
       current.external_ids = { ...current.external_ids, ...item.external_ids };
       changedMonths.add(current.published_at.slice(0, 7));
       merged++;
+    } else if (!current.summary && item.summary) {
+      // 取り出しが直って要約が取れるようになった既存記事を埋める。
+      // 情報が増える方向にしか動かさない（既にある要約は上書きしない）
+      current.summary = item.summary;
+      // 要約が無かったせいで3行サマリを作れなかった記事は、作り直せるようになる。
+      // title_ja が処理済みフラグを兼ねているので、消して和訳ジョブの対象に戻す
+      if (current.title_ja && !current.summary_ja?.length) {
+        delete current.title_ja;
+        delete current.summary_ja;
+      }
+      changedMonths.add(current.published_at.slice(0, 7));
+      summaryFilled++;
     } else {
       skipped++;
     }
   }
-  return { added, merged, skipped, excluded };
+  return { added, merged, skipped, excluded, summaryFilled };
 }
 
 /**
@@ -198,9 +213,17 @@ export async function collect(): Promise<void> {
     feedState[source.id] = sourceState;
     try {
       const outcome = await fetchItems(source, sourceState);
-      const { added, merged, skipped, excluded } = mergeItems(outcome.items, source, existing, fetchedAt, changedMonths);
+      const { added, merged, skipped, excluded, summaryFilled } = mergeItems(outcome.items, source, existing, fetchedAt, changedMonths);
       totalAdded += added;
-      results.push({ source, added, merged, skipped, excluded, notModified: outcome.notModified });
+      results.push({
+        source,
+        added,
+        merged,
+        skipped,
+        excluded,
+        summaryFilled,
+        notModified: outcome.notModified,
+      });
 
       sourceState.consecutive_failures = 0;
       sourceState.last_success = fetchedAt;
@@ -214,6 +237,7 @@ export async function collect(): Promise<void> {
         merged: 0,
         skipped: 0,
         excluded: 0,
+        summaryFilled: 0,
         notModified: false,
         error: e instanceof Error ? e : new Error(String(e)),
       });
@@ -244,6 +268,7 @@ export async function collect(): Promise<void> {
     } else {
       console.log(
         `✓ ${r.source.id}: 新規 ${r.added} 件 / metrics更新 ${r.merged} 件 / 既存スキップ ${r.skipped} 件` +
+          (r.summaryFilled > 0 ? ` / 要約を補完 ${r.summaryFilled} 件` : "") +
           (r.excluded > 0 ? ` / 除外 ${r.excluded} 件` : ""),
       );
     }
