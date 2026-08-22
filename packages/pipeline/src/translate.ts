@@ -1,11 +1,14 @@
 import { isLlmEnabled, LlmRunner } from "./llm/gemini.ts";
 import { loadExisting, saveAll } from "./store.ts";
+import { fetchBodies } from "./translator/body.ts";
 import { translateCandidates, translateWithLlm } from "./translator/llm.ts";
 
 interface TranslateOptions {
   limit?: number;
   sources?: string[];
   dryRun?: boolean;
+  /** フィードに要約が無い記事について、リンク先の本文を取りに行く（HN 向け） */
+  fetchBodies?: boolean;
 }
 
 /**
@@ -13,7 +16,12 @@ interface TranslateOptions {
  * collect に組み込まれた分と同じジョブを、件数とソースを絞って走らせる。
  * dryRun のときは保存せず結果を標準出力に出す（品質を目視で確かめるための経路）。
  */
-export async function translate({ limit, sources, dryRun }: TranslateOptions): Promise<void> {
+export async function translate({
+  limit,
+  sources,
+  dryRun,
+  fetchBodies: shouldFetchBodies,
+}: TranslateOptions): Promise<void> {
   if (!isLlmEnabled()) {
     console.error("translate: GEMINI_API_KEY が未設定のため実行できない");
     process.exitCode = 1;
@@ -34,8 +42,12 @@ export async function translate({ limit, sources, dryRun }: TranslateOptions): P
   const noSummary = candidates.filter((a) => !a.summary).length;
   console.log(`  うち要約がフィードに無い（タイトルのみ）記事: ${noSummary} 件`);
 
+  // 取得の失敗でリクエスト予算を無駄にしないよう、LLM を呼ぶ前にまとめて取りに行く。
+  // 取れなかった記事は「タイトルのみ」として同じバッチに乗る（従来どおりサマリは空になる）
+  const bodies = shouldFetchBodies ? (await fetchBodies(candidates)).bodies : new Map<string, string>();
+
   const runner = new LlmRunner();
-  const { updated } = await translateWithLlm(candidates, runner);
+  const { updated } = await translateWithLlm(candidates, runner, bodies);
 
   // 目視用の出力。原文と和訳を並べる
   for (const [n, a] of updated.entries()) {

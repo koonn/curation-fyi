@@ -34,6 +34,7 @@ switch (command) {
       limit: limit === undefined ? undefined : Number(limit),
       sources: flag("source")?.split(",").filter(Boolean),
       dryRun: rest.includes("--dry-run"),
+      fetchBodies: rest.includes("--fetch-bodies"),
     });
     process.exit(process.exitCode ?? 0);
     break;

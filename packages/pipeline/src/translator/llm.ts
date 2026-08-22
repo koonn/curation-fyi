@@ -29,11 +29,17 @@ interface TranslateAnswer {
   summary_ja: string[];
 }
 
-function buildPrompt(articles: Article[]): string {
+function buildPrompt(articles: Article[], bodies: Map<string, string>): string {
   const list = articles
     .map((a, i) => {
-      const summary = a.summary ? `\n   要約: ${a.summary}` : "\n   要約: （フィードに無し。タイトルのみ）";
-      return `${i}. タイトル: ${a.title}${summary}`;
+      // フィードの要約が無ければ、リンク先から取った本文を使う（HN はこちらが主）
+      const body = a.summary ? null : bodies.get(a.url);
+      const material = a.summary
+        ? `\n   要約: ${a.summary}`
+        : body
+          ? `\n   本文（抜粋）: ${body}`
+          : "\n   要約: （フィードに無し。タイトルのみ）";
+      return `${i}. タイトル: ${a.title}${material}`;
     })
     .join("\n");
   return `以下は英語の技術記事です。それぞれについて次の2つを日本語で作ってください。
@@ -84,6 +90,7 @@ export interface TranslateResult {
 export async function translateWithLlm(
   candidates: Article[],
   runner: LlmRunner,
+  bodies: Map<string, string> = new Map(),
 ): Promise<TranslateResult> {
   const result: TranslateResult = {
     updated: [],
@@ -102,7 +109,7 @@ export async function translateWithLlm(
   for (const batch of chunk(candidates, BATCH_SIZE)) {
     let answers: TranslateAnswer[] | null;
     try {
-      answers = await runner.json<TranslateAnswer[]>(buildPrompt(batch), RESPONSE_SCHEMA);
+      answers = await runner.json<TranslateAnswer[]>(buildPrompt(batch, bodies), RESPONSE_SCHEMA);
     } catch (e) {
       if (e instanceof QuotaExceededError) {
         result.quotaDetail = e.detail;

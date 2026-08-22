@@ -18,6 +18,11 @@ on:
         type: boolean
         required: false
         default: true
+      fetch_bodies:
+        description: "フィードに要約が無い記事のリンク先本文を取得する（HN向け。取得は保存しない）"
+        type: boolean
+        required: false
+        default: false
 
 permissions:
   contents: write
@@ -52,6 +57,9 @@ jobs:
           fi
           if [ "${{ inputs.dry_run }}" = "true" ]; then
             args="$args --dry-run"
+          fi
+          if [ "${{ inputs.fetch_bodies }}" = "true" ]; then
+            args="$args --fetch-bodies"
           fi
           echo "pnpm translate $args"
           pnpm translate $args
