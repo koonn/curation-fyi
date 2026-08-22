@@ -27,18 +27,32 @@ function responseSchema(mode: Mode): unknown {
       type: Type.OBJECT,
       properties: {
         i: { type: Type.INTEGER, description: "記事番号" },
+        // **突き合わせ用**。i だけでは対応の正しさを検証できないため、入力のタイトルを
+        // そのまま返させて照合する（実測でサマリが記事間でずれる事故が起きた）
+        echo: { type: Type.STRING, description: "入力のタイトルの先頭20文字をそのまま返す" },
         ...(translate ? { title_ja: { type: Type.STRING, description: "和訳した見出し" } } : {}),
         summary_ja: SUMMARY_FIELD,
       },
-      required: translate ? ["i", "title_ja", "summary_ja"] : ["i", "summary_ja"],
+      required: translate ? ["i", "echo", "title_ja", "summary_ja"] : ["i", "echo", "summary_ja"],
     },
   };
 }
 
 interface TranslateAnswer {
   i: number;
+  /** 入力タイトルの写し。i との対応が正しいかの照合に使う */
+  echo?: string;
   title_ja?: string;
   summary_ja: string[];
+}
+
+/** 照合用にタイトルを正規化する。空白・記号のゆれを吸収し、先頭だけを見る */
+function titleKey(title: string): string {
+  return title
+    .replace(/\s+/g, "")
+    .replace(/[|｜\-–—:：・、。,.'"“”'']/g, "")
+    .toLowerCase()
+    .slice(0, 12);
 }
 
 function buildPrompt(articles: Article[], bodies: Map<string, string>, mode: Mode): string {
@@ -59,7 +73,8 @@ function buildPrompt(articles: Article[], bodies: Map<string, string>, mode: Mod
 - **見出しの言い換えを並べない**。見出しから分かること以外の中身を書く
 - **与えられた情報に書かれていないことは書かない**。推測で補わない
 - タイトルしか無く要点が取れない場合は、無理に${SUMMARY_LINES}行にせず、行を減らすか空配列にする`;
-  const common = `記事番号 i は入力のものをそのまま返し、全 ${articles.length} 件を漏れなく1件ずつ返してください。`;
+  const common = `記事番号 i は入力のものをそのまま返し、全 ${articles.length} 件を漏れなく1件ずつ返してください。
+echo には、その記事の「タイトル:」に書かれた文字列の先頭20文字をそのまま写してください（照合に使います）。`;
 
   if (mode === "summarize") {
     return `以下は日本語の技術記事です。それぞれについて内容の要点を日本語で作ってください。
@@ -105,6 +120,8 @@ export interface TranslateResult {
   emptySummary: number;
   /** やり直しの結果が前回より短かったため、前回を残した件数 */
   kept: number;
+  /** タイトルの照合に失敗して捨てた件数。記事間のずれを検出したもの */
+  mismatched: number;
   /** レスポンスに現れなかった・見出しが空で捨てた件数。次回実行で再び対象になる */
   missed: number;
   requests: number;
@@ -128,6 +145,7 @@ export async function translateWithLlm(
     shortSummary: 0,
     emptySummary: 0,
     kept: 0,
+    mismatched: 0,
     missed: 0,
     requests: 0,
     quotaDetail: null,
@@ -165,6 +183,14 @@ export async function translateWithLlm(
       for (const answer of answers) {
         const article = batch[answer?.i as number];
         if (!article || applied.has(answer.i)) continue; // 範囲外・重複は無視
+        // **i の対応を信じない。** 入力タイトルの写しと突き合わせ、合わなければ捨てる。
+        // 実測: 照合が無かったとき、日本語498件のうち判定できた313件中20件で
+        // 別記事のサマリが書き込まれていた（DbGateの記事に熱雑音の要約、等）
+        const echo = typeof answer.echo === "string" ? titleKey(answer.echo) : "";
+        if (echo === "" || !titleKey(article.title).startsWith(echo.slice(0, 8))) {
+          result.mismatched++;
+          continue;
+        }
         if (mode === "translate") {
           const title = typeof answer.title_ja === "string" ? answer.title_ja.trim() : "";
           // 見出しが空なら書き込まない＝この記事だけ次回に残る（他は巻き込まない）
@@ -203,6 +229,7 @@ export async function translateWithLlm(
     `和訳: ${result.processed} 件処理（${result.requests} リクエスト、` +
       `サマリ${SUMMARY_LINES}行未満 ${result.shortSummary} 件、サマリ空 ${result.emptySummary} 件、` +
       (result.kept > 0 ? `前回より短いため据え置き ${result.kept} 件、` : "") +
+      (result.mismatched > 0 ? `**タイトル不一致で破棄 ${result.mismatched} 件**、` : "") +
       `取りこぼし ${result.missed} 件、未着手 ${remaining} 件、入力 ${input} tok / 出力 ${output} tok）` +
       (waits.count > 0 ? `\n  上限に当たって ${waits.count} 回・計 ${waits.seconds} 秒待った` : "") +
       (result.quotaDetail ? `\n  ※利用上限に達したため打ち切り — ${result.quotaDetail}` : ""),
