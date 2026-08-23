@@ -578,7 +578,10 @@
   site_url: https://cecilycarver.substack.com/
   feed_url: https://cecilycarver.substack.com/feed
   fetcher: rss
-  enabled: true
+  # *.substack.com は GitHub Actions のIPから403（ローカルは同じUAで200。IPベースの遮断）。
+  # CIでは毎回失敗しシグナルを埋めるため無効化した（2026-08-23 実測）。
+  # 記事は無効化前にローカルで収集済み。更新したいときはローカルで pnpm collect を回す
+  enabled: false
 
 - id: defector
   name: "Defector"
@@ -623,7 +626,10 @@
   site_url: https://gelliottmorris.substack.com/
   feed_url: https://gelliottmorris.substack.com/feed
   fetcher: rss
-  enabled: true
+  # *.substack.com は GitHub Actions のIPから403（ローカルは同じUAで200。IPベースの遮断）。
+  # CIでは毎回失敗しシグナルを埋めるため無効化した（2026-08-23 実測）。
+  # 記事は無効化前にローカルで収集済み。更新したいときはローカルで pnpm collect を回す
+  enabled: false
 
 - id: inequalitybyinteriordesign-wordpress
   name: "Inequality by (Interior) Design"
@@ -767,7 +773,10 @@
   site_url: https://rajivsethi.substack.com/
   feed_url: https://rajivsethi.substack.com/feed
   fetcher: rss
-  enabled: true
+  # *.substack.com は GitHub Actions のIPから403（ローカルは同じUAで200。IPベースの遮断）。
+  # CIでは毎回失敗しシグナルを埋めるため無効化した（2026-08-23 実測）。
+  # 記事は無効化前にローカルで収集済み。更新したいときはローカルで pnpm collect を回す
+  enabled: false
 
 - id: rebeccamakkai-substack
   name: "SubMakk"
@@ -776,7 +785,10 @@
   site_url: https://rebeccamakkai.substack.com/
   feed_url: https://rebeccamakkai.substack.com/feed
   fetcher: rss
-  enabled: true
+  # *.substack.com は GitHub Actions のIPから403（ローカルは同じUAで200。IPベースの遮断）。
+  # CIでは毎回失敗しシグナルを埋めるため無効化した（2026-08-23 実測）。
+  # 記事は無効化前にローカルで収集済み。更新したいときはローカルで pnpm collect を回す
+  enabled: false
 
 - id: technicallyfood-substack
   name: "Technically Food"
@@ -785,7 +797,10 @@
   site_url: https://technicallyfood.substack.com/
   feed_url: https://technicallyfood.substack.com/feed
   fetcher: rss
-  enabled: true
+  # *.substack.com は GitHub Actions のIPから403（ローカルは同じUAで200。IPベースの遮断）。
+  # CIでは毎回失敗しシグナルを埋めるため無効化した（2026-08-23 実測）。
+  # 記事は無効化前にローカルで収集済み。更新したいときはローカルで pnpm collect を回す
+  enabled: false
 
 - id: thedizzies-substack
   name: "The Dizzies"
@@ -794,7 +809,10 @@
   site_url: https://thedizzies.substack.com/
   feed_url: https://thedizzies.substack.com/feed
   fetcher: rss
-  enabled: true
+  # *.substack.com は GitHub Actions のIPから403（ローカルは同じUAで200。IPベースの遮断）。
+  # CIでは毎回失敗しシグナルを埋めるため無効化した（2026-08-23 実測）。
+  # 記事は無効化前にローカルで収集済み。更新したいときはローカルで pnpm collect を回す
+  enabled: false
 
 - id: thepatronsaintofsuperheroes-wordpress
   name: "The Patron Saint of Superheroes"
@@ -956,7 +974,10 @@
   site_url: https://jamesclaims.substack.com/
   feed_url: https://jamesclaims.substack.com/feed
   fetcher: rss
-  enabled: true
+  # *.substack.com は GitHub Actions のIPから403（ローカルは同じUAで200。IPベースの遮断）。
+  # CIでは毎回失敗しシグナルを埋めるため無効化した（2026-08-23 実測）。
+  # 記事は無効化前にローカルで収集済み。更新したいときはローカルで pnpm collect を回す
+  enabled: false
 
 - id: johncarlosbaez-wordpress
   name: "Azimuth"
@@ -1064,7 +1085,10 @@
   site_url: https://theartofinsight.substack.com/
   feed_url: https://theartofinsight.substack.com/feed
   fetcher: rss
-  enabled: true
+  # *.substack.com は GitHub Actions のIPから403（ローカルは同じUAで200。IPベースの遮断）。
+  # CIでは毎回失敗しシグナルを埋めるため無効化した（2026-08-23 実測）。
+  # 記事は無効化前にローカルで収集済み。更新したいときはローカルで pnpm collect を回す
+  enabled: false
 
 - id: tpmorris-substack
   name: "Statistical methodology meanderings"
@@ -1073,7 +1097,10 @@
   site_url: https://tpmorris.substack.com/
   feed_url: https://tpmorris.substack.com/feed
   fetcher: rss
-  enabled: true
+  # *.substack.com は GitHub Actions のIPから403（ローカルは同じUAで200。IPベースの遮断）。
+  # CIでは毎回失敗しシグナルを埋めるため無効化した（2026-08-23 実測）。
+  # 記事は無効化前にローカルで収集済み。更新したいときはローカルで pnpm collect を回す
+  enabled: false
 
 - id: xianblog-wordpress
   name: "Xi'an's Og"
