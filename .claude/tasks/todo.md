@@ -28,7 +28,9 @@
   - サイト内絶対リンク **32,030個すべてに base が付いている**（ビルド出力を走査して0件の漏れを確認）
   - ブラウザ実測（本番）: `/search/` で `Cloudflare` → 43件、リンク先は原文URL、`bundlePath` は `/curation-fyi/pagefind/`
   - ブラウザ実測（本番）: トップで言語=日本語 → サーバー生成分が hidden になり196件に絞り込み、EN バッジ0件、`localStorage` に `ja` が保存される
-- [ ] 検証: 無操作で本番に新記事が反映される（cron → collect → deploy の連鎖）
+- [x] 検証: 無操作で本番に新記事が反映される（cron → collect → deploy の連鎖）（2026-08-23 確認）
+  - 直近24時間で deploy が `workflow_run` 契機で4回成功（01:22 / 02:23 / 06:42 UTC ほか）。手動pushによる起動と混ざらないよう `event` で確認した
+  - 本番 `recent.json` は 3,150件・掲載日が当日（2026-08-23）まで届いており、当日追加したソースも載っている（openai-news 144 / nvidia-developer 100 / arxiv-stat 47 / arxiv-econ 45 / anthropic-release-notes 33 ほか）
   - **落とし穴**: `collect` が `GITHUB_TOKEN` で push したコミットは push イベントを起こさない（ワークフロー再帰を防ぐGitHubの仕様）ため、`deploy` の `push` トリガーだけでは連鎖しない。`workflow_run`（collect の完了を契機にする）を追加して対処した
 
 ## v0.5（A-1〜A-8）— 完了 / v1（B-1〜B-5）— 着手中
