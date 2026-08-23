@@ -77,6 +77,30 @@
   language: en
   site_url: https://arxiv.org/
   fetcher: arxiv_api
+  arxiv:
+    categories: [cs.AI, cs.LG, cs.CL, cs.SE]
+  enabled: true
+
+- id: arxiv-stat
+  name: arXiv (stat.ME / stat.AP / stat.CO / stat.TH)
+  type: paper
+  language: en
+  site_url: https://arxiv.org/
+  fetcher: arxiv_api
+  arxiv:
+    # stat.ML は入れない。cs.LG との相互クロスリストが多く、arxiv-cs と同じ論文で
+    # 50件の枠を食い合う（重複排除はURLで効くので取り込みは壊れないが、枠が無駄になる）
+    categories: [stat.ME, stat.AP, stat.CO, stat.TH]
+  enabled: true
+
+- id: arxiv-econ
+  name: arXiv (econ.EM / econ.GN / econ.TH)
+  type: paper
+  language: en
+  site_url: https://arxiv.org/
+  fetcher: arxiv_api
+  arxiv:
+    categories: [econ.EM, econ.GN, econ.TH]
   enabled: true
 
 - id: github-engineering
