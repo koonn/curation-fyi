@@ -168,12 +168,16 @@ async function tagArticles(
   const untagged = [...existing.values()].filter(
     (a) => a.tags.length === 0 && a.llm_tags.length === 0 && !a.llm_tagged_at,
   );
+  // social と culture は技術タグ体系が当たらない。候補に残すと毎回LLM予算を食う
   const candidates = untagged
-    .filter((a) => categoryOf(sourceById.get(a.source_id)?.type) !== "social")
+    .filter((a) => {
+      const category = categoryOf(sourceById.get(a.source_id)?.type);
+      return category !== "social" && category !== "culture";
+    })
     .sort((a, b) => (a.published_at === b.published_at ? 0 : a.published_at < b.published_at ? 1 : -1));
   console.log(
     `ルールベースタグ付け: ${ruleChanged} 件更新 / LLM候補 ${candidates.length} 件` +
-      `（未タグ ${untagged.length} 件のうち social ${untagged.length - candidates.length} 件は対象外）`,
+      `（未タグ ${untagged.length} 件のうち social / culture ${untagged.length - candidates.length} 件は対象外）`,
   );
 
   if (!runner) {

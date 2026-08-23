@@ -24,7 +24,12 @@ export function toSummary(snippet: string | undefined): string | null {
 
 interface RssItem {
   link?: string;
-  title?: string;
+  /**
+   * 空要素（`<title type='text'></title>`）のとき rss-parser は空文字ではなく `{}` を返す。
+   * `!item.title` が真にならず、その先の `.trim()` で落ちるので、型は unknown で受けて
+   * 文字列であることを確かめてから使う。
+   */
+  title?: unknown;
   contentSnippet?: string;
   isoDate?: string;
   pubDate?: string;
@@ -93,10 +98,13 @@ export async function fetchRss(source: Source, state: SourceState): Promise<RssF
   const feed = await parser.parseString(body);
   const items: FetchedItem[] = [];
   for (const item of feed.items as RssItem[]) {
-    if (!item.link || !item.title) continue;
+    // タイトルが空の記事は捨てる。1件の欠損でソース全体を落とさない
+    // （実測: dgmyers.blogspot.com は25件中1件が空タイトルで、ソースごと失敗していた）
+    const rawTitle = typeof item.title === "string" ? item.title : null;
+    if (!item.link || !rawTitle || !rawTitle.trim()) continue;
     const publishedAt = item.isoDate ?? (item.pubDate ? new Date(item.pubDate).toISOString() : null);
     if (!publishedAt) continue;
-    const title = item.title.trim();
+    const title = rawTitle.trim();
     const summary = toSummary(snippetOf(item));
     items.push({
       url: normalizeUrl(item.link, { keepFragment: source.keep_url_fragment }),

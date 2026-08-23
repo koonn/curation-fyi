@@ -509,6 +509,581 @@
     title_strip: " \\| DeepSeek API Docs$"
   enabled: true
 
+- id: statmodeling
+  name: Statistical Modeling, Causal Inference, and Social Science (Gelman)
+  type: personal_blog
+  language: en
+  site_url: https://statmodeling.stat.columbia.edu/
+  feed_url: https://statmodeling.stat.columbia.edu/feed/
+  fetcher: rss
+  enabled: true
+
+- id: tjo-hatena
+  name: 渋谷駅前で働くデータサイエンティストのブログ
+  type: personal_blog
+  language: ja
+  site_url: https://tjo.hatenablog.com/
+  feed_url: https://tjo.hatenablog.com/rss
+  fetcher: rss
+  enabled: true
+
+- id: note-hik0107
+  name: 樫田光 | Hikaru Kashida（note）
+  type: personal_blog
+  language: ja
+  site_url: https://note.com/hik0107
+  feed_url: https://note.com/hik0107/rss
+  fetcher: rss
+  enabled: true
+
+# Andrew Gelman のブログロール（statmodeling.stat.columbia.edu/blogs-i-read/）由来。
+# 一覧ページ自体は Cloudflare の JSチャレンジで取得できないため、Wayback の
+# 2026-07-28 スナップショットから68サイトを取り出し、60サイトでフィードを実測した（2026-08-23）。
+# 統計・データ・研究方法・プログラミングは personal_blog（Tech）、それ以外は culture_blog（Culture）。
+# フィードが見つからなかった8件: blog.isi-web.org / jepusto.com / jrobertlennon.com /
+# medium.com/multiple-views-visualization-research-explained / rgiordan.github.io /
+# sharonlohr.com / thebeliever.net / yiqinfu.github.io
+
+- id: alexandracooks
+  name: "Alexandra's Kitchen"
+  type: culture_blog
+  language: en
+  site_url: https://alexandracooks.com/
+  feed_url: https://alexandracooks.com/feed/
+  fetcher: rss
+  enabled: true
+
+- id: blog-ayjay
+  name: "The Homebound Symphony"
+  type: culture_blog
+  language: en
+  site_url: https://blog.ayjay.org/
+  feed_url: https://blog.ayjay.org/feed/
+  fetcher: rss
+  enabled: true
+
+- id: bookandsword
+  name: "Book and Sword"
+  type: culture_blog
+  language: en
+  site_url: https://www.bookandsword.com/
+  feed_url: https://www.bookandsword.com/feed/
+  fetcher: rss
+  enabled: true
+
+- id: cecilycarver-substack
+  name: "The Amateur"
+  type: culture_blog
+  language: en
+  site_url: https://cecilycarver.substack.com/
+  feed_url: https://cecilycarver.substack.com/feed
+  fetcher: rss
+  enabled: true
+
+- id: defector
+  name: "Defector"
+  type: culture_blog
+  language: en
+  site_url: https://defector.com/
+  feed_url: https://defector.com/feed
+  fetcher: rss
+  enabled: true
+
+- id: dgmyers-blogspot
+  name: "A Commonplace Blog"
+  type: culture_blog
+  language: en
+  site_url: https://dgmyers.blogspot.com/
+  feed_url: https://dgmyers.blogspot.com/feeds/posts/default
+  fetcher: rss
+  enabled: true
+
+- id: doyouwriteunderyourownname-blogspot
+  name: "'Do You Write Under Your Own Name?'"
+  type: culture_blog
+  language: en
+  site_url: https://doyouwriteunderyourownname.blogspot.com/
+  feed_url: https://doyouwriteunderyourownname.blogspot.com/feeds/posts/default
+  fetcher: rss
+  enabled: true
+
+- id: familyinequality-wordpress
+  name: "Family Inequality"
+  type: culture_blog
+  language: en
+  site_url: https://familyinequality.wordpress.com/
+  feed_url: https://familyinequality.wordpress.com/feed/
+  fetcher: rss
+  enabled: true
+
+- id: gelliottmorris-substack
+  name: "Strength In Numbers"
+  type: culture_blog
+  language: en
+  site_url: https://gelliottmorris.substack.com/
+  feed_url: https://gelliottmorris.substack.com/feed
+  fetcher: rss
+  enabled: true
+
+- id: inequalitybyinteriordesign-wordpress
+  name: "Inequality by (Interior) Design"
+  type: culture_blog
+  language: en
+  site_url: https://inequalitybyinteriordesign.wordpress.com/
+  feed_url: https://inequalitybyinteriordesign.wordpress.com/feed/
+  fetcher: rss
+  enabled: true
+
+- id: justthesocialfacts-blogspot
+  name: "Just the social facts, ma'am"
+  type: culture_blog
+  language: en
+  site_url: https://justthesocialfacts.blogspot.com/
+  feed_url: https://justthesocialfacts.blogspot.com/feeds/posts/default
+  fetcher: rss
+  enabled: true
+
+- id: languagelog-ldc-upenn
+  name: "Language Log"
+  type: culture_blog
+  language: en
+  site_url: https://languagelog.ldc.upenn.edu/
+  feed_url: https://languagelog.ldc.upenn.edu/nll/?feed=rss2
+  fetcher: rss
+  enabled: true
+
+- id: madeinamericathebook-wordpress
+  name: "MADE IN AMERICA"
+  type: culture_blog
+  language: en
+  site_url: https://madeinamericathebook.wordpress.com/
+  feed_url: https://madeinamericathebook.wordpress.com/feed/
+  fetcher: rss
+  enabled: true
+
+- id: marginalrevolution
+  name: "Marginal REVOLUTION"
+  type: culture_blog
+  language: en
+  site_url: https://www.marginalrevolution.com/
+  feed_url: https://www.marginalrevolution.com/rss
+  fetcher: rss
+  enabled: true
+
+- id: montclairsoci-blogspot
+  name: "Montclair SocioBlog"
+  type: culture_blog
+  language: en
+  site_url: https://montclairsoci.blogspot.com/
+  feed_url: https://montclairsoci.blogspot.com/feeds/posts/default
+  fetcher: rss
+  enabled: true
+
+- id: mporcius-blogspot
+  name: "MPorcius Fiction Log"
+  type: culture_blog
+  language: en
+  site_url: https://mporcius.blogspot.com/
+  feed_url: https://mporcius.blogspot.com/feeds/posts/default
+  fetcher: rss
+  enabled: true
+
+- id: namerology
+  name: "Namerology"
+  type: culture_blog
+  language: en
+  site_url: https://namerology.com/
+  feed_url: https://namerology.com/feed/
+  fetcher: rss
+  enabled: true
+
+- id: neglectedbooks
+  name: "The Neglected Books Page"
+  type: culture_blog
+  language: en
+  site_url: https://neglectedbooks.com/
+  feed_url: https://neglectedbooks.com/?feed=rss2
+  fetcher: rss
+  enabled: true
+
+- id: nevalalee-wordpress
+  name: "Alec Nevala-Lee"
+  type: culture_blog
+  language: en
+  site_url: https://nevalalee.wordpress.com/
+  feed_url: https://nevalalee.wordpress.com/feed/
+  fetcher: rss
+  enabled: true
+
+- id: newsfromme
+  name: "News From ME"
+  type: culture_blog
+  language: en
+  site_url: https://www.newsfromme.com/
+  feed_url: https://www.newsfromme.com/feed/
+  fetcher: rss
+  enabled: true
+
+- id: plagiarismtoday
+  name: "Plagiarism Today"
+  type: culture_blog
+  language: en
+  site_url: https://www.plagiarismtoday.com/
+  feed_url: https://www.plagiarismtoday.com/feed/
+  fetcher: rss
+  enabled: true
+
+- id: postsecret
+  name: "PostSecret"
+  type: culture_blog
+  language: en
+  site_url: https://postsecret.com/
+  feed_url: https://postsecret.com/feed/
+  fetcher: rss
+  enabled: true
+
+- id: psychobabble200-blogspot
+  name: "Psychobabble"
+  type: culture_blog
+  language: en
+  site_url: https://psychobabble200.blogspot.com/
+  feed_url: https://psychobabble200.blogspot.com/feeds/posts/default
+  fetcher: rss
+  enabled: true
+
+- id: quoteinvestigator
+  name: "Quote Investigator®"
+  type: culture_blog
+  language: en
+  site_url: https://quoteinvestigator.com/
+  feed_url: https://quoteinvestigator.com/feed/
+  fetcher: rss
+  enabled: true
+
+- id: rajivsethi-substack
+  name: "Imperfect Information"
+  type: culture_blog
+  language: en
+  site_url: https://rajivsethi.substack.com/
+  feed_url: https://rajivsethi.substack.com/feed
+  fetcher: rss
+  enabled: true
+
+- id: rebeccamakkai-substack
+  name: "SubMakk"
+  type: culture_blog
+  language: en
+  site_url: https://rebeccamakkai.substack.com/
+  feed_url: https://rebeccamakkai.substack.com/feed
+  fetcher: rss
+  enabled: true
+
+- id: technicallyfood-substack
+  name: "Technically Food"
+  type: culture_blog
+  language: en
+  site_url: https://technicallyfood.substack.com/
+  feed_url: https://technicallyfood.substack.com/feed
+  fetcher: rss
+  enabled: true
+
+- id: thedizzies-substack
+  name: "The Dizzies"
+  type: culture_blog
+  language: en
+  site_url: https://thedizzies.substack.com/
+  feed_url: https://thedizzies.substack.com/feed
+  fetcher: rss
+  enabled: true
+
+- id: thepatronsaintofsuperheroes-wordpress
+  name: "The Patron Saint of Superheroes"
+  type: culture_blog
+  language: en
+  site_url: https://thepatronsaintofsuperheroes.wordpress.com/
+  feed_url: https://thepatronsaintofsuperheroes.wordpress.com/feed/
+  fetcher: rss
+  enabled: true
+
+- id: 404media
+  name: "404 Media"
+  type: personal_blog
+  language: en
+  site_url: https://www.404media.co/
+  feed_url: https://www.404media.co/rss/
+  fetcher: rss
+  enabled: true
+
+- id: baseballwithr-wordpress
+  name: "Exploring Baseball Data with R"
+  type: personal_blog
+  language: en
+  site_url: https://baseballwithr.wordpress.com/
+  feed_url: https://baseballwithr.wordpress.com/feed/
+  fetcher: rss
+  enabled: true
+
+- id: blog-djnavarro
+  name: "Notes from a data witch"
+  type: personal_blog
+  language: en
+  site_url: https://blog.djnavarro.net/
+  feed_url: https://blog.djnavarro.net/index.xml
+  fetcher: rss
+  enabled: true
+
+- id: blog-rinesi
+  name: "blog.rinesi.com"
+  type: personal_blog
+  language: en
+  site_url: https://blog.rinesi.com/
+  feed_url: https://blog.rinesi.com/feed/
+  fetcher: rss
+  enabled: true
+
+- id: cold-takes
+  name: "Cold Takes"
+  type: personal_blog
+  language: en
+  site_url: https://www.cold-takes.com/
+  feed_url: https://www.cold-takes.com/rss/
+  fetcher: rss
+  enabled: true
+
+- id: critical-inference
+  name: "Critical Inference"
+  type: personal_blog
+  language: en
+  site_url: https://critical-inference.com/
+  feed_url: https://critical-inference.com/feed/
+  fetcher: rss
+  enabled: true
+
+- id: danluu
+  name: "danluu"
+  type: personal_blog
+  language: en
+  site_url: https://danluu.com/
+  feed_url: https://danluu.com/atom.xml
+  fetcher: rss
+  enabled: true
+
+- id: dansblog-netlify
+  name: "Un garçon pas comme les autres (Bayes)"
+  type: personal_blog
+  language: en
+  site_url: https://dansblog.netlify.app/
+  feed_url: https://dansblog.netlify.app/index.xml
+  fetcher: rss
+  enabled: true
+
+- id: datacolada
+  name: "Data Colada"
+  type: personal_blog
+  language: en
+  site_url: https://datacolada.org/
+  feed_url: https://datacolada.org/feed
+  fetcher: rss
+  enabled: true
+
+- id: deevybee-blogspot
+  name: "BishopBlog"
+  type: personal_blog
+  language: en
+  site_url: https://deevybee.blogspot.com/
+  feed_url: https://deevybee.blogspot.com/feeds/posts/default
+  fetcher: rss
+  enabled: true
+
+- id: eighteenthelephant
+  name: "The Eighteenth Elephant"
+  type: personal_blog
+  language: en
+  site_url: https://eighteenthelephant.com/
+  feed_url: https://eighteenthelephant.com/feed/
+  fetcher: rss
+  enabled: true
+
+- id: errorstatistics
+  name: "Error Statistics Philosophy"
+  type: personal_blog
+  language: en
+  site_url: https://errorstatistics.com/
+  feed_url: https://errorstatistics.com/feed/
+  fetcher: rss
+  enabled: true
+
+- id: fharrell
+  name: "Statistical Thinking"
+  type: personal_blog
+  language: en
+  site_url: https://www.fharrell.com/
+  feed_url: https://www.fharrell.com/index.xml
+  fetcher: rss
+  enabled: true
+
+- id: gojiberries
+  name: "Gojiberries"
+  type: personal_blog
+  language: en
+  site_url: https://www.gojiberries.io/
+  feed_url: https://www.gojiberries.io/rss/
+  fetcher: rss
+  enabled: true
+
+- id: idlewords
+  name: "Idle Words"
+  type: personal_blog
+  language: en
+  site_url: https://idlewords.com/
+  feed_url: https://idlewords.com/index.xml
+  fetcher: rss
+  enabled: true
+
+- id: inframethodology-cbs
+  name: "Inframethodology"
+  type: personal_blog
+  language: en
+  site_url: https://inframethodology.cbs.dk/
+  feed_url: https://inframethodology.cbs.dk/?feed=rss2
+  fetcher: rss
+  enabled: true
+
+- id: jamesclaims-substack
+  name: "james.claims"
+  type: personal_blog
+  language: en
+  site_url: https://jamesclaims.substack.com/
+  feed_url: https://jamesclaims.substack.com/feed
+  fetcher: rss
+  enabled: true
+
+- id: johncarlosbaez-wordpress
+  name: "Azimuth"
+  type: personal_blog
+  language: en
+  site_url: https://johncarlosbaez.wordpress.com/
+  feed_url: https://johncarlosbaez.wordpress.com/feed/
+  fetcher: rss
+  enabled: true
+
+- id: johndcook
+  name: "John D. Cook"
+  type: personal_blog
+  language: en
+  site_url: https://www.johndcook.com/
+  feed_url: https://www.johndcook.com/blog/feed/
+  fetcher: rss
+  enabled: true
+
+- id: judgmentmisguided-blogspot
+  name: "Judgment misguided"
+  type: personal_blog
+  language: en
+  site_url: https://judgmentmisguided.blogspot.com/
+  feed_url: https://judgmentmisguided.blogspot.com/feeds/posts/default
+  fetcher: rss
+  enabled: true
+
+- id: junkcharts
+  name: "Junk Charts"
+  type: personal_blog
+  language: en
+  site_url: https://www.junkcharts.com/
+  feed_url: https://www.junkcharts.com/rss/
+  fetcher: rss
+  enabled: true
+
+- id: kieranhealy
+  name: "kieranhealy.org"
+  type: personal_blog
+  language: en
+  site_url: https://kieranhealy.org/
+  feed_url: https://kieranhealy.org/index.xml
+  fetcher: rss
+  enabled: true
+
+- id: ludic-mataroa
+  name: "Ludicity"
+  type: personal_blog
+  language: en
+  site_url: https://ludic.mataroa.blog/
+  feed_url: https://ludic.mataroa.blog/rss/
+  fetcher: rss
+  enabled: true
+
+- id: notstatschat-rbind
+  name: "Biased and Inefficient"
+  type: personal_blog
+  language: en
+  site_url: https://notstatschat.rbind.io/
+  feed_url: https://notstatschat.rbind.io/index.xml
+  fetcher: rss
+  enabled: true
+
+- id: observationalepidemiology-blogspot
+  name: "West Coast Stat Views (on Observational Epide"
+  type: personal_blog
+  language: en
+  site_url: https://observationalepidemiology.blogspot.com/
+  feed_url: https://observationalepidemiology.blogspot.com/feeds/posts/default
+  fetcher: rss
+  enabled: true
+
+- id: retractionwatch
+  name: "Retraction Watch"
+  type: personal_blog
+  language: en
+  site_url: https://retractionwatch.com/
+  feed_url: https://retractionwatch.com/feed/
+  fetcher: rss
+  enabled: true
+
+- id: roadtolarissa
+  name: "roadtolarissa"
+  type: personal_blog
+  language: en
+  site_url: https://roadtolarissa.com/
+  feed_url: https://roadtolarissa.com/rss.xml
+  fetcher: rss
+  enabled: true
+
+- id: steamtraen-blogspot
+  name: "Nick Brown's blog"
+  type: personal_blog
+  language: en
+  site_url: https://steamtraen.blogspot.com/
+  feed_url: https://steamtraen.blogspot.com/feeds/posts/default
+  fetcher: rss
+  enabled: true
+
+- id: theartofinsight-substack
+  name: "Alberto Cairo's The Art of Insight"
+  type: personal_blog
+  language: en
+  site_url: https://theartofinsight.substack.com/
+  feed_url: https://theartofinsight.substack.com/feed
+  fetcher: rss
+  enabled: true
+
+- id: tpmorris-substack
+  name: "Statistical methodology meanderings"
+  type: personal_blog
+  language: en
+  site_url: https://tpmorris.substack.com/
+  feed_url: https://tpmorris.substack.com/feed
+  fetcher: rss
+  enabled: true
+
+- id: xianblog-wordpress
+  name: "Xi'an's Og"
+  type: personal_blog
+  language: en
+  site_url: https://xianblog.wordpress.com/
+  feed_url: https://xianblog.wordpress.com/feed/
+  fetcher: rss
+  enabled: true
+
 # 追加を見送った候補（2026-08-22 実測）。再検討するときは同じURLを測り直すこと
 #
 # - Uber Engineering: 全パスが 406 / 404。2026-08-16 の診断（Cloudflare の bot 判定と推測）を再現。

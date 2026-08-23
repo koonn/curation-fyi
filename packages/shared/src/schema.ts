@@ -1,6 +1,8 @@
 export type SourceType =
   | "company_blog"
   | "personal_blog"
+  /** 技術以外の読み物（社会科学・経済・文芸・雑記）。Tech の一覧に混ぜない */
+  | "culture_blog"
   | "aggregator"
   /** 編集を経た技術誌（ACM Queue 等）。査読プレプリントの paper とは別に扱う */
   | "magazine"
@@ -15,6 +17,7 @@ export type Language = "en" | "ja";
  */
 export const CATEGORIES = {
   tech: { label: "Tech", types: ["company_blog", "personal_blog", "magazine", "tweet"] },
+  culture: { label: "Culture", types: ["culture_blog"] },
   social: { label: "Social", types: ["aggregator"] },
   papers: { label: "論文", types: ["paper"] },
 } as const;

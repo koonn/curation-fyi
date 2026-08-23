@@ -52,7 +52,10 @@ export function exportUntagged(limit = DEFAULT_LIMIT, file = TAGGING_FILE, sourc
     ? all.filter((a) => sources.includes(a.source_id))
     : (() => {
         const typeById = new Map(loadAllSources().map((s) => [s.id, s.type]));
-        return all.filter((a) => categoryOf(typeById.get(a.source_id)) !== "social");
+        return all.filter((a) => {
+          const category = categoryOf(typeById.get(a.source_id));
+          return category !== "social" && category !== "culture";
+        });
       })();
   const rows: PendingRow[] = candidates.slice(0, limit).map((a) => ({
     url: a.url,
