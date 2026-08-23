@@ -18,6 +18,15 @@ import { defaultSourceState, loadFeedState, saveFeedState, type SourceState } fr
 
 const FAILURE_THRESHOLD = 7;
 
+/**
+ * タグ付けの取り分（リクエスト数）。1リクエスト25件なので150件ぶん。
+ * 定常の候補は1回の collect あたり1〜7件（実測 2026-08-23）で、これで足りる。
+ * **上限を切る理由は、和訳を飢餓させないため**——タグ付けと和訳は同じ無料枠を共有し、
+ * タグ付けが先に走るので、切らないとタグ付けの積み残しが多い日に和訳が0件になる
+ * （実際に20時間で和訳0件になった）。残りは全部和訳が使う。
+ */
+const TAG_REQUEST_SHARE = 6;
+
 interface FetchOutcome {
   items: FetchedItem[];
   notModified: boolean;
@@ -172,6 +181,7 @@ async function tagArticles(
     return;
   }
 
+  runner.beginStage("タグ付け", TAG_REQUEST_SHARE);
   const { updated } = await tagWithLlm(candidates, taxonomy, runner);
   for (const article of updated) {
     changedMonths.add(article.published_at.slice(0, 7));
@@ -196,6 +206,7 @@ async function translateArticles(
     return;
   }
 
+  runner.beginStage("和訳", null); // 最後の段階なので残り全部
   const { updated } = await translateWithLlm(candidates, runner);
   for (const article of updated) {
     changedMonths.add(article.published_at.slice(0, 7));

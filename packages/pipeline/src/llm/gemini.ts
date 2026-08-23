@@ -102,6 +102,11 @@ export function chunk<T>(items: T[], size: number): T[][] {
 export class LlmRunner {
   private readonly client: GoogleGenAI;
   private requests = 0;
+  /** いま走っている段階の取り分。null なら実行全体の残り全部を使える */
+  private stageLimit: number | null = null;
+  /** 段階が始まった時点の requests。段階の消費量を測るための基準 */
+  private stageStart = 0;
+  private stageName = "";
   private retries = 0;
   private waitedSeconds = 0;
   private inputTokens = 0;
@@ -115,8 +120,23 @@ export class LlmRunner {
     return this.requests;
   }
 
+  /**
+   * 段階の取り分を宣言する。**同じ実行に複数の段階が同居すると、先に走る段階が
+   * 予算を使い切って後続を飢餓させる**——実際、タグ付けが枠を食って和訳が
+   * 20時間0件になった。段階ごとに上限を切ることで、後続の取り分を残す。
+   * maxRequests に null を渡すと残り全部（最後の段階に使う）。
+   */
+  beginStage(name: string, maxRequests: number | null): void {
+    this.stageName = name;
+    this.stageLimit = maxRequests;
+    this.stageStart = this.requests;
+  }
+
   get remainingRequests(): number {
-    return Math.max(0, MAX_REQUESTS_PER_RUN - this.requests);
+    const runRemaining = Math.max(0, MAX_REQUESTS_PER_RUN - this.requests);
+    if (this.stageLimit === null) return runRemaining;
+    const stageRemaining = Math.max(0, this.stageLimit - (this.requests - this.stageStart));
+    return Math.min(runRemaining, stageRemaining);
   }
 
   get tokens(): { input: number; output: number } {
@@ -140,8 +160,13 @@ export class LlmRunner {
     // 待ち時間が MAX_RETRY_SECONDS を超えるとき（日次の上限）は待たずに諦める
     for (let attempt = 0; ; attempt++) {
       if (this.remainingRequests === 0) {
+        // 実行全体を使い切ったのか、この段階の取り分を使い切ったのかを区別して残す
+        const runExhausted = this.requests >= MAX_REQUESTS_PER_RUN;
         throw new QuotaExceededError(
-          `1実行あたりの予算 ${MAX_REQUESTS_PER_RUN} リクエストを使い切った（API側の上限ではない）`,
+          runExhausted
+            ? `1実行あたりの予算 ${MAX_REQUESTS_PER_RUN} リクエストを使い切った（API側の上限ではない）`
+            : `${this.stageName} の取り分 ${this.stageLimit} リクエストを使い切った` +
+              `（実行全体では残り ${MAX_REQUESTS_PER_RUN - this.requests}。API側の上限ではない）`,
         );
       }
       this.requests++;
