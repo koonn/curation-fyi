@@ -469,7 +469,7 @@
   keep_url_fragment: true
   enabled: true
 
-# 以下5件は RSS/Atom を持たないため、一覧ページのHTMLから収集する（fetcher: custom:html_list）。
+# 以下6件は RSS/Atom を持たないため、一覧ページのHTMLから収集する（fetcher: custom:html_list）。
 # 一覧から URL と公開日、記事ページから og:title / og:description を取る
 # （paulgraham だけは日付も記事ページから取る。下のコメント参照）
 - id: manus
@@ -508,6 +508,19 @@
     link_pattern: "^/news/news\\d{6}$"
     date_from_slug: "news(\\d{2})(\\d{2})(\\d{2})$"
     title_strip: " \\| DeepSeek API Docs$"
+  enabled: true
+
+- id: humanlayer
+  name: HumanLayer Blog
+  type: company_blog
+  language: en
+  site_url: https://www.humanlayer.dev/blog
+  fetcher: custom:html_list
+  html_list:
+    # RSSは無い（/rss.xml・/feed.xml・/atom.xml はどれも SPA の catch-all が 200 で HTML を返す）。
+    # 記事カードは <a> の内側に「Dex · August 12, 2026 · 7 min read」を持つので日付はそこから取れる。
+    # /blog/tags/<tag> はスラッシュを含むので link_pattern から自然に外れる
+    link_pattern: "^/blog/[a-z0-9-]+$"
   enabled: true
 
 - id: paulgraham
