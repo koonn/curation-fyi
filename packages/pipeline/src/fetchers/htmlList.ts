@@ -43,23 +43,27 @@ const MONTHS: Record<string, number> = {
   july: 7, august: 8, september: 9, october: 10, november: 11, december: 12,
 };
 
-/** 一覧のカードに現れる日付表記。実測した3形式だけを見る */
-const DATE_PATTERNS: RegExp[] = [
-  /(\d{4})-(\d{2})-(\d{2})/,
-  /([A-Z][a-z]+)\s+(\d{1,2})(?:st|nd|rd|th)?,?\s+(\d{4})/,
+/**
+ * 一覧のカードに現れる日付表記。実測した形式だけを見る。
+ * kind は「どのキャプチャが年/月/日か」で、正規表現の見た目から推測しない
+ * （2026-08-26 に stripe の 2026.7.30 を足すまでは source.startsWith で分岐していて、
+ * 同じ `(\d{4})` 始まりの形式を足すとゼロ埋めのない日付を組み立ててしまう形だった）
+ */
+const DATE_PATTERNS: { re: RegExp; kind: "ymd" | "mdy" }[] = [
+  { re: /(\d{4})-(\d{2})-(\d{2})/, kind: "ymd" },
+  // stripe.com/blog/engineering の「2026.7.30」。月・日はゼロ埋めされないことがある
+  { re: /(\d{4})\.(\d{1,2})\.(\d{1,2})/, kind: "ymd" },
+  { re: /([A-Z][a-z]+)\s+(\d{1,2})(?:st|nd|rd|th)?,?\s+(\d{4})/, kind: "mdy" },
 ];
 
 function parseDate(text: string): string | null {
-  for (const re of DATE_PATTERNS) {
+  for (const { re, kind } of DATE_PATTERNS) {
     const m = re.exec(text);
     if (!m) continue;
-    if (re.source.startsWith("(\\d{4})")) {
-      return `${m[1]}-${m[2]}-${m[3]}T00:00:00.000Z`;
-    }
-    const month = MONTHS[(m[1] ?? "").toLowerCase()];
-    if (!month) continue;
-    const day = Number(m[2]);
-    const year = Number(m[3]);
+    const year = Number(kind === "ymd" ? m[1] : m[3]);
+    const month = kind === "ymd" ? Number(m[2]) : MONTHS[(m[1] ?? "").toLowerCase()];
+    const day = Number(kind === "ymd" ? m[3] : m[2]);
+    if (!month || month > 12 || !day || day > 31) continue;
     return new Date(Date.UTC(year, month - 1, day)).toISOString();
   }
   return null;

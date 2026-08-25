@@ -469,7 +469,7 @@
   keep_url_fragment: true
   enabled: true
 
-# 以下6件は RSS/Atom を持たないため、一覧ページのHTMLから収集する（fetcher: custom:html_list）。
+# 以下7件は RSS/Atom を持たないため、一覧ページのHTMLから収集する（fetcher: custom:html_list）。
 # 一覧から URL と公開日、記事ページから og:title / og:description を取る
 # （paulgraham だけは日付も記事ページから取る。下のコメント参照）
 - id: manus
@@ -508,6 +508,26 @@
     link_pattern: "^/news/news\\d{6}$"
     date_from_slug: "news(\\d{2})(\\d{2})(\\d{2})$"
     title_strip: " \\| DeepSeek API Docs$"
+  enabled: true
+
+- id: stripe-engineering
+  name: Stripe Engineering Blog
+  type: company_blog
+  language: en
+  site_url: https://stripe.com/blog/engineering
+  fetcher: custom:html_list
+  html_list:
+    # stripe-blog（feed.rss）はビジネス・プロダクト側だけで、engineering の記事は1本も流れてこない
+    # （収集済み14件を確認）。engineering セクションに feed.rss は無い（404）ので一覧のHTMLから取る。
+    # 記事URLは業務側と同じ /blog/<slug> だが、この一覧に出るのは engineering の21本だけ。
+    # 日付は <a> の内側の「2026.7.30」形式（ゼロ埋め無し。DATE_PATTERNS に追加した）。
+    #
+    # **21本中10本は記事ページ自体が404**（2026-08-26 実測）。2026-02 以降の新しい10本が全滅で、
+    # 2020-12〜2025-09 の11本は200。UA・ロケール・末尾スラッシュを変えても404で、本文は
+    # <title>Page not found</title> なので Stripe 側でページが出ていない。fetcher は取れない
+    # ものを捨てるのでリンク切れは公開されない。Stripe が直せば次の収集で自動的に入る
+    # （その代わり、直るまでは毎回この10本を取りに行って失敗する＝収集ごとに10リクエスト）
+    link_pattern: "^/blog/[a-z0-9-]+$"
   enabled: true
 
 - id: humanlayer
