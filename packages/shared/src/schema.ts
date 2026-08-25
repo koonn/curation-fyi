@@ -84,6 +84,12 @@ export interface HtmlListConfig {
   title_strip?: string;
   /** 一覧に日付が無く slug に YYMMDD が埋まっている形式（DeepSeek）。3つのキャプチャが YY/MM/DD */
   date_from_slug?: string;
+  /**
+   * 一覧にも slug にも日付が無く、記事ページ本文の冒頭に「Month YYYY」があるサイト（paulgraham.com）。
+   * 記事ページの先頭400文字から拾い、日は1日に丸める。日付が一覧で確定しないため、
+   * 未知のURLは日付が無くても記事ページを取りに行く（既知のURLは従来どおり取りに行かない）。
+   */
+  date_from_article_head?: boolean;
   /** 1回の収集で見る上限（既定40） */
   max_items?: number;
 }

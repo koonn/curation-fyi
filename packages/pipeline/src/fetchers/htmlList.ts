@@ -19,6 +19,9 @@ import type { FetchedItem } from "./types.ts";
  * 日付が取れない項目は捨てる（rss fetcher と同じ）。nav のリンクが link_pattern に
  * 引っかかっても日付を持たないので、この規則が実質のフィルタになる。
  *
+ * 例外が date_from_article_head（paulgraham.com）で、日付は**記事ページ本文の冒頭**にしかない。
+ * このときだけ一覧では日付を確定せず、記事ページを取ってから捨てる。捨てる規則は同じ。
+ *
  * 記事ページの取得は **未知のURLだけ**。2回目以降の collect は一覧1リクエストで済む。
  */
 
@@ -28,6 +31,12 @@ const CONCURRENCY = 4;
 const DEFAULT_MAX_ITEMS = 40;
 /** <a> の内側テキストとして見る上限。閉じタグを見失ったときに全文を舐めないための保険 */
 const MAX_ANCHOR_TEXT = 2_000;
+/**
+ * date_from_article_head で日付を探す本文冒頭の文字数。
+ * paulgraham.com 全232本の実測で、日付の出現位置は最大311文字・95%が84文字以内（2026-08-25）。
+ * 冒頭に長い注記を置く essay（distraction.html）が311文字なので、そこまで届く幅を取る。
+ */
+const ARTICLE_HEAD_CHARS = 400;
 
 const MONTHS: Record<string, number> = {
   january: 1, february: 2, march: 3, april: 4, may: 5, june: 6,
@@ -52,6 +61,20 @@ function parseDate(text: string): string | null {
     const day = Number(m[2]);
     const year = Number(m[3]);
     return new Date(Date.UTC(year, month - 1, day)).toISOString();
+  }
+  return null;
+}
+
+/**
+ * 記事ページ本文の冒頭にある「Month YYYY」。日は持たないので1日に丸める。
+ * コメント（paulgraham.com は旧タイトルを <!-- --> で残している）を先に落としてから探す。
+ */
+function parseMonthYearHead(html: string): string | null {
+  const head = stripTags(html.replace(/<!--[\s\S]*?-->/g, " ")).slice(0, ARTICLE_HEAD_CHARS);
+  // 月名でない「語+西暦」（"Viaweb 1998" 等）で打ち切らないよう、最初に月名と読めたものを採る
+  for (const m of head.matchAll(/\b([A-Z][a-z]+)\s+(\d{4})\b/g)) {
+    const month = MONTHS[(m[1] ?? "").toLowerCase()];
+    if (month) return new Date(Date.UTC(Number(m[2]), month - 1, 1)).toISOString();
   }
   return null;
 }
@@ -113,7 +136,8 @@ async function get(url: string): Promise<string | null> {
 
 interface Candidate {
   url: string;
-  publishedAt: string;
+  /** date_from_article_head のときだけ null。記事ページを取った後で確定する */
+  publishedAt: string | null;
 }
 
 /** 一覧ページから「記事URLと公開日」を取り出す。日付はアンカーの内側だけを見る */
@@ -137,7 +161,9 @@ function extractCandidates(html: string, listUrl: string, source: Source): Candi
     seen.add(absolute);
 
     let publishedAt: string | null;
-    if (config.date_from_slug) {
+    if (config.date_from_article_head) {
+      publishedAt = null; // 記事ページを見るまで決まらない
+    } else if (config.date_from_slug) {
       publishedAt = dateFromSlug(absolute, config.date_from_slug);
     } else {
       const start = m.index + m[0].length;
@@ -145,7 +171,7 @@ function extractCandidates(html: string, listUrl: string, source: Source): Candi
       const end = close < 0 ? start + MAX_ANCHOR_TEXT : Math.min(close, start + MAX_ANCHOR_TEXT);
       publishedAt = parseDate(stripTags(html.slice(start, end)));
     }
-    if (!publishedAt) continue;
+    if (!publishedAt && !config.date_from_article_head) continue;
     out.push({ url: absolute, publishedAt });
   }
   return out;
@@ -174,6 +200,8 @@ export async function fetchHtmlList(
       if (!c) return;
       const page = await get(c.url);
       if (!page) continue;
+      const publishedAt = c.publishedAt ?? parseMonthYearHead(page);
+      if (!publishedAt) continue; // 冒頭に日付が無いページ（nav・記事以外）はここで落ちる
       const title =
         metaContent(page, "og:title") ??
         (/<title[^>]*>([\s\S]*?)<\/title>/i.exec(page)?.[1]?.trim() ?? "");
@@ -185,7 +213,7 @@ export async function fetchHtmlList(
         url: c.url,
         title: stripTags(stripped),
         summary: summary ? stripTags(summary) : null,
-        published_at: c.publishedAt,
+        published_at: publishedAt,
         language: source.language === "mixed" ? "en" : source.language,
       });
     }

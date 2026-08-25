@@ -469,8 +469,9 @@
   keep_url_fragment: true
   enabled: true
 
-# 以下4件は RSS/Atom を持たないため、一覧ページのHTMLから収集する（fetcher: custom:html_list）。
+# 以下5件は RSS/Atom を持たないため、一覧ページのHTMLから収集する（fetcher: custom:html_list）。
 # 一覧から URL と公開日、記事ページから og:title / og:description を取る
+# （paulgraham だけは日付も記事ページから取る。下のコメント参照）
 - id: manus
   name: Manus Blog
   type: company_blog
@@ -507,6 +508,27 @@
     link_pattern: "^/news/news\\d{6}$"
     date_from_slug: "news(\\d{2})(\\d{2})(\\d{2})$"
     title_strip: " \\| DeepSeek API Docs$"
+  enabled: true
+
+- id: paulgraham
+  name: Paul Graham
+  type: personal_blog
+  language: en
+  site_url: https://paulgraham.com/
+  fetcher: custom:html_list
+  html_list:
+    # 公式RSSは無い。articles.html からリンクされている Aaron Swartz の scraped feed は
+    # Superlinear Returns（2023-10）で更新が止まっており、以降の15本が入らない（2026-08-25 実測）
+    list_url: https://paulgraham.com/articles.html
+    # essay は全部ルート直下の <name>.html。nav（index / articles / rss）だけ外す。
+    # 画像マップの <area> は fetcher が <a> しか見ないので元から入らない
+    link_pattern: "^(?!index|articles|rss)[a-z0-9]+\\.html$"
+    # 一覧にも slug にも日付が無く、日付は essay 本文の冒頭の「September 2024」だけ。
+    # 日は持たないので1日に丸める。全232本中229本が取れる（残り3本は本文にも日付が無い古い Lisp
+    # 記事。記事にならないので毎回 known にならず、収集ごとに3リクエストだけ余分に出る）
+    date_from_article_head: true
+    # 一覧が全232本を返すので初回に全部取る（2回目以降は未知のURLだけ記事ページを見る）
+    max_items: 250
   enabled: true
 
 - id: statmodeling
