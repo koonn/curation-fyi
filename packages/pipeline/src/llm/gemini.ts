@@ -33,14 +33,47 @@ const MAX_RETRY_SECONDS = 90;
 export const BATCH_SIZE = 25;
 
 /**
- * 無料枠の上限に当たったことを表す。捕まえた側は打ち切って正常終了する。
+ * 「この実行ではもう続けられないが、異常ではない」ことを表す基底クラス。
+ * 捕まえた側は打ち切って正常終了し、残りは次回の実行に回す。
+ * **付加的な工程（タグ付け・和訳）の中断で収集そのものを落とさないための境界**で、
+ * これに当たらない例外は実装の不具合として扱う。
+ */
+export abstract class LlmStopError extends Error {
+  /** ログに出す打ち切り理由（「利用上限」等）。文中に埋めるので体言止めにする */
+  abstract readonly label: string;
+  constructor(
+    message: string,
+    readonly detail: string,
+  ) {
+    super(message);
+  }
+}
+
+/**
+ * 無料枠の上限に当たったことを表す。
  * どの制限（日次・分あたり・トークン数）に当たったかは応答本文にしか出ないので、
  * detail に残してログに出す（バッチサイズの調整に必要）
  */
-export class QuotaExceededError extends Error {
-  constructor(readonly detail: string) {
-    super("Gemini の利用上限に達した");
+export class QuotaExceededError extends LlmStopError {
+  readonly label = "利用上限";
+  constructor(detail: string) {
+    super("Gemini の利用上限に達した", detail);
     this.name = "QuotaExceededError";
+  }
+}
+
+/**
+ * モデル側の一過性の障害（503 UNAVAILABLE / 500 / 504）。
+ * 応答は "Spikes in demand are usually temporary" と言うとおり待てば解けるので、
+ * json() が数回バックオフして再試行し、それでも駄目ならこれを投げて次回に回す。
+ * **利用上限と同じく「異常ではない打ち切り」**として扱う（再試行で自己回復するため、
+ * これで CI を赤くしても対処できることが無い）。
+ */
+export class ServiceUnavailableError extends LlmStopError {
+  readonly label = "モデル側の一時的な過負荷";
+  constructor(detail: string) {
+    super("Gemini が一時的に応答できない", detail);
+    this.name = "ServiceUnavailableError";
   }
 }
 
@@ -53,12 +86,30 @@ function isQuotaError(e: unknown): boolean {
 }
 
 /**
- * 429 の本文から、どの制限に当たったかをログ用に取り出す。
+ * モデル側の一過性の障害を判定する。503 UNAVAILABLE が主だが、
+ * 500 / 504 も同じく「待てば解ける」側なので同列に扱う。
+ * 429（利用上限）は待ち時間が本文で申告されるので、そちらは isQuotaError で切る。
+ */
+function isTransientServerError(e: unknown): boolean {
+  const status = (e as { status?: unknown })?.status;
+  if (status === 503 || status === 500 || status === 504) return true;
+  const message = e instanceof Error ? e.message : String(e);
+  return /\b(503|500|504)\b|UNAVAILABLE|INTERNAL|DEADLINE_EXCEEDED/.test(message);
+}
+
+/**
+ * 一過性障害で待つ秒数。429 と違い応答が retryDelay を持たないので固定値を使う。
+ * CI のジョブ（timeout-minutes: 15）に収めるため、合計 20 秒に留める。
+ */
+const TRANSIENT_BACKOFF_SECONDS = [5, 15];
+
+/**
+ * エラー本文から、ログに残す説明を組み立てる。429 なら当たった制限を要約に足す。
  * 本文は ApiError.message に JSON がそのまま入る（実測で確認）。
  * ただし 429 の details[] の入れ子は実物で確認できていないので、
  * 平坦な文字列一致で拾えるものだけを要約に足し、拾えなくても本文全体を残す。
  */
-function describeQuotaError(e: unknown): string {
+function describeApiError(e: unknown): string {
   const raw = e instanceof Error ? e.message : String(e);
   const ids = [...raw.matchAll(/"(?:quotaId|quotaMetric)"\s*:\s*"([^"]+)"/g)].map((m) => m[1]);
   const retry = raw.match(/"retryDelay"\s*:\s*"([^"]+)"/)?.[1];
@@ -183,8 +234,22 @@ export class LlmRunner {
         text = response.text;
         break;
       } catch (e) {
+        if (isTransientServerError(e)) {
+          const detail = describeApiError(e);
+          const seconds = TRANSIENT_BACKOFF_SECONDS[attempt];
+          // 待ち時間を用意していない回数まで来たら諦めて次回の実行に回す
+          if (seconds === undefined) throw new ServiceUnavailableError(detail);
+          this.retries++;
+          this.waitedSeconds += seconds;
+          console.log(
+            `  モデル側が応答できないので ${seconds} 秒待って再試行する` +
+              `（${attempt + 1}/${TRANSIENT_BACKOFF_SECONDS.length}）`,
+          );
+          await sleep(seconds * 1000);
+          continue;
+        }
         if (!isQuotaError(e)) throw e;
-        const detail = describeQuotaError(e);
+        const detail = describeApiError(e);
         const wait = retryDelaySeconds(e);
         if (attempt >= MAX_RETRIES_PER_REQUEST || wait === null || wait > MAX_RETRY_SECONDS) {
           throw new QuotaExceededError(detail);

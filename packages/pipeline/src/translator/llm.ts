@@ -1,6 +1,6 @@
 import { Type } from "@google/genai";
 import type { Article } from "@curation-fyi/shared";
-import { BATCH_SIZE, chunk, type LlmRunner, QuotaExceededError } from "../llm/gemini.ts";
+import { BATCH_SIZE, chunk, type LlmRunner, LlmStopError } from "../llm/gemini.ts";
 
 /** サマリの行数。カードの表示もこの数を前提にする */
 const SUMMARY_LINES = 3;
@@ -126,7 +126,8 @@ export interface TranslateResult {
   missed: number;
   requests: number;
   /** 打ち切った理由（どの上限に当たったか）。打ち切っていなければ null */
-  quotaDetail: string | null;
+  /** 打ち切った理由。利用上限・モデル側の過負荷など。null なら最後まで回った */
+  stopped: LlmStopError | null;
 }
 
 /**
@@ -149,24 +150,24 @@ export async function translateWithLlm(
     mismatched: 0,
     missed: 0,
     requests: 0,
-    quotaDetail: null,
+    stopped: null,
   };
   if (candidates.length === 0) {
     console.log("和訳: 対象記事なし");
     return result;
   }
 
-  /** 1つの言語ぶんをバッチで処理する。上限に当たったら quotaDetail を立てて止まる */
+  /** 1つの言語ぶんをバッチで処理する。打ち切りに当たったら stopped を立てて止まる */
   const runBatches = async (articles: Article[], mode: Mode): Promise<void> => {
     const schema = responseSchema(mode);
     for (const batch of chunk(articles, BATCH_SIZE)) {
-      if (result.quotaDetail) return;
+      if (result.stopped) return;
       let answers: TranslateAnswer[] | null;
       try {
         answers = await runner.json<TranslateAnswer[]>(buildPrompt(batch, bodies, mode), schema);
       } catch (e) {
-        if (e instanceof QuotaExceededError) {
-          result.quotaDetail = e.detail;
+        if (e instanceof LlmStopError) {
+          result.stopped = e;
           return;
         }
         throw e;
@@ -234,7 +235,7 @@ export async function translateWithLlm(
       (result.mismatched > 0 ? `**タイトル不一致で破棄 ${result.mismatched} 件**、` : "") +
       `取りこぼし ${result.missed} 件、未着手 ${remaining} 件、入力 ${input} tok / 出力 ${output} tok）` +
       (waits.count > 0 ? `\n  上限に当たって ${waits.count} 回・計 ${waits.seconds} 秒待った` : "") +
-      (result.quotaDetail ? `\n  ※利用上限に達したため打ち切り — ${result.quotaDetail}` : ""),
+      (result.stopped ? `\n  ※${result.stopped.label}のため打ち切り — ${result.stopped.detail}` : ""),
   );
   return result;
 }

@@ -34,7 +34,12 @@ jobs:
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
 
+      # collect が非0で終わっても、保存済みの収集ぶんは必ずコミットする。
+      # **付加工程（LLMのタグ付け・和訳）の失敗で収集データを落とさないため**——
+      # 以前は collect の失敗でこのstepに到達せず、そのランの取得が丸ごと消えていた。
+      # 収集そのものが落ちた場合は saveAll に到達しないので、ここは「変更なし」になる
       - name: Commit collected articles
+        if: always()
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"

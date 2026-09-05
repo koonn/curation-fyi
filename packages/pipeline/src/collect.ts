@@ -5,7 +5,7 @@ import { loadAllSources, loadSources } from "./sources.ts";
 import { loadTaxonomy, ruleTags } from "./tagger/rules.ts";
 import { tagWithLlm } from "./tagger/llm.ts";
 import { translateCandidates, translateWithLlm } from "./translator/llm.ts";
-import { isLlmEnabled, LlmRunner } from "./llm/gemini.ts";
+import { isLlmEnabled, LlmRunner, LlmStopError } from "./llm/gemini.ts";
 import { isExcluded } from "./exclude.ts";
 import { fetchRss } from "./fetchers/rss.ts";
 import { fetchHackernews } from "./fetchers/hackernews.ts";
@@ -277,8 +277,29 @@ export async function collect({ refresh = false } = {}): Promise<void> {
   // 1回の collect で使えるリクエスト予算を Runner が一括で持つ。
   // タグ付けと和訳が同じ Runner を共有するので、予算管理は1本のまま
   const runner = isLlmEnabled() ? new LlmRunner() : null;
-  await tagArticles(existing, changedMonths, runner);
-  await translateArticles(existing, changedMonths, runner);
+  // タグ付け・和訳は収集に対して付加的な工程なので、ここで落ちても
+  // 取得済みの記事は保存する。**保存は下の saveAll でしか行われないため、
+  // ここで例外を素通しすると、そのランで取得した記事が丸ごと捨てられる**
+  // （実際に 2026-09-05 の Gemini 503 でそうなった）。
+  // 打ち切りが LlmStopError（利用上限・モデル側の過負荷）なら次回の実行で解けるので
+  // 正常終了のままにし、それ以外は実装の不具合として終了コードを立てる。
+  const enrichFailures: Error[] = [];
+  for (const [name, run] of [
+    ["タグ付け", () => tagArticles(existing, changedMonths, runner)],
+    ["和訳", () => translateArticles(existing, changedMonths, runner)],
+  ] as const) {
+    try {
+      await run();
+    } catch (e) {
+      const error = e instanceof Error ? e : new Error(String(e));
+      if (error instanceof LlmStopError) {
+        console.log(`${name}: ${error.label}のため打ち切り — ${error.detail}`);
+      } else {
+        console.error(`✗ ${name}が失敗した（収集ぶんは保存する）: ${error.stack ?? error.message}`);
+        enrichFailures.push(error);
+      }
+    }
+  }
 
   // 変更のあった月に属する記事全件を集めて、その月のファイルだけ全量書き直す
   const toSave: Article[] = [];
@@ -324,5 +345,11 @@ export async function collect({ refresh = false } = {}): Promise<void> {
 
   if (failed === results.length && results.length > 0) {
     process.exitCode = 1; // 全滅のときだけ失敗にする（部分失敗は運用で拾う）
+  }
+  if (enrichFailures.length > 0) {
+    // 保存を終えてから落とす。ワークフローのコミットstepは if: always() なので
+    // 終了コードを立てても収集ぶんは取りこぼさない
+    console.error(`✗ 付加工程が ${enrichFailures.length} 件失敗した（収集ぶんは保存済み）`);
+    process.exitCode = 1;
   }
 }

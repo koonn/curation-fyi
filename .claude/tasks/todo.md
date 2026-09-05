@@ -695,3 +695,56 @@ HN 767件のリンク先を実際に取得した結果:
      ローカルでは全ソース成功のため再現しなかった）→ 明示的 process.exit + timeout-minutes: 15
 - 既知の問題: mercari-engineering が CI の IP からのみ 403（対処手順は design.md タスク A-6）
 - コミット: 8b2ecd9（v0）、5347ada（CIハング修正）、52bfb6f（CI初回データ）
+
+## LLM障害でcollect全体が落ちる問題の修正（2026-09-05）
+
+### 症状
+2026-09-05T10:02 の collect が Gemini の 503（UNAVAILABLE / モデル過負荷）で異常終了。
+2026-09-04T15:50 にも同じ失敗。単発ではない。
+
+### 診断（コードとCIログで確定済み）
+- `gemini.ts` の `isQuotaError` は 429 / RESOURCE_EXHAUSTED / quota しか見ない。
+  **503 は素通りして `json()` が生のまま再スロー**する（`if (!isQuotaError(e)) throw e`）
+- `tagWithLlm` / `translateWithLlm` は `QuotaExceededError` だけを握って正常終了扱いにし、
+  それ以外は再スローする
+- `collect()` は `tagArticles`(280) → `translateArticles`(281) → **`saveAll`(290) / `saveFeedState`(291)** の順。
+  タグ付けで例外が飛ぶと保存に到達せず、**そのランで取得した記事が全部捨てられる**
+- CI 側も `pnpm collect` が非0で終わるとコミットstepに到達しない。
+  実際に 10:02 のランに対応する `chore: collect articles` コミットは存在しない
+- 永久欠落はしない（etag も一緒に捨てられるので次回また取りに行く）。
+  ただしフィードから溢れた記事は取り逃す
+
+### 方針
+付加的な工程（タグ付け・和訳）が、収集そのものを道連れにしない構造にする。
+
+- [x] 1. `gemini.ts`: 503/500/504 を一過性障害として扱い、バックオフ再試行を入れる
+      （ボディに retryDelay が無いので固定バックオフ）。回数超過は「異常ではない打ち切り」にする
+- [x] 2. `gemini.ts`: 基底クラス `LlmStopError` を導入し `QuotaExceededError` をその派生にする。
+      呼び出し側の握り先を1箇所にまとめる
+- [x] 3. `tagger/llm.ts` / `translator/llm.ts`: catch を `LlmStopError` に広げる。
+      打ち切り理由をログに出す（`quotaDetail` は理由を持てないので置き換え）
+- [x] 4. `collect.ts`: タグ付け・和訳を try/catch で囲み、**想定外の例外でも `saveAll` に到達させる**。
+      想定外のときだけ exitCode を立てる
+- [x] 5. `collect.yml`: コミットstepを `if: always()` にして、collect が非0でも保存済みデータを取りこぼさない
+- [x] 6. 検証: 503 を注入して (a)再試行が走る (b)保存される (c)終了コード を実測
+
+### 判断メモ
+一過性の 503 は再試行後も解けなければ**正常終了（exit 0）**とする。既存の
+`QuotaExceededError` が同じ扱い（待てば解ける制限は異常ではない）なので、それに揃える。
+自己回復する事象で毎回 run failed が飛ぶのを避ける狙い。想定外の例外は従来どおり exit 1。
+
+### レビュー（実測 2026-09-05）
+
+スタブしたAPIでの単体確認:
+- 503 が続く場合: 呼び出し3回・待ち合計20秒（5秒→15秒）で `ServiceUnavailableError`。
+  `LlmStopError` の派生なので呼び出し側が握って正常終了する
+- 503 が2回で解ける場合: 3回目で成功し、結果が返る（＝今回の障害は再試行だけで回復した可能性が高い）
+- 429: `QuotaExceededError` のまま。既存挙動は不変
+- 想定外の例外（TypeError）: `LlmStopError` ではないので素通しされ、collect 側が拾う
+
+`collect` の通し確認（無効なAPIキーで付加工程を両方失敗させた）:
+- タグ付け・和訳とも 400 INVALID_ARGUMENT で失敗
+- **それでも saveAll に到達し、記事65件と feed-state を保存した**（修正前はこの65件が捨てられていた）
+- 終了コード 1。`if: always()` により、この65件はコミットstepで取りこぼされない
+
+typecheck: 全パッケージ 0 エラー。`quotaDetail` の残存なし。
