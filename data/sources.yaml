@@ -665,6 +665,15 @@
   fetcher: rss
   enabled: true
 
+- id: econ101
+  name: "経済学101"
+  type: culture_blog
+  language: ja
+  site_url: https://econ101.jp/
+  feed_url: https://econ101.jp/feed/
+  fetcher: rss
+  enabled: true
+
 - id: familyinequality-wordpress
   name: "Family Inequality"
   type: culture_blog
