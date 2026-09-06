@@ -319,7 +319,14 @@
   site_url: https://queue.acm.org/
   feed_url: https://queue.acm.org/rss/feeds/queuecontent.xml
   fetcher: rss
-  enabled: true
+  # ACM がフィードを廃止した。410 Gone で、本文が RDF で
+  # 「Association for Computing Machinery: Feed Not Available / This channel is discontinued.」
+  # と明示している（2026-09-06 実測）。一時的な障害ではないので無効化する。
+  # HTML収集への切り替えも不可能で、queue.acm.org は / も含め全パスが 403
+  # （ブラウザのUAでも403。ボット遮断）。/feed.xml・/rss.xml・/atom.xml も403、
+  # /rss/feeds/latest.xml は同じく410。
+  # 収集済みの21件（2026-04-20〜2026-08-24）はそのまま残る
+  enabled: false
 
 - id: analyzecore
   name: AnalyzeCore by Serhiy Bryl
