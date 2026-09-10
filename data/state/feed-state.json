@@ -9,175 +9,175 @@
     "etag": null,
     "last_modified": null,
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "cloudflare-blog": {
     "etag": null,
-    "last_modified": "Wed, 09 Sep 2026 14:04:23 GMT",
+    "last_modified": "Thu, 10 Sep 2026 13:00:40 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "stripe-blog": {
     "etag": null,
     "last_modified": null,
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "martinfowler": {
     "etag": "\"2e443-65b0f4173a940\"",
     "last_modified": "Wed, 09 Sep 2026 16:22:21 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "jxck": {
     "etag": "\"6a9fa9dc-a5eb\"",
     "last_modified": "Tue, 08 Sep 2026 06:23:24 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "hn-frontpage": {
     "etag": null,
     "last_modified": null,
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "hatena-hotentry-it": {
     "etag": null,
     "last_modified": null,
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "arxiv-cs": {
     "etag": null,
     "last_modified": null,
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "github-engineering": {
     "etag": "W/\"730dd5d44165b4706a3a6781cb97e9dc\"",
     "last_modified": "Thu, 10 Sep 2026 02:05:17 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "netflix-techblog": {
     "etag": null,
     "last_modified": null,
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "airbnb-engineering": {
     "etag": null,
     "last_modified": null,
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "slack-engineering": {
     "etag": "W/\"9e62e1ce5207e2161c803dac900dd615\"",
     "last_modified": "Tue, 14 Jul 2026 16:10:08 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "spotify-engineering": {
     "etag": null,
     "last_modified": null,
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "dropbox-tech": {
     "etag": null,
     "last_modified": null,
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "meta-engineering": {
     "etag": "W/\"765001ddf24a40cccc0947d0bf8b2bc9\"",
     "last_modified": "Tue, 08 Sep 2026 16:52:38 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "discord-engineering": {
     "etag": null,
-    "last_modified": "Thu, 10 Sep 2026 09:51:14 GMT",
+    "last_modified": "Thu, 10 Sep 2026 09:57:28 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "vercel-blog": {
-    "etag": null,
+    "etag": "W/\"48f7ac3b9a84df52a4926a4645fa1eb6\"",
     "last_modified": null,
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "line-yahoo-tech": {
     "etag": "W/\"623a92da84734a38a78b2083cec9ea76\"",
     "last_modified": "Thu, 10 Sep 2026 02:04:12 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "cyberagent-developers": {
     "etag": "\"b77c31ba151996fb06245b740cc369a4-gzip\"",
     "last_modified": null,
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "hatena-developer": {
     "etag": null,
     "last_modified": null,
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "zozo-techblog": {
     "etag": null,
     "last_modified": null,
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "moneyforward-dev": {
     "etag": null,
     "last_modified": null,
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "smarthr-tech": {
     "etag": null,
     "last_modified": null,
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "dena-engineering": {
     "etag": "W/\"6aa20b97-c5595\"",
     "last_modified": "Thu, 10 Sep 2026 01:44:55 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "freee-developers": {
     "etag": null,
     "last_modified": null,
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "simonwillison": {
     "etag": null,
     "last_modified": "Thu, 10 Sep 2026 00:56:41 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "overreacted": {
     "etag": "W/\"e85b2c5442ac458fb968d38fd674e6bd\"",
     "last_modified": null,
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "naoya": {
     "etag": null,
     "last_modified": null,
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "azukiazusa": {
     "etag": "W/\"9802412f33136bb933ed6bb6682bea88\"",
     "last_modified": null,
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "acm-queue": {
     "etag": "W/\"153d-65a2bcb6a4fda\"",
@@ -189,157 +189,157 @@
     "etag": "\"bf03f916c599b911564c9cbfb1669ab5\"",
     "last_modified": null,
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "amazon-science": {
     "etag": null,
     "last_modified": null,
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "google-research": {
     "etag": null,
     "last_modified": "Thu, 03 Sep 2026 18:20:31 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "google-deepmind": {
-    "etag": "\"h4y7cg\"",
+    "etag": "\"WtMpQw\"",
     "last_modified": null,
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "nvidia-developer": {
-    "etag": "\"a7e8c65352522a0b6907b6d3bcbfba1d\"",
-    "last_modified": "Thu, 10 Sep 2026 09:00:00 GMT",
+    "etag": "\"9bd3a0036cc6f7c4a98cf4f43a8aaa78\"",
+    "last_modified": "Thu, 10 Sep 2026 15:00:00 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "apple-machine-learning": {
     "etag": "W/\"6aa24e6e-2750\"",
     "last_modified": "Thu, 10 Sep 2026 06:30:06 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "aws-architecture": {
     "etag": null,
-    "last_modified": "Wed, 09 Sep 2026 23:23:13 GMT",
+    "last_modified": "Thu, 10 Sep 2026 15:52:31 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "microsoft-devblogs": {
     "etag": "W/\"3d282bcf56cb1d97efc42ec6e98a7297\"",
     "last_modified": "Thu, 10 Sep 2026 03:25:53 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "microsoft-research": {
-    "etag": "\"0a46d9a9d8014883c4d56d609ec01e74\"",
-    "last_modified": "Thu, 10 Sep 2026 00:03:56 GMT",
+    "etag": "\"e1e2031236e4edc5c332c0a67a7dcae3\"",
+    "last_modified": "Thu, 10 Sep 2026 15:53:33 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "karpathy": {
     "etag": null,
-    "last_modified": "Thu, 10 Sep 2026 08:34:26 GMT",
+    "last_modified": "Thu, 10 Sep 2026 14:27:37 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "openai-news": {
     "etag": null,
     "last_modified": null,
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "openai-developers": {
     "etag": "W/\"c434146933ae7aa25fd6b38bc5fd0896\"",
     "last_modified": "Sat, 22 Aug 2026 06:45:12 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "palantir-blog": {
     "etag": null,
     "last_modified": null,
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "cursor-changelog": {
     "etag": null,
     "last_modified": null,
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "anthropic-release-notes": {
     "etag": null,
     "last_modified": null,
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "manus": {
     "etag": null,
     "last_modified": null,
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "napkin-ai": {
     "etag": null,
     "last_modified": null,
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "deepseek-news": {
     "etag": null,
     "last_modified": null,
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "arxiv-stat": {
     "etag": null,
     "last_modified": null,
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "arxiv-econ": {
     "etag": null,
     "last_modified": null,
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "statmodeling": {
-    "etag": "W/\"5a3c7ce87ad77ab39bd06528c1448804\"",
-    "last_modified": "Wed, 09 Sep 2026 13:44:20 GMT",
+    "etag": "W/\"261e7737179700c4d951c7fa7a53f678\"",
+    "last_modified": "Thu, 10 Sep 2026 15:26:30 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "tjo-hatena": {
     "etag": null,
     "last_modified": null,
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "note-hik0107": {
-    "etag": "W/\"650b9c57972f7864cfaecd0254f29eea\"",
+    "etag": "W/\"ff9787c580b775d04872530339fa15bb\"",
     "last_modified": null,
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "alexandracooks": {
     "etag": null,
     "last_modified": "Wed, 09 Sep 2026 00:05:24 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "blog-ayjay": {
-    "etag": "\"3d4aea8dba24d537051f0be2a68a3469-gzip\"",
-    "last_modified": "Thu, 10 Sep 2026 01:21:22 GMT",
+    "etag": "\"bca8472553ca37c0c184aa70848de17a-gzip\"",
+    "last_modified": "Thu, 10 Sep 2026 15:50:03 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "bookandsword": {
     "etag": "\"b1506705f082665988da1ace8b511e81\"",
     "last_modified": "Mon, 07 Sep 2026 20:42:40 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "cecilycarver-substack": {
     "etag": "W/\"506af-HmqD5AeQ1jYyXqFX0Wvv7ICQPC0\"",
@@ -348,28 +348,28 @@
     "last_success": "2026-08-23T14:48:12.250Z"
   },
   "defector": {
-    "etag": "W/\"1276vwaqes1kj5\"",
+    "etag": "W/\"ldknkf749jjo8\"",
     "last_modified": null,
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "dgmyers-blogspot": {
     "etag": "W/\"72db7ae477f953bcdbab1a0ef0bfd78fca56cbf342e1c2debcdf9a30ce856232\"",
     "last_modified": "Mon, 07 Sep 2026 16:51:38 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "doyouwriteunderyourownname-blogspot": {
     "etag": "W/\"66cb8f78f4963c966e7b7c2d1a0a4234f6a8dee233009a1de483e0efda603e11\"",
     "last_modified": "Wed, 09 Sep 2026 12:37:33 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "familyinequality-wordpress": {
     "etag": null,
     "last_modified": "Fri, 04 Sep 2026 23:05:48 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "gelliottmorris-substack": {
     "etag": "W/\"9ccc7-mXAxSQp4wzMFWlOn2pRdZ/GHgcE\"",
@@ -379,93 +379,93 @@
   },
   "inequalitybyinteriordesign-wordpress": {
     "etag": null,
-    "last_modified": "Wed, 03 Dec 2025 20:25:06 GMT",
+    "last_modified": "Tue, 14 Jul 2026 03:06:36 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "justthesocialfacts-blogspot": {
-    "etag": "W/\"e346f53b720abd06c79eb8578a9e0117f45c71d9e87ee6c6c88926f41d305078\"",
-    "last_modified": "Thu, 10 Sep 2026 01:53:28 GMT",
+    "etag": "W/\"379ec602762f0d0487e4b73469331540e58520bdddbec4db2dba3a033353f40c\"",
+    "last_modified": "Thu, 10 Sep 2026 15:10:58 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "languagelog-ldc-upenn": {
-    "etag": "\"a6ac9afe74df229e82ad420e0e689efc-gzip\"",
-    "last_modified": "Mon, 07 Sep 2026 13:49:31 GMT",
+    "etag": "\"2b646164e97e07ee40c739977847a5ec-gzip\"",
+    "last_modified": "Thu, 10 Sep 2026 11:01:51 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "madeinamericathebook-wordpress": {
     "etag": null,
-    "last_modified": "Wed, 19 Aug 2026 04:49:26 GMT",
+    "last_modified": "Wed, 19 Aug 2026 04:49:27 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "marginalrevolution": {
-    "etag": "\"b428503f96ef6e52ea99b6be19b2d93a\"",
-    "last_modified": "Thu, 10 Sep 2026 08:39:10 GMT",
+    "etag": "\"68550947aeb3eb66cefc2b1ece92900a\"",
+    "last_modified": "Thu, 10 Sep 2026 15:47:02 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "montclairsoci-blogspot": {
     "etag": "W/\"51b95ba89cf0aa20d64281d7fd5d8d76bfb7c0034b2b3b7c2fde27d765c54dd0\"",
     "last_modified": "Mon, 07 Sep 2026 15:56:12 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "mporcius-blogspot": {
-    "etag": "W/\"16f4b726bf14ee4fe808e15cac8eaadb467536b2bd0256f4a36fa40b768c60bb\"",
-    "last_modified": "Thu, 10 Sep 2026 06:01:36 GMT",
+    "etag": "W/\"163aaa0be8bf1b7bbb38dd1e287ba675d5b68b29cb2436ecf200dbeadf6c76f9\"",
+    "last_modified": "Thu, 10 Sep 2026 15:14:06 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "namerology": {
-    "etag": "\"353d4c5ae725f60fb7fb3cc3d60b6b4f\"",
-    "last_modified": "Thu, 10 Sep 2026 10:42:38 GMT",
+    "etag": "\"11497a1146da2eb9639cd85ce534947b\"",
+    "last_modified": "Thu, 10 Sep 2026 15:11:40 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "neglectedbooks": {
     "etag": "\"4918ca761fd1d4bab7e3ac24547209f2\"",
     "last_modified": "Tue, 08 Sep 2026 14:23:09 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "nevalalee-wordpress": {
     "etag": null,
-    "last_modified": "Wed, 26 Aug 2026 14:51:28 GMT",
+    "last_modified": "Wed, 26 Aug 2026 14:56:20 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "newsfromme": {
-    "etag": "W/\"6182dbaff4e3e7a6205cdb0e47f42686\"",
-    "last_modified": "Wed, 09 Sep 2026 21:49:23 GMT",
+    "etag": "W/\"3373f2e50c27307d186d0bf4c5903080\"",
+    "last_modified": "Thu, 10 Sep 2026 15:49:26 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "plagiarismtoday": {
     "etag": "\"37ed7293e8de1576eb67c3ca142a1e36\"",
     "last_modified": "Wed, 09 Sep 2026 20:07:50 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "postsecret": {
     "etag": "W/\"8ab24f543c2aa82f627920981fd4af7a\"",
     "last_modified": "Sun, 06 Sep 2026 16:01:30 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "psychobabble200-blogspot": {
     "etag": "W/\"2cc27f77b91b8fa57b27519b29f3837a57152f3acc297b2dd13691f0a08a6bc3\"",
     "last_modified": "Wed, 09 Sep 2026 21:42:20 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "quoteinvestigator": {
     "etag": "W/\"7a7ba3a1cf95cc85ab09cb4100d060d9\"",
     "last_modified": "Thu, 10 Sep 2026 01:46:25 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "rajivsethi-substack": {
     "etag": "W/\"53eac-VO+79KKwGJFspm13z7abWWvVO9o\"",
@@ -495,103 +495,103 @@
     "etag": null,
     "last_modified": "Mon, 07 Sep 2026 10:33:07 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "404media": {
     "etag": "W/\"32c39-SeLuXdwih+yC2UIGIn2K2tYyKkA\"",
     "last_modified": null,
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "baseballwithr-wordpress": {
     "etag": null,
-    "last_modified": "Fri, 19 Jun 2026 14:18:49 GMT",
+    "last_modified": "Tue, 14 Jul 2026 03:18:35 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "blog-djnavarro": {
     "etag": "W/\"6a94c98c-7ac5f6\"",
     "last_modified": "Mon, 31 Aug 2026 00:23:40 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "blog-rinesi": {
     "etag": null,
     "last_modified": "Sat, 05 Sep 2026 04:59:37 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "cold-takes": {
-    "etag": "W/\"a53c0-sz1QJtE71PiG7EbRLdS/XQB5+GI\"",
+    "etag": "W/\"a53c0-MHuH0SW0Y2JNgFVaA0sTwN4Bv+k\"",
     "last_modified": null,
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "critical-inference": {
     "etag": null,
     "last_modified": "Mon, 14 Apr 2025 18:47:56 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "danluu": {
     "etag": "W/\"6a9a3c6d-636b93\"",
     "last_modified": "Fri, 04 Sep 2026 03:35:09 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "dansblog-netlify": {
     "etag": "\"8379ca168ef2f456de3a7f84cbe9d21c-ssl-df\"",
     "last_modified": null,
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "datacolada": {
     "etag": "W/\"d686b773cb58e0dcd8eee3b9db782e96\"",
     "last_modified": "Tue, 08 Sep 2026 10:43:09 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "deevybee-blogspot": {
     "etag": "W/\"076010d6ffec7a6ed214282a24a7617c07f1695be2b71492f43cd14df9d8e9c6\"",
     "last_modified": "Tue, 08 Sep 2026 04:52:41 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "eighteenthelephant": {
     "etag": null,
-    "last_modified": "Tue, 08 Sep 2026 01:28:15 GMT",
+    "last_modified": "Tue, 08 Sep 2026 01:35:19 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "errorstatistics": {
     "etag": null,
     "last_modified": "Wed, 09 Sep 2026 20:22:27 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "fharrell": {
     "etag": "\"d275a63119cd157e22a42a252abc38ef-ssl-df\"",
     "last_modified": null,
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "gojiberries": {
-    "etag": "W/\"2abfd-aBRClb4rNBF4z8jWuAQtxdgCnL0\"",
+    "etag": "W/\"2abfd-Wz+JsmUwiMTXyWU19intsGZl/c8\"",
     "last_modified": null,
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "idlewords": {
     "etag": "\"4a154-64e4897b55a1e-gzip\"",
     "last_modified": "Tue, 31 Mar 2026 02:19:10 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "inframethodology-cbs": {
     "etag": "\"40bc1e64590cb36e665c331e62368662\"",
     "last_modified": "Wed, 02 Sep 2026 12:59:51 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "jamesclaims-substack": {
     "etag": "W/\"9088a-N6ZikhvDxLtsu6USVbU/GQQ3+mE\"",
@@ -601,69 +601,69 @@
   },
   "johncarlosbaez-wordpress": {
     "etag": null,
-    "last_modified": "Wed, 09 Sep 2026 13:15:32 GMT",
+    "last_modified": "Wed, 09 Sep 2026 13:15:34 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "johndcook": {
-    "etag": "\"46be2e768b8812feab04f4c1adc05084\"",
-    "last_modified": "Wed, 09 Sep 2026 15:18:22 GMT",
+    "etag": "\"21cc7f6e3ebc22bce35960b03d2a611a\"",
+    "last_modified": "Thu, 10 Sep 2026 13:17:36 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "judgmentmisguided-blogspot": {
     "etag": "W/\"32cfa8882e8d57a0624901386c34c4ff397d90a4febd815993627a8dc0d94cd4\"",
     "last_modified": "Wed, 26 Aug 2026 03:46:06 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "junkcharts": {
     "etag": "W/\"b3172-mnP5sUKmoyYdzBHmeNcXRehBjsI\"",
     "last_modified": null,
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "kieranhealy": {
     "etag": "\"12021-65ae438dcc7fa\"",
     "last_modified": "Mon, 07 Sep 2026 13:01:53 GMT",
-    "consecutive_failures": 1,
-    "last_success": "2026-09-10T03:21:49.790Z"
+    "consecutive_failures": 0,
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "ludic-mataroa": {
     "etag": null,
     "last_modified": "Sat, 18 Jul 2026 00:00:00 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "notstatschat-rbind": {
     "etag": "\"f6bf80221c50da3f6b54f6dcea132664-ssl-df\"",
     "last_modified": null,
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "observationalepidemiology-blogspot": {
-    "etag": "W/\"752bbb9ce36995ce4a5a0dfebe69ba4cad525c7245a39cb12cbdf5ff182297ab\"",
-    "last_modified": "Thu, 10 Sep 2026 10:10:19 GMT",
+    "etag": "W/\"e2d49b672ab0747bb3ae4bb03e0bba7bc74097ddbf81edaf7242a01ad91ca03c\"",
+    "last_modified": "Thu, 10 Sep 2026 11:30:00 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "retractionwatch": {
-    "etag": "\"f1b098ef3290e9a5b6d812a43b60a80a\"",
+    "etag": "\"3cea3f26925452d3c97cc6f73fba6160\"",
     "last_modified": null,
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "roadtolarissa": {
     "etag": "W/\"69c9e467-4642\"",
     "last_modified": "Mon, 30 Mar 2026 02:48:07 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "steamtraen-blogspot": {
     "etag": "W/\"9820a0e705c8445494a6d95cb9e5abb7fdc953cb261b376bdd82a3ff1dc47d25\"",
     "last_modified": "Mon, 24 Aug 2026 16:53:41 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "theartofinsight-substack": {
     "etag": "W/\"3d029-53YIEwDUamhHw6GavxTTHERNFr0\"",
@@ -681,30 +681,30 @@
     "etag": null,
     "last_modified": "Wed, 09 Sep 2026 22:27:05 GMT",
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "stripe-engineering": {
     "etag": null,
     "last_modified": null,
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "humanlayer": {
     "etag": null,
     "last_modified": null,
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "paulgraham": {
     "etag": null,
     "last_modified": null,
     "consecutive_failures": 0,
-    "last_success": "2026-09-10T10:45:14.090Z"
+    "last_success": "2026-09-10T15:55:12.876Z"
   },
   "econ101": {
     "etag": "W/\"7b3a8b9c08bf66e8a9e37af9e275a1f6\"",
     "last_modified": "Thu, 27 Aug 2026 08:59:17 GMT",
-    "consecutive_failures": 1,
-    "last_success": "2026-09-10T03:21:49.790Z"
+    "consecutive_failures": 0,
+    "last_success": "2026-09-10T15:55:12.876Z"
   }
 }
