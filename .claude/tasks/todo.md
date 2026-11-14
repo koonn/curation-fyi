@@ -797,8 +797,13 @@ fetcher は1本（`kaggle_api`）にまとめ、ソースごとの設定で「�
       11件のうち4件は write-up（URL が `/writeups/...`）で、sources.yaml で writeups が先に並ぶため
       kaggle-writeups 側で取り込まれ、discussions 側では既存スキップになる。**discussions 固有は7件**で目視の見積りと一致
 - [x] トークン未設定で実行 → kaggle 3ソースとも `KAGGLE_API_TOKEN が未設定` で失敗（他ソースへの影響は collect の try/catch で分離済み）
-- [ ] ユーザーが GitHub Secrets に `KAGGLE_API_TOKEN` を登録 → `workflow_dispatch` で collect が成功し、3ソースの新規件数がログに出る
-- [ ] 本番サイトに kaggle の記事が載る（deploy の連鎖を確認）
+- [x] ユーザーが GitHub Secrets に `KAGGLE_API_TOKEN` を登録 → `workflow_dispatch` で collect が成功し、3ソースの新規件数がログに出る
+      （2026-11-14 run 43554762917）: blog 新規23 / writeups 新規20 / discussions 新規7・既存スキップ4（write-up 重複）。
+      同じ回の失敗3件は arxiv-cs（429）・arxiv-stat / arxiv-econ（タイムアウト）で kaggle とは無関係（前回は成功、連続失敗1）
+- [x] 本番サイトに kaggle の記事が載る（deploy の連鎖を確認）（2026-11-14 run 43554966541、`workflow_run` 契機で成功）
+      - `/sources/` に3ソースが載り、ソース別ページは kaggle-blog 23件（1ページ目20＋2ページ目3）/ writeups 20件 / discussions 7件
+      - `recent.json` には writeups 20・discussions 7。**blog が無いのは仕様どおり**——`recent.json` の範囲は
+        2026-08-16〜で、blog の最新は 2026-06-09（更新停止中）なので範囲外
 
 ### 運用後に見直すこと
 - 1〜2週間後、kaggle-discussions に入った実物を見て `min_votes` を決め直す。
