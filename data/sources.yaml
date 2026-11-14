@@ -1,5 +1,5 @@
 # 収集ソースのマスタ。1エントリ = 1収集元。
-# fetcher: rss | hn_api | arxiv_api | hatena_hotentry | custom:<name>
+# fetcher: rss | hn_api | arxiv_api | hatena_hotentry | kaggle_api | custom:<name>
 - id: mercari-engineering
   name: メルカリ Engineering Blog # CIのIPが403になるため無効化（2026-08-10 診断）
   type: company_blog
@@ -1180,6 +1180,41 @@
   site_url: https://xianblog.wordpress.com/
   feed_url: https://xianblog.wordpress.com/feed/
   fetcher: rss
+  enabled: true
+
+# Kaggle は公式 API（要 KAGGLE_API_TOKEN）から取る。RSS は無い（詳細は docs/sources.md）。
+# Notebook の hot は提出用ノート・授業課題が多くノイズ過多のため入れていない（2026-11-14 実測）
+- id: kaggle-blog
+  name: Kaggle Blog
+  type: company_blog
+  language: en
+  site_url: https://www.kaggle.com/blog
+  fetcher: kaggle_api
+  kaggle:
+    feed: blog
+  enabled: true
+
+- id: kaggle-writeups
+  name: Kaggle 解法 write-up
+  type: personal_blog
+  language: en
+  site_url: https://www.kaggle.com/discussions?category=competitionWriteUps
+  fetcher: kaggle_api
+  kaggle:
+    feed: writeups
+  enabled: true
+
+- id: kaggle-discussions
+  name: Kaggle Discussions（hot）
+  type: aggregator
+  language: en
+  site_url: https://www.kaggle.com/discussions
+  fetcher: kaggle_api
+  kaggle:
+    feed: discussions
+    # 仮の値。hot 20件のうち write-up 以外の13件を目視し、10票以上でノイズ1件・良い投稿の取りこぼし3件
+    # （2026-11-14）。1〜2週間運用して実物を見て決め直す
+    min_votes: 10
   enabled: true
 
 # 追加を見送った候補（2026-08-22 実測）。再検討するときは同じURLを測り直すこと

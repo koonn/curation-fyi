@@ -37,6 +37,7 @@ export type FetcherKind =
   | "hn_api"
   | "arxiv_api"
   | "hatena_hotentry"
+  | "kaggle_api"
   | `custom:${string}`;
 
 export interface Source {
@@ -55,6 +56,8 @@ export interface Source {
   html_list?: HtmlListConfig;
   /** fetcher: arxiv_api のときの設定 */
   arxiv?: ArxivConfig;
+  /** fetcher: kaggle_api のときの設定 */
+  kaggle?: KaggleConfig;
   /**
    * URLのフラグメント（#以降）を重複排除キーに残す。既定は除去。
    * 1ページの中を #anchor で区切って各記事を指すフィード（Anthropic の release notes 等）だけ true にする。
@@ -69,6 +72,18 @@ export interface ArxivConfig {
   categories: string[];
   /** 1回の問い合わせで取る件数（既定50） */
   max_results?: number;
+}
+
+/**
+ * Kaggle 公式 API（api.kaggle.com/v1）から何を取るか。
+ * - blog: 公式ブログ。検索 API で Writeup 種別 BLOG に絞る（新しい順）
+ * - writeups: コンペの解法 write-up（ListTopics の HOT）
+ * - discussions: Discussion 全体（ListTopics の HOT）
+ */
+export interface KaggleConfig {
+  feed: "blog" | "writeups" | "discussions";
+  /** この票数に満たないものを取り込まない。hot は6時間ごとに見直すので、hot にいる間に届けばその回で拾われる */
+  min_votes?: number;
 }
 
 /**

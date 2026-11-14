@@ -29,10 +29,12 @@ jobs:
       - run: pnpm install --frozen-lockfile
 
       # シークレットは自動では環境変数にならないので明示的に渡す。
-      # 未設定でも collect は成功する（LLM タグ付けだけがスキップされる）
+      # GEMINI_API_KEY が未設定でも collect は成功する（LLM タグ付けだけがスキップされる）。
+      # KAGGLE_API_TOKEN が未設定なら kaggle_api の3ソースだけが失敗し、他は継続する
       - run: pnpm collect
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          KAGGLE_API_TOKEN: ${{ secrets.KAGGLE_API_TOKEN }}
 
       # collect が非0で終わっても、保存済みの収集ぶんは必ずコミットする。
       # **付加工程（LLMのタグ付け・和訳）の失敗で収集データを落とさないため**——

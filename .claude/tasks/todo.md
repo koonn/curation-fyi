@@ -748,3 +748,58 @@ HN 767件のリンク先を実際に取得した結果:
 - 終了コード 1。`if: always()` により、この65件はコミットstepで取りこぼされない
 
 typecheck: 全パッケージ 0 エラー。`quotaDetail` の残存なし。
+
+## Kaggle をソースに加える（2026-11-14・計画）
+
+### 全体像
+Kaggle の公式 API（`api.kaggle.com/v1`、Bearer 認証）から3ソースを収集する。
+fetcher は1本（`kaggle_api`）にまとめ、ソースごとの設定で「何を取るか」を切り替える。
+
+| ソース id | 取得元（実測で200確認済み） | 並び | 絞り込み | 掲載先（type） |
+|---|---|---|---|---|
+| `kaggle-blog` | `search.SearchApiService/ListEntities`（TOPIC ＋ writeUpTypes=[BLOG]） | 作成日の新しい順 | なし | Tech（`company_blog`） |
+| `kaggle-writeups` | `discussions.DiscussionApiService/ListTopics`（category=COMPETITION_WRITE_UPS） | HOT | なし | Tech（`personal_blog`） |
+| `kaggle-discussions` | 同上（category 指定なし） | HOT | **10票以上** | Social（`aggregator`） |
+
+### 調査で確定した事実（2026-11-14 実測）
+- Kaggle Blog に RSS は無い（Medium の旧フィードは 2020-09 で停止、`/blog` は JS 描画、sitemap 404）
+- 検索 API に `documentTypes:["BLOG"]` を渡すと `Unsupported document types: [Blog]` で 400。
+  **TOPIC 型を `writeUpTypes:["BLOG"]` で絞ると取れる**（Blog は内部で Writeup 扱い）
+- Blog の記事 URL は `discussionDocument.newCommentUrl`（`/blog/<slug>#<commentId>`）。`#` 以降を落とす
+- Blog の最新は 2026-06-09（ユーザー確認済み: 実際に更新が止まっている）。件数は全期間で23件
+- 検索 API の HOTNESS は「累計の人気」（2018年の入門 Exercise が上位）。**「いま伸びている」は ListTopics の HOT で取る**
+- ListTopics は pageSize を 50 にしても **20件で打ち切られ、hot は次ページが無い**
+- ListTopics の項目: `title` `url`（パス） `postDate` `votes` `commentCount` `forumName` `authorName`。要約は無い
+- hot Discussion 20件のうち7件は write-up で、URL が `/writeups/...` なので kaggle-writeups と URL 重複排除で揃う
+- 残り13件を目視: 10票以上で切ると7件残り、ノイズは「Petition…」1件。良い投稿3件（9・3・3票）が落ちる
+  → **10 は仮の値**。6時間ごとに hot を見直すので、hot にいる間に10票を超えればその回で拾われる
+- Notebook（ListKernels HOT）は提出用ノート・授業課題が多くノイズ過多のため**対象外**（ユーザー判断）
+
+### 実装
+- [x] 1. `shared/schema.ts`: `Source` に `kaggle?: KaggleConfig` を追加
+      （`feed: "blog" | "writeups" | "discussions"`、`min_votes?: number`）
+- [x] 2. `pipeline/src/fetchers/kaggle.ts`: 3種の取得を実装
+  - 認証: 環境変数 `KAGGLE_API_TOKEN`。**未設定なら例外**（連続失敗として可視化される。他ソースは継続）
+  - URL: `https://www.kaggle.com` ＋ パス、`#` 以降を除去してから `normalizeUrl`
+  - published_at: blog は `createTime`、writeups/discussions は `postDate`
+  - summary: blog は `writeUpMetadata.subtitle`、他は null（和訳工程が見出しを付ける）
+  - language: `en`
+- [x] 3. `collect.ts`: `fetchItems` の switch に `kaggle_api` を追加。`FetcherKind` にも追加
+- [x] 4. `data/sources.yaml`: 3ソースを追加（enabled: true）
+- [x] 5. `.github/workflows/collect.yml`: `KAGGLE_API_TOKEN: ${{ secrets.KAGGLE_API_TOKEN }}` を env に追加
+- [x] 6. `docs/sources.md`: Kaggle ソースの節（API・トークン・min_votes の意味と仮置きである旨）
+
+### 検証（期待値）
+- [x] typecheck 全パッケージ 0 エラー（shared・pipeline は tsc、site は astro check。2026-11-14）
+- [x] fetcher を単体で3ソース実行（`data/` は書かない）（2026-11-14）:
+      blog = **23件**・全件 `https://www.kaggle.com/blog/...`・`#` を含まない（URL不正0件） /
+      writeups = **20件** / discussions = **11件**（10票以上）。
+      11件のうち4件は write-up（URL が `/writeups/...`）で、sources.yaml で writeups が先に並ぶため
+      kaggle-writeups 側で取り込まれ、discussions 側では既存スキップになる。**discussions 固有は7件**で目視の見積りと一致
+- [x] トークン未設定で実行 → kaggle 3ソースとも `KAGGLE_API_TOKEN が未設定` で失敗（他ソースへの影響は collect の try/catch で分離済み）
+- [ ] ユーザーが GitHub Secrets に `KAGGLE_API_TOKEN` を登録 → `workflow_dispatch` で collect が成功し、3ソースの新規件数がログに出る
+- [ ] 本番サイトに kaggle の記事が載る（deploy の連鎖を確認）
+
+### 運用後に見直すこと
+- 1〜2週間後、kaggle-discussions に入った実物を見て `min_votes` を決め直す。
+  ノイズが残るならタイトルの除外（`exclude.title_matches`）か LLM 判定を検討する

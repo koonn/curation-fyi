@@ -12,6 +12,7 @@ import { fetchHackernews } from "./fetchers/hackernews.ts";
 import { fetchHatena } from "./fetchers/hatena.ts";
 import { fetchArxiv } from "./fetchers/arxiv.ts";
 import { fetchHtmlList } from "./fetchers/htmlList.ts";
+import { fetchKaggle } from "./fetchers/kaggle.ts";
 import type { FetchedItem } from "./fetchers/types.ts";
 import { loadExisting, saveAll } from "./store.ts";
 import { defaultSourceState, loadFeedState, saveFeedState, type SourceState } from "./state.ts";
@@ -48,6 +49,8 @@ async function fetchItems(
       return { items: await fetchHatena(source), notModified: false };
     case "arxiv_api":
       return { items: await fetchArxiv(source), notModified: false };
+    case "kaggle_api":
+      return { items: await fetchKaggle(source), notModified: false };
     case "custom:html_list":
       return fetchHtmlList(source, known);
     default:
